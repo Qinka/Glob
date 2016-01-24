@@ -1,0 +1,6 @@
+# For Haskell
+*.hi
+*.o
+dist
+cabal.sandbox.config
+.cabal-sandbox
