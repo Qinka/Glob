@@ -23,30 +23,30 @@ $$ LANGUAGE plpgsql;
 SELECT drop_all_table('qinka','public');
 
 CREATE TABLE table_nav
-{
+(
   texts TEXT NOT NULL PRIMARY KEY,
   ordering INT ,
   refto TEXT NOT NULL
-};
+);
 
 CREATE TABLE table_pages
-{
+(
   indexs TEXT NOT NULL PRIMARY KEY,
   tos TEXT NOT NULL,
   times DATE NOT NULL,
   title TEXT NOT NULL
-};
+);
 
 CREATE TABLE table_blogs
-{
+(
   indexs TEXT NOT NULL PRIMARY KEY,
   tos TEXT NOT NULL,
   times DATE NOT NULL,
   title TEXT NOT NULL
-};
+);
 
 CREATE TABLE table_htmls
-{
+(
   indexs TEXT NOT NULL PRIMARY KEY,
   html TEXT NOT NULL
-};
+);
