@@ -22,10 +22,10 @@ module Main.CmdArgs
         } deriving (Show,Typeable,Data)
       globCMdArgs = GlobCmdArgs
         { fromFile = "stdin"
-          &= opt "stdin"
+          &= name "file"
+          &= explicit
           &= typFile
           &= help "Input the config-file from file."
-          &= name "file"
         }
         &= program "glob"
         &= summary ("glob "++showVersion version++",(C) Qinka 2015")

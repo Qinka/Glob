@@ -51,31 +51,32 @@ module Glob where
       share [mkPersist sqlSettings,mkMigrate "migrateAll"] [persistLowerCase|
         Navs sql=table_nav
           Id sql=
-          text Text
-          order Int Maybe
-          ref Text
+          text Text sql=texts
+          order Int Maybe sql=ordering
+          ref Text sql=refto
           Primary text
           deriving Eq Show
         Pages sql=table_pages
           Id sql=
-          index Text
-          to Text
-          time Day
+          index Text sql=indexs
+          to Text sql=tos
+          time Day sql=times
           title Text
           Primary index
           deriving Eq Show
         Blogs sql=table_blogs
           Id sql=
-          index Text
-          to Text
-          time Day
+          index Text sql=indexs
+          to Text sql=tos
+          time Day sql=times
           title Text
           Primary index
           deriving Eq Show
         Htmls sql=table_htmls
           Id sql=
-          index Text
+          index Text sql=indexs
           html Text
+          title Text
           Primary index
       |]
 
@@ -118,21 +119,27 @@ module Glob where
 
       getHomeR :: Handler Html
       getHomeR = do
-        [Entity _ (Htmls _ mainText)] <- liftHandlerT $ runDB $
+        [Entity _ (Htmls _ mainText mainTitle)] <- liftHandlerT $ runDB $
           selectList [HtmlsIndex ==. "@#page.main"] []
         let mainHtml = preEscapedToHtml mainText
-        defaultLayout [whamlet|#{mainHtml}|]
+        --setTitle $ toHtml mainTitle
+        defaultLayout [whamlet|
+          <head>
+            <title> HHHH
+          #{mainHtml}
+          |]
       getBlogItemR :: Text -> Text -> Handler Html
       getBlogItemR time index = do
         [Entity _ (Blogs _ to _ _ )] <- liftHandlerT $ runDB $
           selectList [BlogsTime ==. read (unpack time),BlogsIndex ==. index] []
-        [Entity _ (Htmls _ blogText)] <- liftHandlerT $ runDB $
+        [Entity _ (Htmls _ blogText blogTitle)] <- liftHandlerT $ runDB $
           selectList [HtmlsIndex ==. to] []
         let blogHtml = preEscapedToHtml blogText
+        --setTitle $ toHtml blogTitle
         defaultLayout [whamlet|#{blogHtml}|]
       getFaviconR :: Handler Html
       getFaviconR = do
-        (Glob _ (Config _ _ path)) <- getYesod
+        (Glob _ (Config _ _ path _)) <- getYesod
         sendFile "applcation/x-ico" path
       getBlogListR :: Handler Html
       getBlogListR = do
@@ -155,9 +162,10 @@ module Glob where
       getPageR index = do
         [Entity _ (Pages _ to _ _ )] <- liftHandlerT $ runDB $
           selectList [PagesIndex ==. index] [ Desc PagesTime]
-        [Entity _ (Htmls _ pageText)] <- liftHandlerT $ runDB $
+        [Entity _ (Htmls _ pageText pageTitle)] <- liftHandlerT $ runDB $
           selectList [HtmlsIndex ==. to] []
         let pageHtml = preEscapedToHtml pageText
+        --setTitle pageTitle
         defaultLayout [whamlet|#{pageHtml}|]
 
 
@@ -167,21 +175,25 @@ module Glob where
 
       globLayout :: Widget -> Handler Html
       globLayout w = do
+        Glob _ (Config _ _ _ ti) <- liftHandlerT getYesod
         pc <- widgetToPageContent w
-        [Entity _ (Htmls _ topText)] <- liftHandlerT $ runDB $ selectList [HtmlsIndex ==. "@#page.frame.top"] []
-        [Entity _ (Htmls _ cprightText)] <- liftHandlerT $ runDB $ selectList [HtmlsIndex ==. "@#page.frame.copyright"] []
+        [Entity _ (Htmls _ topText _)] <- liftHandlerT $ runDB $ selectList [HtmlsIndex ==. "@#page.frame.top"] []
+        [Entity _ (Htmls _ cprightText _)] <- liftHandlerT $ runDB $ selectList [HtmlsIndex ==. "@#page.frame.copyright"] []
         navs' <- liftHandlerT $ runDB $ selectList [NavsOrder !=. Nothing] []
         let navs = sortOn (\(Navs _ x _) -> x) $ map (\(Entity _ x) -> x) navs'
         let topHtml = preEscapedToHtml topText
         let cprightHtml = preEscapedToHtml cprightText
         let adText = "<h1> 假设这里有广告 </h1>" ::String
         let adHtml = preEscapedToHtml adText
+        let tit = toHtml ti >> pageTitle pc
         withUrlRenderer
           [hamlet|
+            $newline never
             $doctype 5
             <html>
               <head>
-                <title>#{pageTitle pc }
+                <title>
+                  #{tit} | #{pageTitle pc}
                 <meta charset=utf-8>
                 ^{pageHead pc}
               <body>

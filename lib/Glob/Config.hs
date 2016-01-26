@@ -24,6 +24,7 @@ module Glob.Config
         { port :: Int
         , dbConfig :: DbConfig
         , faviconPath :: FilePath
+        , siteTitle :: String
         }
 
       instance FromJSON Config where
@@ -31,11 +32,13 @@ module Glob.Config
           <$> v .: "port"
           <*> v .: "dbConfig"
           <*> v .: "favicon-path"
+          <*> v .: "site-title"
       instance ToJSON Config where
         toJSON Config{..} = object
           [ "port" .= port
           , "dbConfig" .= dbConfig
           , "favicon-path" .= faviconPath
+          , "site-title" .= siteTitle
           ]
 
       -- 数据库设置

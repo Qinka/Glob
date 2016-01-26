@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION
   RETURNS VOID
   AS $$
   DECLARE statements CURSOR FOR
-    SELECT table_name FROM pg_tables
+    SELECT tablename FROM pg_tables
     WHERE tableowner = user_name AND
           schemaname = schema_name;
     BEGIN
@@ -48,5 +48,15 @@ CREATE TABLE table_blogs
 CREATE TABLE table_htmls
 (
   indexs TEXT NOT NULL PRIMARY KEY,
-  html TEXT NOT NULL
+  html TEXT NOT NULL,
+  title TEXT NOT NULL
+);
+
+--
+
+-- 添加 html 文件
+
+INSERT INTO table_htmls VALUES
+(
+  '@#page.main','<h1> Hello,world </h1> Hello'
 );
