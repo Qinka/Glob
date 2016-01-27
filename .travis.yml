@@ -3,7 +3,7 @@
 env:
   - CABALVER=1.22.5 GHCVERT=7.10.3
 
-befor_install:
+before_install:
   - "sudo add-apt-repository -y ppa:hvr/ghc"
   - "sudo apt-get update && sudo apt-get install --no-install-recommends texlive-xetex latex-xcolor texlive-fonts-recommended texlive-latex-extra lmodern texlive-latex-recommended"
   - "sudo apt-get install ttf-wqy-microhei ttf-wqy-zenhei"
