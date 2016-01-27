@@ -21,7 +21,7 @@ script:
   - cabal sdist
   - cabal install dist/Glob-*.tar.gz
 after_sucess: |
-if [ -n "$GITHUB_API_KEY" ]; then
+  if [ -n "$GITHUB_API_KEY" ]; then
     git config --global user.name "travis_auto"
     git config --global user.email "qinka@live.com"
     echo '\nconfig done\n'
