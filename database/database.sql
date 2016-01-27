@@ -52,11 +52,39 @@ CREATE TABLE table_htmls
   title TEXT NOT NULL
 );
 
+CREATE TABLE table_csss
+(
+  indexs TEXT NOT NULL PRIMARY KEY,
+  css TEXT NOT NULL
+);
+
+CREATE TABLE table_jss
+(
+  indexs TEXT NOT NULL PRIMARY KEY,
+  js TEXT NOT NULL
+);
+
 --
 
 -- 添加 html 文件
 
 INSERT INTO table_htmls VALUES
 (
-  '@#page.main','<h1> Hello,world </h1> Hello'
+  '@#page.main','<h1> Hello,world </h1> Hello<p>This is Qinka''s blog. </p>','Home'
+);
+
+INSERT INTO table_htmls VALUES
+(
+  '@#page.frame.top','<h1>Qinka''s Blog</h1>',''
+);
+
+INSERT INTO table_htmls VALUES
+(
+  '@#page.frame.copyright','Copyright (C) Qinka',''
+);
+
+-- 添加 css 文件
+INSERT INTO table_csss VALUES
+(
+  'css.frame.css','body{background:#282828;color:#ededed}'
 );

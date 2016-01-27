@@ -23,6 +23,7 @@ module Glob where
       import Database.Persist.TH
       import Database.Persist.Postgresql
 
+
       import Data.Text.Lazy hiding(null,map)
 
       import Data.List
@@ -78,6 +79,16 @@ module Glob where
           html Text
           title Text
           Primary index
+        CSSs sql=table_csss
+          Id sql=
+          index Text sql=indexs
+          css Text
+          Primary index
+        JSs sql=table_jss
+          Id sql=
+          index Text sql=indexs
+          js Text
+          Primary index
       |]
 
 
@@ -89,6 +100,8 @@ module Glob where
       /blog BlogListR GET
       /blog/#Text/#Text BlogItemR GET
       /favicon.ico FaviconR GET
+      /css/#Text CssR GET
+      /js/#Text JsR GET
       |]
 
       instance Yesod Glob where
@@ -123,11 +136,9 @@ module Glob where
           selectList [HtmlsIndex ==. "@#page.main"] []
         let mainHtml = preEscapedToHtml mainText
         --setTitle $ toHtml mainTitle
-        defaultLayout [whamlet|
-          <head>
-            <title> HHHH
-          #{mainHtml}
-          |]
+        defaultLayout $ do
+          setTitle "Home"
+          [whamlet|#{mainHtml}|]
       getBlogItemR :: Text -> Text -> Handler Html
       getBlogItemR time index = do
         [Entity _ (Blogs _ to _ _ )] <- liftHandlerT $ runDB $
@@ -135,27 +146,29 @@ module Glob where
         [Entity _ (Htmls _ blogText blogTitle)] <- liftHandlerT $ runDB $
           selectList [HtmlsIndex ==. to] []
         let blogHtml = preEscapedToHtml blogText
-        --setTitle $ toHtml blogTitle
-        defaultLayout [whamlet|#{blogHtml}|]
+        defaultLayout $ do
+          setTitle $ toHtml blogTitle
+          [whamlet|#{blogHtml}|]
       getFaviconR :: Handler Html
       getFaviconR = do
-        (Glob _ (Config _ _ path _)) <- getYesod
+        (Glob _ (Config _ _ path _ _ _)) <- getYesod
         sendFile "applcation/x-ico" path
       getBlogListR :: Handler Html
       getBlogListR = do
         blogs' <- liftHandlerT $ runDB $
           selectList [] [Desc BlogsTime]
         let blogs = map toList blogs'
-        defaultLayout [whamlet|
-        $if null blogs
-          <p> 没有文章
-        $else
-          <ul>
-            $forall (ref,title) <- blogs
-              <li>
-                <a href=#{ref}>
-                  #{title}
-        |]
+        defaultLayout $ do
+          setTitle "Blog's List"
+          [whamlet|
+            $if null blogs
+              <p> 没有文章
+            $else
+              <ul>
+              $forall (ref,title) <- blogs
+                <li>
+                  <a href=#{ref}> #{title}
+            |]
         where
           toList (Entity _ (Blogs index _ time title)) = ("/blog/"++show time++"/"++unpack index,title)
       getPageR :: Text -> Handler Html
@@ -166,16 +179,25 @@ module Glob where
           selectList [HtmlsIndex ==. to] []
         let pageHtml = preEscapedToHtml pageText
         --setTitle pageTitle
-        defaultLayout [whamlet|#{pageHtml}|]
+        defaultLayout $ do
+          setTitle $ toHtml pageTitle
+          [whamlet|#{pageHtml}|]
 
 
+      getCssR :: Text -> Handler TypedContent
+      getCssR index = do
+        [Entity _ (CSSs _ cssText)] <- liftHandlerT $ runDB $ selectList [CSSsIndex ==. index] []
+        selectRep $ provideRepType "text/css" $ return cssText
 
-
+      getJsR :: Text -> Handler TypedContent
+      getJsR index = do
+        [Entity _ (JSs _ jsText)] <- liftHandlerT $ runDB $ selectList [JSsIndex ==. index] []
+        selectRep $ provideRepType "application/x-javascript" $ return jsText
 
 
       globLayout :: Widget -> Handler Html
       globLayout w = do
-        Glob _ (Config _ _ _ ti) <- liftHandlerT getYesod
+        Glob _ (Config _ _ _ ti _ _) <- liftHandlerT getYesod
         pc <- widgetToPageContent w
         [Entity _ (Htmls _ topText _)] <- liftHandlerT $ runDB $ selectList [HtmlsIndex ==. "@#page.frame.top"] []
         [Entity _ (Htmls _ cprightText _)] <- liftHandlerT $ runDB $ selectList [HtmlsIndex ==. "@#page.frame.copyright"] []
@@ -185,7 +207,6 @@ module Glob where
         let cprightHtml = preEscapedToHtml cprightText
         let adText = "<h1> 假设这里有广告 </h1>" ::String
         let adHtml = preEscapedToHtml adText
-        let tit = toHtml ti >> pageTitle pc
         withUrlRenderer
           [hamlet|
             $newline never
@@ -193,10 +214,11 @@ module Glob where
             <html>
               <head>
                 <title>
-                  #{tit} | #{pageTitle pc}
+                  #{ti} - #{pageTitle pc}
                 <meta charset=utf-8>
                 ^{pageHead pc}
               <body>
+                <link rel=stylesheet href=@{CssR "css.frame.css"}>
                 #{topHtml}
                 <div>
                   $if null navs

@@ -4,3 +4,7 @@
 dist
 cabal.sandbox.config
 .cabal-sandbox
+config.json
+ssl.csr
+ssl.key
+ssl.crt

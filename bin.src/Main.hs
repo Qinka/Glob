@@ -11,6 +11,7 @@ module Main
     ) where
 
       import Yesod
+      import Glob.Tls
 
       import System.IO
 
@@ -33,7 +34,11 @@ module Main
         let (constr,conThd) = toConStr $ dbConfig config
         runStderrLoggingT $ withPostgresqlPool constr conThd $
           \pool -> liftIO $
-            warp (port config) $ Glob pool config
+            warpTls 
+              (certPath config)
+              (keyPath config)
+              (port config)
+              (Glob pool config)
 
       withGlobCmdArgs ::  GlobCmdArgs -> IO (Maybe Config)
       withGlobCmdArgs GlobCmdArgs{..} = do

@@ -7,6 +7,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE CPP               #-}
 
 module Glob.Config
     ( toConStr
@@ -25,6 +26,8 @@ module Glob.Config
         , dbConfig :: DbConfig
         , faviconPath :: FilePath
         , siteTitle :: String
+        , certPath  :: FilePath
+        , keyPath   :: FilePath
         }
 
       instance FromJSON Config where
@@ -33,12 +36,17 @@ module Glob.Config
           <*> v .: "dbConfig"
           <*> v .: "favicon-path"
           <*> v .: "site-title"
+          <*> v .: "certificate-file"
+          <*> v .: "key-file"
+
       instance ToJSON Config where
         toJSON Config{..} = object
           [ "port" .= port
           , "dbConfig" .= dbConfig
           , "favicon-path" .= faviconPath
           , "site-title" .= siteTitle
+          , "certificate-file" .= certPath
+          , "key-file" .= keyPath
           ]
 
       -- 数据库设置

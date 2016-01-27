@@ -31,6 +31,10 @@ flag launch-docker
   description:       To build a launch to used in docker.
   default:           False
 
+flag with-tls
+  description:       Use tls.
+  default:           False
+
 executable launch.simple
   main-is:           Main.lhs
   hs-source-dirs:    launch.bin/simple
@@ -53,6 +57,17 @@ executable launch.simple
     build-depends:   aeson
   else
     build-depends:   aeson >= 0.10 && < 0.11
+  if flag(unlimit-version)
+    build-depends:   process
+  else
+    build-depends:   process >= 1.4 && < 1.5
+  if flag(unlimit-version)
+    build-depends:  directory >= 1.2.4
+  else
+    build-depends:  directory >=1.2.4 && <1.3
+
+  if flag(with-tls)
+    cpp-options:     -DWithTls
 
 executable launch.docker
   main-is:           Main.hs
@@ -76,6 +91,17 @@ executable launch.docker
     build-depends:   aeson
   else
     build-depends:   aeson >= 0.10 && < 0.11
+  if flag(unlimit-version)
+    build-depends:   process
+  else
+    build-depends:   process >= 1.4 && < 1.5
+  if flag(unlimit-version)
+    build-depends:  directory >= 1.2.4
+  else
+    build-depends:  directory >=1.2.4 && <1.3
+
+  if flag(with-tls)
+    cpp-options:     -DWithTls
 
 
 executable glob
@@ -136,6 +162,25 @@ executable glob
     build-depends:   monad-logger
   else
     build-depends:   monad-logger >= 0.3 && < 0.4
+  if flag(unlimit-version)
+    build-depends:   yesod-core
+  else
+    build-depends:   yesod-core >= 1.14 && < 1.16
+  if flag(unlimit-version)
+    build-depends:   warp
+  else
+    build-depends:   warp >= 3.2 && < 3.4
+  if flag(unlimit-version)
+    build-depends:   warp-tls
+  else
+    build-depends:   warp-tls >= 3.2 && < 3.4
+  if flag(unlimit-version)
+    build-depends:   template-haskell
+  else
+    build-depends:   template-haskell >= 2.10 && < 2.12
+
+  if flag(with-tls)
+    cpp-options:     -DWithTls
 
   hs-source-dirs:    bin.src
                    , lib

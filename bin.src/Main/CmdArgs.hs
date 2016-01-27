@@ -28,7 +28,7 @@ module Main.CmdArgs
           &= help "Input the config-file from file."
         }
         &= program "glob"
-        &= summary ("glob "++showVersion version++",(C) Qinka 2015")
+        &= summary ("glob "++showVersion version++",(C) Qinka 2016")
 
       runArgs :: (GlobCmdArgs -> IO (Maybe Config)) -> IO (Maybe Config)
       runArgs = (cmdArgs globCMdArgs >>=)
