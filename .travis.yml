@@ -14,6 +14,7 @@ before_install:
   - "cabal install yesod -j9"
   - "cabal install persistent-postgresql"
   - "cabal install cmdargs"
+  - "cabal install warp-tls"
 script:
   - cabal configure -flaunch-docker
   - cabal build
