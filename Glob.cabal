@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                Glob
-version:             0.0.1.40
+version:             0.0.1.60
 synopsis:            A simple blog system.
 -- description:
 -- license:
@@ -97,12 +97,14 @@ executable launch.docker
   else
     build-depends:   process >= 1.4 && < 1.5
   if flag(unlimit-version)
-    build-depends:  directory >= 1.2.4
+    build-depends:   directory >= 1.2.4
   else
-    build-depends:  directory >=1.2.4 && <1.3
+    build-depends:   directory >=1.2.4 && <1.3
 
   if flag(with-tls)
     cpp-options:     -DWithTls
+  default-language:  Haskell2010
+  other-modules:     Main.CmdArgs
 
 
 executable glob
@@ -186,7 +188,9 @@ executable glob
   hs-source-dirs:    bin.src
                    , lib
 
-  other-modules:     Main.CmdArgs.hs
-                   , 
+  other-modules:     Main.CmdArgs
+                   , Glob
+                   , Glob.Config
+                   , Glob.Tls
 
   default-language:  Haskell2010
