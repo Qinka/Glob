@@ -220,7 +220,7 @@ module Glob where
               <body>
                 <link rel=stylesheet href=@{CssR "css.frame.css"}>
                 #{topHtml}
-                <div>
+                <nav>
                   $if null navs
                     <p> Nothing
                   $else

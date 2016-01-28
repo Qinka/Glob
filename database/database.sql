@@ -88,3 +88,13 @@ INSERT INTO table_csss VALUES
 (
   'css.frame.css','body{background:#282828;color:#ededed}'
 );
+
+-- 添加 Nav 导航
+INSERT INTO table_nav VALUES
+(
+  'Home',0,'/'
+);
+INSERT INTO table_nav VALUES
+(
+  'Blog',0,'/blog'
+);
