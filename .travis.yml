@@ -20,6 +20,8 @@ script:
   - cabal build
   - cabal sdist
   - cabal install dist/Glob-*.tar.gz
+  - cabal install dist/Glob-*.tar.gz -flaunch-docker -flaunch-simple
+  - cabal install dist/Glob-*.tar.gz -fwith-tls
 after_sucess: |
   if [ -n "$GITHUB_API_KEY" ]; then
     git config --global user.name "travis_auto"

@@ -6,7 +6,7 @@ version:             0.0.1.40
 synopsis:            A simple blog system.
 -- description:
 -- license:
-license-file:        LICENSE
+license-file:        license/LICENSE
 author:              Qinka
 maintainer:          qinka@live.com
 copyright:           2015,2016 Qinka <qinka@live.com>
@@ -16,7 +16,8 @@ extra-source-files:  README.md
 cabal-version:       >=1.10
 
 extra-source-files:  README.md
-                   , licenses/LICENSE
+                   , license/LICENSE
+                   , database/database.sql
 
 flag unlimit-version
   description: 不对版本进行限制，已解决一些应为版本带来的问题。
@@ -184,4 +185,8 @@ executable glob
 
   hs-source-dirs:    bin.src
                    , lib
+
+  other-modules:     Main.CmdArgs.hs
+                   , 
+
   default-language:  Haskell2010

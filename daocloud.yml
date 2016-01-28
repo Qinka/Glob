@@ -1,0 +1,42 @@
+image: daocloud/ci-gcc:5
+
+env:
+  - CABALVER=1.22 GHCVER=7.10.2
+
+install:
+  - add-apt-repository -y ppa:hvr/ghc
+  - echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+  - wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+  - apt-get update
+  - apt-get -y install cabal-install-$CABALVER ghc-$GHCVER postgresql-9.4
+  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
+  - cabal sandbox init
+  - cabal update
+  - cabal install directory
+  - cabal install process
+  - cabal install yesod -j9
+  - cabal install yesod-auth
+  - cabal install yesod-core
+  - cabal install monad-logger
+  - cabal install aeson
+  - cabal install bytestring
+  - cabal install text
+  - cabal install persistent
+  - cabal install persistent-template
+  - cabal install persistent-postgresql
+  - cabal install transformers
+  - cabal install resourcet
+  - cabal install blaze-html
+  - cabal install time
+  - cabal install cmdargs
+  - cabal install warp-tls
+before_script:
+  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
+  - echo $PATH
+  - which cabal
+script:
+  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
+  - echo $PATH
+  - which cabal
+  - cabal install -j9 -flaunch-docker -flaunch-simple -fwith-tls
+  - cabal install -j9 -flaunch-docker -flaunch-simpleß
