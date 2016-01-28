@@ -8,3 +8,4 @@ config.json
 ssl.csr
 ssl.key
 ssl.crt
+bin.src/client_session_key.aes

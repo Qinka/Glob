@@ -12,6 +12,7 @@
 {-# LANGUAGE ViewPatterns               #-}
 {-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE FlexibleInstances          #-}
 
 module Glob where
 
@@ -23,6 +24,9 @@ module Glob where
       import Database.Persist.TH
       import Database.Persist.Postgresql
 
+      import Data.Aeson
+
+      import Data.Text.Lazy.Encoding(decodeUtf8)
 
       import Data.Text.Lazy hiding(null,map)
 
@@ -50,7 +54,7 @@ module Glob where
 
 
       share [mkPersist sqlSettings,mkMigrate "migrateAll"] [persistLowerCase|
-        Navs sql=table_nav
+        Navs json sql=table_nav
           Id sql=
           text Text sql=texts
           order Int Maybe sql=ordering
@@ -96,6 +100,7 @@ module Glob where
 
       mkYesod "Glob" [parseRoutes|
       / HomeR GET
+      /nav NavR POST
       /page/#Text PageR GET
       /blog BlogListR GET
       /blog/#Text/#Text BlogItemR GET
@@ -195,16 +200,23 @@ module Glob where
         selectRep $ provideRepType "application/x-javascript" $ return jsText
 
 
+      postNavR :: Handler TypedContent
+      postNavR = do
+        navs' <- liftHandlerT $ runDB $ selectList [] [Desc NavsOrder]
+        let navs = map (\(Entity _ x) -> x) navs'
+        selectRep $ provideRepType "application/json" $ return $ decodeUtf8 $ encode navs
+
+
       globLayout :: Widget -> Handler Html
       globLayout w = do
         Glob _ (Config _ _ _ ti _ _) <- liftHandlerT getYesod
         pc <- widgetToPageContent w
         [Entity _ (Htmls _ topText _)] <- liftHandlerT $ runDB $ selectList [HtmlsIndex ==. "@#page.frame.top"] []
         [Entity _ (Htmls _ cprightText _)] <- liftHandlerT $ runDB $ selectList [HtmlsIndex ==. "@#page.frame.copyright"] []
-        navs' <- liftHandlerT $ runDB $ selectList [NavsOrder !=. Nothing] []
-        let navs = sortOn (\(Navs _ x _) -> x) $ map (\(Entity _ x) -> x) navs'
+        [Entity _ (Htmls _ navText _)] <- liftHandlerT $ runDB $ selectList [HtmlsIndex ==. "@#page.frame.nav"] []
         let topHtml = preEscapedToHtml topText
         let cprightHtml = preEscapedToHtml cprightText
+        let navHtml = preEscapedToHtml navText
         let adText = "<h1> 假设这里有广告 </h1>" ::String
         let adHtml = preEscapedToHtml adText
         withUrlRenderer
@@ -220,14 +232,7 @@ module Glob where
               <body>
                 <link rel=stylesheet href=@{CssR "css.frame.css"}>
                 #{topHtml}
-                <nav>
-                  $if null navs
-                    <p> Nothing
-                  $else
-                    <ul>
-                      $forall nav <- navs
-                       <li>
-                        <a href=#{navsRef nav}> #{navsText nav}
+                #{navHtml}
                 ^{pageBody pc}
                 #{cprightHtml}
                 #{adHtml}

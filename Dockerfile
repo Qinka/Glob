@@ -1,4 +1,4 @@
-FROM index.docker.io/library/haskell:7.10.3
+FROM index.docker.io/library/haskell:7.10.2
 MAINTAINER qinka
 ADD . /src
 RUN ls -a /src

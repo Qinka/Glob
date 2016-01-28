@@ -83,6 +83,11 @@ INSERT INTO table_htmls VALUES
   '@#page.frame.copyright','Copyright (C) Qinka',''
 );
 
+INSERT INTO table_htmls VALUES
+(
+  '@#page.frame.nav','<nav class="navclass"><ul><li><a href="/" class="navclass"> Home</a></li><li><a href="/blog"> Blog</a></li></ul></nav>',''
+);
+
 -- 添加 css 文件
 INSERT INTO table_csss VALUES
 (
