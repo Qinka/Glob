@@ -30,7 +30,7 @@ module Main
         where
           main' :: G.Config -> IO()
           main' c = do
-            (hIn,_,_,hProc) <- createProcess (shell $ "glob" ++ exeExtension ++ " -file=stdin") {std_in=CreatePipe}
+            (hIn,_,_,hProc) <- createProcess (shell $ "glob" ++ exeExtension ++ " --file=stdin") {std_in=CreatePipe}
             hPutStrLn (fromMaybe stdout hIn) $ read $ show $ encode c
             hClose (fromMaybe stdout hIn)
             print =<< waitForProcess hProc
