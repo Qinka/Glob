@@ -18,3 +18,4 @@ RUN cd /src && cabal install cmdargs
 RUN cd /src && cabal install -flaunch-docker
 RUN cp /src/.cabal-sandbox/bin/* /usr/bin
 RUN rm -r src
+EXPOSE 3000
