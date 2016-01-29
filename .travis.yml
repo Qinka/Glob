@@ -15,6 +15,7 @@ before_install:
   - "cabal install persistent-postgresql"
   - "cabal install cmdargs"
   - "cabal install warp-tls"
+  - "cabal install hpc-coveralls"
 script:
   - cabal configure -flaunch-docker
   - cabal build
@@ -22,6 +23,8 @@ script:
   - cabal install dist/Glob-*.tar.gz
   - cabal install dist/Glob-*.tar.gz -flaunch-docker -flaunch-simple
   - cabal install dist/Glob-*.tar.gz -fwith-tls
+after_script:
+  -
 after_sucess: |
   if [ -n "$GITHUB_API_KEY" ]; then
     git config --global user.name "travis_auto"
@@ -39,7 +42,6 @@ after_sucess: |
     cd "$TRAVIS_BUILD_DIR"/src
     ls
     pwd
-    cp *.pdf $RELPATH
     echo "copy done"
     cd "$TRAVIS_BUILD_DIR"/dist
     cp *.tar.gz $RELPATH
