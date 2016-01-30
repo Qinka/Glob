@@ -20,8 +20,8 @@ extra-source-files:  README.md
                    , database/database.sql
 
 flag unlimit-version
-  description: 不对版本进行限制，已解决一些应为版本带来的问题。
-  default:     False
+  description:       不对版本进行限制，已解决一些应为版本带来的问题。
+  default:           False
 
 
 flag launch-simple
@@ -70,7 +70,9 @@ executable launch.simple
   if flag(with-tls)
     cpp-options:     -DWithTls
 
-  other-modules:    Main.CmdArgs
+  other-modules:     Main.CmdArgs
+  default-language:  Haskell2010
+  ghc-options:       -Wall -O2
 
 executable launch.docker
   main-is:           Main.hs
@@ -107,6 +109,7 @@ executable launch.docker
     cpp-options:     -DWithTls
   default-language:  Haskell2010
   other-modules:     Main.CmdArgs
+  ghc-options:       -Wall -O2
 
 
 executable glob
@@ -183,6 +186,15 @@ executable glob
     build-depends:   template-haskell
   else
     build-depends:   template-haskell >= 2.10 && < 2.12
+  if flag(unlimit-version)
+    build-depends:   process
+  else
+    build-depends:   process >= 1.4 && < 1.5
+  if flag(unlimit-version)
+    build-depends:  directory >= 1.2.4
+  else
+    build-depends:  directory >=1.2.4 && <1.3
+
 
   if flag(with-tls)
     cpp-options:     -DWithTls

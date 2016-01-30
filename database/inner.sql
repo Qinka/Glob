@@ -3,30 +3,30 @@
 
 -- 添加 html 文件
 
-INSERT INTO table_htmls VALUES
+INSERT INTO table_html VALUES
 (
-  '@#page.main','<h1> Hello,world </h1> Hello<p>This is Qinka''s blog. </p>','Home'
+  '@#page.main','<h1> Hello,world </h1> Hello<p>This is Qinka''s blog. </p>','Home','home','2016-01-01'
 );
 
-INSERT INTO table_htmls VALUES
+INSERT INTO table_html VALUES
 (
-  '@#page.frame.top','<h1>Qinka''s Blog</h1>',''
+  '@#page.frame.top','<h1>Qinka''s Blog</h1>','','home','2016-01-01'
 );
 
-INSERT INTO table_htmls VALUES
+INSERT INTO table_html VALUES
 (
-  '@#page.frame.copyright','Copyright (C) Qinka',''
+  '@#page.frame.bottom','<p>Copyright (C) Qinka</p><p>假设这里有广告</p>','','home','2016-01-01'
 );
 
-INSERT INTO table_htmls VALUES
+INSERT INTO table_html VALUES
 (
-  '@#page.frame.nav','<nav class="navclass"><ul><li><a href="/" class="navclass"> Home</a></li><li><a href="/blog"> Blog</a></li></ul></nav>',''
+  '@#page.frame.nav','<nav class="navclass"><ul><li><a href="/" class="navclass"> Home</a></li><li><a href="/blog"> Blog</a></li></ul></nav>','','home','2016-01-01'
 );
 
 -- 添加 css 文件
-INSERT INTO table_csss VALUES
+INSERT INTO table_txt VALUES
 (
-  'css.frame.css','body{background:#282828;color:#ededed}'
+  'css.frame.css','body{background:#282828;color:#ededed}','text/css'
 );
 
 -- 添加 Nav 导航

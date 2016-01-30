@@ -8,9 +8,9 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 
 module Main.CmdArgs
-    ( DockerLaunch(..)
+    ( runArgs
+    , DockerLaunch(..)
     , dockerLaunch
-    , runArgs
     ) where
 
       import System.Console.CmdArgs
@@ -32,6 +32,7 @@ module Main.CmdArgs
         , dbUsr :: String
         } deriving (Show,Typeable,Data)
 
+      dockerLaunch :: DockerLaunch
       dockerLaunch = DockerLaunch
         { port = "GLOB_PORT"
             &= help "The environment value(\'s name) of this web site's port."

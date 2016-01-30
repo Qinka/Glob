@@ -13,6 +13,7 @@
 {-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE DeriveGeneric              #-}
 
 module Glob where
 
@@ -20,20 +21,20 @@ module Glob where
 
       import Yesod
 
-      import Database.Persist
-      import Database.Persist.TH
       import Database.Persist.Postgresql
 
       import Data.Aeson
 
       import Data.Text.Lazy.Encoding(decodeUtf8)
+      import Data.Text.Encoding(encodeUtf8)
 
       import Data.Text.Lazy hiding(null,map)
 
-      import Data.List
       import Data.Time
 
       import Text.Blaze.Html
+
+      import qualified Data.ByteString as B
 
 
 
@@ -54,44 +55,32 @@ module Glob where
 
 
       share [mkPersist sqlSettings,mkMigrate "migrateAll"] [persistLowerCase|
-        Navs json sql=table_nav
+        Nav json sql=table_nav
           Id sql=
-          text Text sql=texts
-          order Int Maybe sql=ordering
-          ref Text sql=refto
-          Primary text
+          label Text sql=key_label
+          order Int Maybe sql=key_order
+          ref Text sql=key_ref
+          Primary label
           deriving Eq Show
-        Pages sql=table_pages
+        Htm sql=table_html
           Id sql=
-          index Text sql=indexs
-          to Text sql=tos
-          time Day sql=times
-          title Text
+          index Text sql=key_index
+          html Text sql=key_html
+          title Text sql=key_title
+          typ Text sql=key_content
+          time Day sql=key_time
+          Primary index time
+        Txt sql=table_txt
+          Id sql=
+          index Text sql=key_index
+          txt Text sql=key_text
+          content Text sql=key_content
           Primary index
-          deriving Eq Show
-        Blogs sql=table_blogs
+        Bin sql=table_bin
           Id sql=
-          index Text sql=indexs
-          to Text sql=tos
-          time Day sql=times
-          title Text
-          Primary index
-          deriving Eq Show
-        Htmls sql=table_htmls
-          Id sql=
-          index Text sql=indexs
-          html Text
-          title Text
-          Primary index
-        CSSs sql=table_csss
-          Id sql=
-          index Text sql=indexs
-          css Text
-          Primary index
-        JSs sql=table_jss
-          Id sql=
-          index Text sql=indexs
-          js Text
+          index Text sql=key_index
+          bin B.ByteString sql=key_binary
+          content Text sql=key_content
           Primary index
       |]
 
@@ -102,11 +91,11 @@ module Glob where
       / HomeR GET
       /nav NavR POST
       /page/#Text PageR GET
-      /blog BlogListR GET
+      /blog BlogListR POST GET
       /blog/#Text/#Text BlogItemR GET
       /favicon.ico FaviconR GET
-      /css/#Text CssR GET
-      /js/#Text JsR GET
+      /txt/#Text TxtR GET
+      /bin/#Text BinR GET
       |]
 
       instance Yesod Glob where
@@ -137,19 +126,16 @@ module Glob where
 
       getHomeR :: Handler Html
       getHomeR = do
-        [Entity _ (Htmls _ mainText mainTitle)] <- liftHandlerT $ runDB $
-          selectList [HtmlsIndex ==. "@#page.main"] []
+        [Entity _ (Htm _ mainText mainTitle _ _)] <- liftHandlerT $ runDB $
+          selectList [HtmIndex ==. "@#page.main",HtmTyp ==. "home"] []
         let mainHtml = preEscapedToHtml mainText
-        --setTitle $ toHtml mainTitle
         defaultLayout $ do
-          setTitle "Home"
+          setTitle $ toHtml mainTitle
           [whamlet|#{mainHtml}|]
       getBlogItemR :: Text -> Text -> Handler Html
-      getBlogItemR time index = do
-        [Entity _ (Blogs _ to _ _ )] <- liftHandlerT $ runDB $
-          selectList [BlogsTime ==. read (unpack time),BlogsIndex ==. index] []
-        [Entity _ (Htmls _ blogText blogTitle)] <- liftHandlerT $ runDB $
-          selectList [HtmlsIndex ==. to] []
+      getBlogItemR t i= do
+        [Entity _ (Htm _ blogText blogTitle _ _)] <- liftHandlerT $ runDB $
+          selectList [HtmIndex ==. i,HtmTime ==. read (read $ show t),HtmTyp ==. "blog"] []
         let blogHtml = preEscapedToHtml blogText
         defaultLayout $ do
           setTitle $ toHtml blogTitle
@@ -158,68 +144,66 @@ module Glob where
       getFaviconR = do
         (Glob _ (Config _ _ path _ _ _)) <- getYesod
         sendFile "applcation/x-ico" path
+
+      postBlogListR :: Handler TypedContent
+      postBlogListR = do
+        blogs' <- liftHandlerT $ runDB $ selectList [HtmTyp ==. "blog"] []
+        let blogs = map (\(Entity _ x) -> x) blogs'
+        selectRep $ provideRepType "application/json" $
+          return $ decodeUtf8 $ encode $ map (\(Htm i _ tit _ tim) -> object ["index" .= i,"title" .= tit,"time" .= tim]) blogs
+
       getBlogListR :: Handler Html
       getBlogListR = do
-        blogs' <- liftHandlerT $ runDB $
-          selectList [] [Desc BlogsTime]
-        let blogs = map toList blogs'
+        [Entity _ (Htm _ blogText blogTitle _ _)] <- liftHandlerT $ runDB $
+          selectList [HtmIndex ==. "@#page.blog",HtmTyp ==. "home"] []
+        let blogHtml = preEscapedToHtml blogText
         defaultLayout $ do
-          setTitle "Blog's List"
-          [whamlet|
-            $if null blogs
-              <p> 没有文章
-            $else
-              <ul>
-              $forall (ref,title) <- blogs
-                <li>
-                  <a href=#{ref}> #{title}
-            |]
-        where
-          toList (Entity _ (Blogs index _ time title)) = ("/blog/"++show time++"/"++unpack index,title)
+          setTitle $ toHtml blogTitle
+          [whamlet|#{blogHtml}|]
+
       getPageR :: Text -> Handler Html
-      getPageR index = do
-        [Entity _ (Pages _ to _ _ )] <- liftHandlerT $ runDB $
-          selectList [PagesIndex ==. index] [ Desc PagesTime]
-        [Entity _ (Htmls _ pageText pageTitle)] <- liftHandlerT $ runDB $
-          selectList [HtmlsIndex ==. to] []
+      getPageR i = do
+        [Entity _ (Htm _ pageText pageTitle_ _ _)] <- liftHandlerT $ runDB $
+          selectList [HtmIndex ==. i,HtmTyp ==. "page"] []
         let pageHtml = preEscapedToHtml pageText
-        --setTitle pageTitle
         defaultLayout $ do
-          setTitle $ toHtml pageTitle
+          setTitle $ toHtml pageTitle_
           [whamlet|#{pageHtml}|]
 
 
-      getCssR :: Text -> Handler TypedContent
-      getCssR index = do
-        [Entity _ (CSSs _ cssText)] <- liftHandlerT $ runDB $ selectList [CSSsIndex ==. index] []
-        selectRep $ provideRepType "text/css" $ return cssText
+      getTxtR :: Text -> Handler TypedContent
+      getTxtR i = do
+        [Entity _ (Txt _ txtText content)] <- liftHandlerT $ runDB $ selectList [TxtIndex ==. i] []
+        selectRep $ provideRepType (encodeUtf8 $ toStrict content) $ return txtText
 
-      getJsR :: Text -> Handler TypedContent
-      getJsR index = do
-        [Entity _ (JSs _ jsText)] <- liftHandlerT $ runDB $ selectList [JSsIndex ==. index] []
-        selectRep $ provideRepType "application/x-javascript" $ return jsText
+      getBinR :: Text -> Handler TypedContent
+      getBinR i = do
+        [Entity _ (Bin _ binText content)] <- liftHandlerT $ runDB $ selectList [BinIndex ==. i] []
+        selectRep $ provideRepType (encodeUtf8 $ toStrict content) $ return binText
 
 
       postNavR :: Handler TypedContent
       postNavR = do
-        navs' <- liftHandlerT $ runDB $ selectList [] [Desc NavsOrder]
+        navs' <- liftHandlerT $ runDB $ selectList [] [Desc NavOrder]
         let navs = map (\(Entity _ x) -> x) navs'
-        selectRep $ provideRepType "application/json" $ return $ decodeUtf8 $ encode navs
+        selectRep $ provideRepType "application/json" $
+          return $ decodeUtf8 $ encode navs
 
 
       globLayout :: Widget -> Handler Html
       globLayout w = do
         Glob _ (Config _ _ _ ti _ _) <- liftHandlerT getYesod
         pc <- widgetToPageContent w
-        [Entity _ (Htmls _ topText _)] <- liftHandlerT $ runDB $ selectList [HtmlsIndex ==. "@#page.frame.top"] []
-        [Entity _ (Htmls _ cprightText _)] <- liftHandlerT $ runDB $ selectList [HtmlsIndex ==. "@#page.frame.copyright"] []
-        [Entity _ (Htmls _ navText _)] <- liftHandlerT $ runDB $ selectList [HtmlsIndex ==. "@#page.frame.nav"] []
+        [Entity _ (Htm _ topText _ _ _)] <- liftHandlerT $ runDB $
+          selectList [HtmIndex ==. "@#page.frame.top" , HtmTyp ==. "home"] []
+        [Entity _ (Htm _ bottomText _ _ _)] <- liftHandlerT $ runDB $
+          selectList [HtmIndex ==. "@#page.frame.bottom", HtmTyp ==. "home"] []
+        [Entity _ (Htm _ navText _ _ _)] <- liftHandlerT $ runDB $
+          selectList [HtmIndex ==. "@#page.frame.nav", HtmTyp ==. "home"] []
         let topHtml = preEscapedToHtml topText
-        let cprightHtml = preEscapedToHtml cprightText
+        let bottomHtml = preEscapedToHtml bottomText
         let navHtml = preEscapedToHtml navText
-        let adText = "<h1> 假设这里有广告 </h1>" ::String
-        let adHtml = preEscapedToHtml adText
-        withUrlRenderer
+        withUrlRenderer --width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no
           [hamlet|
             $newline never
             $doctype 5
@@ -228,12 +212,12 @@ module Glob where
                 <title>
                   #{ti} - #{pageTitle pc}
                 <meta charset=utf-8>
+                <meta name=viewport content=width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no>
                 ^{pageHead pc}
               <body>
-                <link rel=stylesheet href=@{CssR "css.frame.css"}>
+                <link rel=stylesheet href=@{TxtR "css.frame.css"}>
                 #{topHtml}
                 #{navHtml}
                 ^{pageBody pc}
-                #{cprightHtml}
-                #{adHtml}
+                #{bottomHtml}
           |]
