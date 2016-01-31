@@ -184,7 +184,7 @@ module Glob where
 
       postNavR :: Handler TypedContent
       postNavR = do
-        navs' <- liftHandlerT $ runDB $ selectList [] [Desc NavOrder]
+        navs' <- liftHandlerT $ runDB $ selectList [] [Asc NavOrder]
         let navs = map (\(Entity _ x) -> x) navs'
         selectRep $ provideRepType "application/json" $
           return $ decodeUtf8 $ encode navs
