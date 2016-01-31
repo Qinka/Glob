@@ -36,7 +36,8 @@ module Glob where
 
       import qualified Data.ByteString as B
 
-
+      import Paths_Glob
+      import Data.Version(showVersion)
 
       data Glob = Glob
         { conPool :: ConnectionPool
@@ -82,6 +83,11 @@ module Glob where
           bin B.ByteString sql=key_binary
           content Text sql=key_content
           Primary index
+        Qry sql=table_query
+          Id sql=
+          index Text sql=key_index
+          txt Text sql=key_text
+          Primary index
       |]
 
 
@@ -96,6 +102,7 @@ module Glob where
       /favicon.ico FaviconR GET
       /txt/#Text TxtR GET
       /bin/#Text BinR GET
+      /query/#Text QueryR GET
       |]
 
       instance Yesod Glob where
@@ -123,6 +130,19 @@ module Glob where
           |]
         isAuthorized _ _ = return Authorized
         defaultLayout = globLayout
+
+      getQueryR :: Text -> Handler Text
+      getQueryR i = 
+        case i of
+          "version" -> return $ pack $ showVersion version
+          "name" -> return "Glob"
+          _ -> getQry
+        where
+          getQry = do
+            x <- liftHandlerT $ runDB $ selectList [QryIndex ==. i] []
+            if null x
+              then return ""
+              else return $ (\[Entity _ (Qry _ t)]->t) x
 
       getHomeR :: Handler Html
       getHomeR = do

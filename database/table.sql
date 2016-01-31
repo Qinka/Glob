@@ -35,3 +35,9 @@ CREATE TABLE table_bin
   key_binary BYTEA NOT NULL,
   key_content TEXT NOT NULL
 );
+
+CREATE TABLE table_query
+(
+  key_index TEXT NOT NULL PRIMARY KEY,
+  key_text TEXT NOT NULL
+);

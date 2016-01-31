@@ -1,6 +1,10 @@
 # The change log of Glob
 
 
+## [VERSION] 0.0.2.10
+
+1. 添加了 “ 查询功能 ”， 可以查询到版本号及其他的内容。
+
 ## [VERSION] 0.0.2.1
 
 1. 调整了 nav 返回的 json 中数据的顺序。
