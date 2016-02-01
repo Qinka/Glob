@@ -14,12 +14,11 @@ CREATE TABLE table_nav
 
 CREATE TABLE table_html
 (
-  key_index TEXT NOT NULL,
+  key_index TEXT NOT NULL PRIMARY KEY,
   key_html TEXT NOT NULL,
   key_title TEXT NOT NULL,
   key_content TEXT NOT NULL,
-  key_time DATE NOT NULL,
-  PRIMARY KEY(key_index,key_time)
+  key_time DATE NOT NULL
 );
 
 CREATE TABLE table_txt

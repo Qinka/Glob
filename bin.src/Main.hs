@@ -34,11 +34,11 @@ module Main
         let (constr,conThd) = toConStr $ dbConfig config
         runStderrLoggingT $ withPostgresqlPool constr conThd $
           \pool -> liftIO $
-            warpTls 
+            warpTls
               (certPath config)
               (keyPath config)
               (port config)
-              (Glob pool config)
+              (Glob pool config (Management pool config))
 
       withGlobCmdArgs ::  GlobCmdArgs -> IO (Maybe Config)
       withGlobCmdArgs GlobCmdArgs{..} = do

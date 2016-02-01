@@ -23,8 +23,9 @@ module Main.CmdArgs
         , conThd :: String
         , favPath :: String
         , siteTitle :: String
-        , certPath ::String
-        , keyPath ::String
+        , certPath :: String
+        , keyPath :: String
+        , tokenEnv :: String
         , dbPort :: String
         , dbAddr :: String
         , dbName :: String
@@ -62,6 +63,11 @@ module Main.CmdArgs
         , keyPath = "KEY_PATH"
             &= help "The environment value(\'s name) of the website's key file's path."
             &= name "keypath"
+            &= explicit
+            &= groupname "Glob Settings"
+        , tokenEnv = "GLOB_BACKEND_TOKEN"
+            &= help "The environment value(\'s name) of the backend's token."
+            &= name "token"
             &= explicit
             &= groupname "Glob Settings"
         , dbPort = "DB_PORT"

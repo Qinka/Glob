@@ -15,80 +15,48 @@
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE DeriveGeneric              #-}
 
-module Glob where
+module Glob
+    ( module Glob
+    , module Glob.Management
+    ) where
 
       import Glob.Config
+      import Glob.Database
+      import Glob.Management
 
       import Yesod
 
       import Database.Persist.Postgresql
 
-      import Data.Aeson
+      import System.Environment
 
-      import Data.Text.Lazy.Encoding(decodeUtf8)
-      import Data.Text.Encoding(encodeUtf8)
+      import Data.Text.Encoding(encodeUtf8,decodeUtf8)
 
-      import Data.Text.Lazy hiding(null,map)
+      import Data.Text hiding(null,map)
+      import qualified Data.Text.Lazy as L
 
       import Data.Time
 
       import Text.Blaze.Html
 
       import qualified Data.ByteString as B
+      import qualified Data.ByteString.Lazy as BL
 
       import Paths_Glob
+      import Data.Aeson
       import Data.Version(showVersion)
 
       data Glob = Glob
         { conPool :: ConnectionPool
         , config :: Config
+        , getManagement :: Management
         }
 
       instance YesodPersist Glob where
         type YesodPersistBackend Glob = SqlBackend
         runDB a = do
-          (Glob p _) <- getYesod
+          (Glob p _ _) <- getYesod
           runSqlPool a p
-
-
-
-
-
-
-      share [mkPersist sqlSettings,mkMigrate "migrateAll"] [persistLowerCase|
-        Nav json sql=table_nav
-          Id sql=
-          label Text sql=key_label
-          order Int Maybe sql=key_order
-          ref Text sql=key_ref
-          Primary label
-          deriving Eq Show
-        Htm sql=table_html
-          Id sql=
-          index Text sql=key_index
-          html Text sql=key_html
-          title Text sql=key_title
-          typ Text sql=key_content
-          time Day sql=key_time
-          Primary index time
-        Txt sql=table_txt
-          Id sql=
-          index Text sql=key_index
-          txt Text sql=key_text
-          content Text sql=key_content
-          Primary index
-        Bin sql=table_bin
-          Id sql=
-          index Text sql=key_index
-          bin B.ByteString sql=key_binary
-          content Text sql=key_content
-          Primary index
-        Qry sql=table_query
-          Id sql=
-          index Text sql=key_index
-          txt Text sql=key_text
-          Primary index
-      |]
 
 
 
@@ -103,6 +71,7 @@ module Glob where
       /txt/#Text TxtR GET
       /bin/#Text BinR GET
       /query/#Text QueryR GET
+      /management SubmanagementR Management getManagement
       |]
 
       instance Yesod Glob where
@@ -128,11 +97,21 @@ module Glob where
           <br>
           #{x}
           |]
+        isAuthorized (SubmanagementR _) _ = managementAuthorCheck
         isAuthorized _ _ = return Authorized
         defaultLayout = globLayout
 
+      managementAuthorCheck :: Handler AuthResult
+      managementAuthorCheck = do
+        token <- liftHandlerT $ lookupHeaders "Tokens"
+        (Glob _ (Config _ _ _ _ _ _ env) _) <- getYesod
+        stoken <- liftIO $ getEnv env
+        if pack stoken `elem` map decodeUtf8 token
+          then return Authorized
+          else return $ Unauthorized ":( Who are you!"
+
       getQueryR :: Text -> Handler Text
-      getQueryR i = 
+      getQueryR i =
         case i of
           "version" -> return $ pack $ showVersion version
           "name" -> return "Glob"
@@ -162,7 +141,7 @@ module Glob where
           [whamlet|#{blogHtml}|]
       getFaviconR :: Handler Html
       getFaviconR = do
-        (Glob _ (Config _ _ path _ _ _)) <- getYesod
+        (Glob _ (Config _ _ path _ _ _ _) _) <- getYesod
         sendFile "applcation/x-ico" path
 
       postBlogListR :: Handler TypedContent
@@ -170,7 +149,8 @@ module Glob where
         blogs' <- liftHandlerT $ runDB $ selectList [HtmTyp ==. "blog"] []
         let blogs = map (\(Entity _ x) -> x) blogs'
         selectRep $ provideRepType "application/json" $
-          return $ decodeUtf8 $ encode $ map (\(Htm i _ tit _ tim) -> object ["index" .= i,"title" .= tit,"time" .= tim]) blogs
+          return $ decodeUtf8 $ BL.toStrict $ encode $
+            map (\(Htm i _ tit _ tim) -> object ["index" .= i,"title" .= tit,"time" .= tim]) blogs
 
       getBlogListR :: Handler Html
       getBlogListR = do
@@ -194,12 +174,12 @@ module Glob where
       getTxtR :: Text -> Handler TypedContent
       getTxtR i = do
         [Entity _ (Txt _ txtText content)] <- liftHandlerT $ runDB $ selectList [TxtIndex ==. i] []
-        selectRep $ provideRepType (encodeUtf8 $ toStrict content) $ return txtText
+        selectRep $ provideRepType (encodeUtf8 content) $ return txtText
 
       getBinR :: Text -> Handler TypedContent
       getBinR i = do
         [Entity _ (Bin _ binText content)] <- liftHandlerT $ runDB $ selectList [BinIndex ==. i] []
-        selectRep $ provideRepType (encodeUtf8 $ toStrict content) $ return binText
+        selectRep $ provideRepType (encodeUtf8 content) $ return binText
 
 
       postNavR :: Handler TypedContent
@@ -207,12 +187,12 @@ module Glob where
         navs' <- liftHandlerT $ runDB $ selectList [] [Asc NavOrder]
         let navs = map (\(Entity _ x) -> x) navs'
         selectRep $ provideRepType "application/json" $
-          return $ decodeUtf8 $ encode navs
+          return $ decodeUtf8 $ BL.toStrict $ encode navs
 
 
       globLayout :: Widget -> Handler Html
       globLayout w = do
-        Glob _ (Config _ _ _ ti _ _) <- liftHandlerT getYesod
+        Glob _ (Config _ _ _ ti _ _ _) _<- liftHandlerT getYesod
         pc <- widgetToPageContent w
         [Entity _ (Htm _ topText _ _ _)] <- liftHandlerT $ runDB $
           selectList [HtmIndex ==. "@#page.frame.top" , HtmTyp ==. "home"] []

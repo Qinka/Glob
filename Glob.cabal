@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                Glob
-version:             0.0.2.10
+version:             0.0.3.11
 synopsis:            A simple blog system.
 -- description:
 -- license:
@@ -194,6 +194,10 @@ executable glob
     build-depends:  directory >= 1.2.4
   else
     build-depends:  directory >=1.2.4 && <1.3
+  if flag(unlimit-version)
+    build-depends:  conduit
+  else
+    build-depends:  conduit >=1.2 && <1.4
 
 
   if flag(with-tls)

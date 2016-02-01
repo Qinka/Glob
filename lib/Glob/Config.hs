@@ -28,6 +28,7 @@ module Glob.Config
         , siteTitle :: String
         , certPath  :: FilePath
         , keyPath   :: FilePath
+        , tokenEnv  :: String
         }
 
       instance FromJSON Config where
@@ -38,6 +39,7 @@ module Glob.Config
           <*> v .: "site-title"
           <*> v .: "certificate-file"
           <*> v .: "key-file"
+          <*> v .: "token-value-name"
 
       instance ToJSON Config where
         toJSON Config{..} = object
@@ -47,6 +49,7 @@ module Glob.Config
           , "site-title" .= siteTitle
           , "certificate-file" .= certPath
           , "key-file" .= keyPath
+          , "token-value-name" .= tokenEnv
           ]
 
       -- 数据库设置

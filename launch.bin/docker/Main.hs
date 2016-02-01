@@ -12,6 +12,7 @@ module Main
     ( main
     ) where
 
+      import qualified Main.CmdArgs as C
       import qualified Glob.Config  as G
       import Data.Aeson
       import System.IO
@@ -21,10 +22,9 @@ module Main
       import System.Directory
       import Data.ByteString.Internal
       import Data.Maybe
-      import Main.CmdArgs
 
       main :: IO ()
-      main = runArgs toConfig >>= main'
+      main = C.runArgs toConfig >>= main'
         where
           main' :: G.Config -> IO()
           main' c = do
@@ -33,19 +33,20 @@ module Main
             hClose (fromMaybe stdout hIn)
             print =<< waitForProcess hProc
 
-      toConfig :: DockerLaunch -> IO G.Config
+      toConfig :: C.DockerLaunch -> IO G.Config
       toConfig x = do
-        port <- getEnv $ port x
-        conThd <- getEnv $ conThd x
-        favPath <- getEnv $ favPath x
-        siteTitle <- getEnv $ siteTitle x
-        certPath <- getEnv $ certPath x
-        keyPath <- getEnv $ keyPath x
-        dbAddr <- getEnv $ dbAddr x
-        dbPort <- getEnv $ dbPort x
-        dbName <- getEnv $ dbName x
-        dbPsk <- getEnv $ dbPsk x
-        dbUsr <- getEnv $ dbUsr x
+        port <- getEnv $ C.port x
+        conThd <- getEnv $ C.conThd x
+        favPath <- getEnv $ C.favPath x
+        siteTitle <- getEnv $ C.siteTitle x
+        certPath <- getEnv $ C.certPath x
+        keyPath <- getEnv $ C.keyPath x
+        let token = C.tokenEnv x
+        dbAddr <- getEnv $ C.dbAddr x
+        dbPort <- getEnv $ C.dbPort x
+        dbName <- getEnv $ C.dbName x
+        dbPsk <- getEnv $ C.dbPsk x
+        dbUsr <- getEnv $ C.dbUsr x
         return $ G.Config
           (read port)
           (G.DbConfig dbAddr dbPort dbUsr dbPsk dbName $ read conThd)
@@ -53,3 +54,4 @@ module Main
           siteTitle
           certPath
           keyPath
+          token

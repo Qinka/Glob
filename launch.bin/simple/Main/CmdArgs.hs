@@ -24,6 +24,7 @@ module Main.CmdArgs
         , siteTitle :: Maybe String
         , certPath ::Maybe String
         , keyPath ::Maybe String
+        , tokenEnv :: Maybe String
         , dbPort :: Maybe String
         , dbAddr :: Maybe String
         , dbName :: Maybe String
@@ -64,6 +65,11 @@ module Main.CmdArgs
         , keyPath = def
             &= help "The value of the website's key file's path."
             &= name "keypath"
+            &= explicit
+            &= groupname "Glob Settings"
+        , tokenEnv = def
+            &= help "The environment value of Token."
+            &= name "token"
             &= explicit
             &= groupname "Glob Settings"
         , dbPort = def
