@@ -17,7 +17,11 @@ cabal-version:       >=1.10
 
 extra-source-files:  README.md
                    , license/LICENSE
-                   , database/database.sql
+                   , database/table.sql
+                   , database/inner.sql
+                   , database/script.sql
+                   , database/function.sql
+                   , bin.image/favicon.ico
 
 flag unlimit-version
   description:       不对版本进行限制，已解决一些应为版本带来的问题。
