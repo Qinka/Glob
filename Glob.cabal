@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                Glob
-version:             0.0.3.11
+version:             0.0.3.24
 synopsis:            A simple blog system.
 -- description:
 -- license:

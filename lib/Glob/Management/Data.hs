@@ -27,14 +27,16 @@ module Glob.Management.Data where
         /nav UpnavR POST
         /bin UpbinR POST
         /qry UpqryR POST
+        /del DelR   POST
+        /list ListR POST
         |]
 
-      data RtMsg = RtMsg
+      data RtMsg a = RtMsg
         { rtStatus :: String
-        , rtMsg :: String
+        , rtMsg :: a
         }
 
-      instance ToJSON RtMsg where
+      instance ToJSON a =>  ToJSON (RtMsg a) where
         toJSON RtMsg{..} = object
           [ "status" .= rtStatus
           , "msg" .= rtMsg
