@@ -6,7 +6,6 @@
 -- launch.bin/simple/Main.hs
 
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
 
 
 module Main
