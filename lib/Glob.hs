@@ -32,7 +32,7 @@ module Glob
 
       import Data.Text.Encoding(encodeUtf8,decodeUtf8)
 
-      import Data.Text hiding(null,map)
+      import Data.Text hiding(null,map,head)
       import qualified Data.Text.Lazy as L
 
       import Data.Time
@@ -41,6 +41,10 @@ module Glob
 
       import qualified Data.ByteString as B
       import qualified Data.ByteString.Lazy as BL
+      import qualified Data.ByteString.Lazy.Char8 as C
+      import Data.Digest.Pure.SHA
+
+      import Data.String(fromString)
 
       import Paths_Glob
       import Data.Aeson
@@ -103,10 +107,24 @@ module Glob
 
       managementAuthorCheck :: Handler AuthResult
       managementAuthorCheck = do
-        token <- liftHandlerT $ lookupHeaders "Tokens"
+        token <- lookupHeaders "Tokens"
+        day <- lookupHeaders "Day"
+        time <- lookupHeaders "TimeOfDay"
+        let td = read $ read $ show $ head day
+        let tt = read $ read $ show $ head time
+        utcT <- liftIO getCurrentTime
+        timezone <- liftIO $ getTimeZone utcT
+        let localT  = utcToLocalTime timezone $ addUTCTime (-6) utcT
+        let localT' = utcToLocalTime timezone $ addUTCTime   6 utcT
         (Glob _ (Config _ _ _ _ _ _ env) _) <- getYesod
         stoken <- liftIO $ getEnv env
-        if pack stoken `elem` map decodeUtf8 token
+        let s1 = showDigest $ sha256 $ BL.concat [fromString stoken,read $ show $ head day,read $ show $ head time]
+        liftIO $ putStrLn s1
+        if   (s1 `elem` map (read.show) token)
+          && (localDay localT <= td)
+          && (localTimeOfDay localT <= tt)
+          && (localDay localT' >= td)
+          && (localTimeOfDay localT' >= tt)
           then return Authorized
           else return $ Unauthorized ":( Who are you!"
 

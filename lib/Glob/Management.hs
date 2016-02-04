@@ -123,7 +123,7 @@ module Glob.Management
                   => HandlerT Management (HandlerT master IO) TypedContent
       postUphtmlR = do
         index <- lookupPostParams "index"
-        fileinfo' <- lookupFile "upload"
+        fileinfo' <- lookupFile "html"
         let fileinfo = case fileinfo' of {(Just x)-> [x];_ -> []}
         title <- lookupPostParams "title"
         typ <- lookupPostParams "type"
