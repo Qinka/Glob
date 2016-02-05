@@ -3,7 +3,7 @@
 
 
 
--- lib/GLob/Tls.hs
+-- src/GLob/Tls.hs
 
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE TemplateHaskell #-}

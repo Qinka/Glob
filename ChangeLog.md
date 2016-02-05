@@ -1,10 +1,13 @@
 # The change log of Glob
 
 
+## [VERSION] 0.0.5.
+
+1. 重新调整了全部的结构
+
 ## [VERSION] 0.0.3.56
 
 1. 更新了秘钥认证的方法，使得秘钥传输在加密。
-
 
 ## [VERSION] 0.0.3.24
 

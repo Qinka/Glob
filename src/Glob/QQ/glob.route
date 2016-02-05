@@ -1,0 +1,16 @@
+/ HomeR GET
+
+/nav NavR POST
+
+/page/#Text PageR GET
+
+/blog BlogListR POST GET
+/blog/#Text/#Text BlogItemR GET
+
+/favicon.ico FaviconR GET
+
+/txt/#Text TxtR GET
+/bin/#Text BinR GET
+/query/#Text QueryR GET
+
+/management ManagementR Management subManagement

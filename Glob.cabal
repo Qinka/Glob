@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                Glob
-version:             0.0.3.56
+version:             0.0.5.23
 synopsis:            A simple blog system.
 -- description:
 -- license:
@@ -21,7 +21,7 @@ extra-source-files:  README.md
                    , database/inner.sql
                    , database/script.sql
                    , database/function.sql
-                   , bin.image/favicon.ico
+                   , resource/favicon.ico
 
 flag unlimit-version
   description:       不对版本进行限制，已解决一些应为版本带来的问题。
@@ -42,52 +42,14 @@ flag with-tls
 
 executable launch.simple
   main-is:           Main.hs
-  hs-source-dirs:    launch.bin/simple
-                   , lib
+  hs-source-dirs:    src.bin/launch.simple
+                   , src
   if flag(launch-simple)
     buildable:       True
   else
     buildable:       False
+
   build-depends:     base >= 4.8 && < 4.9
-
-  if flag(unlimit-version)
-    build-depends:   bytestring
-  else
-    build-depends:   bytestring > 0.10.5 && < 0.11
-  if flag(unlimit-version)
-    build-depends:   cmdargs
-  else
-    build-depends:   cmdargs > 0.10 && < 0.11
-  if flag(unlimit-version)
-    build-depends:   aeson
-  else
-    build-depends:   aeson >= 0.10 && < 0.11
-  if flag(unlimit-version)
-    build-depends:   process
-  else
-    build-depends:   process >= 1.4 && < 1.5
-  if flag(unlimit-version)
-    build-depends:  directory >= 1.2.4
-  else
-    build-depends:  directory >=1.2.4 && <1.3
-
-  if flag(with-tls)
-    cpp-options:     -DWithTls
-
-  other-modules:     Main.CmdArgs
-  default-language:  Haskell2010
-  ghc-options:       -Wall -O2
-
-executable launch.docker
-  main-is:           Main.hs
-  hs-source-dirs:    launch.bin/docker
-                   , lib
-  if flag(launch-docker)
-    buildable:       True
-  else
-    buildable:       False
-  build-depends:     base >= 4.8 && < 4.9
-
   if flag(unlimit-version)
     build-depends:   bytestring
   else
@@ -109,8 +71,42 @@ executable launch.docker
   else
     build-depends:   directory >=1.2.4 && <1.3
 
-  if flag(with-tls)
-    cpp-options:     -DWithTls
+
+  other-modules:     Main.CmdArgs
+  default-language:  Haskell2010
+  ghc-options:       -Wall -O2
+
+executable launch.docker
+  main-is:           Main.hs
+  hs-source-dirs:    src.bin/launch.docker
+                   , src
+  if flag(launch-docker)
+    buildable:       True
+  else
+    buildable:       False
+
+  build-depends:     base >= 4.8 && < 4.9
+  if flag(unlimit-version)
+    build-depends:   bytestring
+  else
+    build-depends:   bytestring > 0.10.5 && < 0.11
+  if flag(unlimit-version)
+    build-depends:   cmdargs
+  else
+    build-depends:   cmdargs > 0.10 && < 0.11
+  if flag(unlimit-version)
+    build-depends:   aeson
+  else
+    build-depends:   aeson >= 0.10 && < 0.11
+  if flag(unlimit-version)
+    build-depends:   process
+  else
+    build-depends:   process >= 1.4 && < 1.5
+  if flag(unlimit-version)
+    build-depends:   directory >= 1.2.4
+  else
+    build-depends:   directory >=1.2.4 && <1.3
+
   default-language:  Haskell2010
   other-modules:     Main.CmdArgs
   ghc-options:       -Wall -O2
@@ -118,10 +114,8 @@ executable launch.docker
 
 executable glob
   main-is:           Main.hs
-  -- other-modules:
-  -- other-extensions:
-  build-depends:     base >=4.8 && <4.9
 
+  build-depends:     base >=4.8 && <4.9
   if flag(unlimit-version)
     build-depends:   bytestring
   else
@@ -195,24 +189,24 @@ executable glob
   else
     build-depends:   process >= 1.4 && < 1.5
   if flag(unlimit-version)
-    build-depends:  directory >= 1.2.4
+    build-depends:   directory >= 1.2.4
   else
-    build-depends:  directory >=1.2.4 && <1.3
+    build-depends:   directory >=1.2.4 && <1.3
   if flag(unlimit-version)
-    build-depends:  conduit
+    build-depends:   conduit
   else
-    build-depends:  conduit >=1.2 && <1.4
+    build-depends:   conduit >=1.2 && <1.4
   if flag(unlimit-version)
-    build-depends:     SHA
+    build-depends:    SHA
   else
-    build-depends:     SHA >= 1.5 && < 2.3
+    build-depends:    SHA >= 1.5 && < 2.3
 
 
   if flag(with-tls)
     cpp-options:     -DWithTls
 
-  hs-source-dirs:    bin.src
-                   , lib
+  hs-source-dirs:    src.bin/glob
+                   , src
 
   other-modules:     Main.CmdArgs
                    , Glob

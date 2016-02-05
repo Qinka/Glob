@@ -1,0 +1,7 @@
+/html UphtmlR POST
+/txt UptxtR POST
+/nav UpnavR POST
+/bin UpbinR POST
+/qry UpqryR POST
+/del DelR   POST
+/list ListR POST

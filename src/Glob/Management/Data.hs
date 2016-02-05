@@ -3,7 +3,7 @@
 
 
 
--- lib/Glob/Management/Data.hs
+-- src/Glob/Management/Data.hs
 {-# LANGUAGE  QuasiQuotes
             , TemplateHaskell
             , OverloadedStrings
@@ -21,15 +21,7 @@ module Glob.Management.Data where
 
       data Management = Management ConnectionPool Config
 
-      mkYesodSubData "Management" [parseRoutes|
-        /html UphtmlR POST
-        /txt UptxtR POST
-        /nav UpnavR POST
-        /bin UpbinR POST
-        /qry UpqryR POST
-        /del DelR   POST
-        /list ListR POST
-        |]
+      mkYesodSubData "Management" $(parseRoutesFile "src/Glob/QQ/management.route")
 
       data RtMsg a = RtMsg
         { rtStatus :: String

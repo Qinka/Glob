@@ -3,7 +3,7 @@
 
 
 
--- bin.src/Main.hs
+-- src.bin/glob/Main.hs
 {-# LANGUAGE RecordWildCards #-}
 
 module Main
@@ -16,6 +16,7 @@ module Main
       import System.IO
 
       import Glob
+      import Glob.Data
       import Glob.Config
       import Main.CmdArgs
 

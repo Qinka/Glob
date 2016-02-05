@@ -3,7 +3,7 @@
 
 
 
--- lib/Glob/Database.hs
+-- src/Glob/Database.hs
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE QuasiQuotes                #-}
 {-# LANGUAGE TemplateHaskell            #-}

@@ -3,11 +3,10 @@
 
 
 
--- lib/Glob/Config.hs
+-- src/Glob/Config.hs
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE CPP               #-}
 
 module Glob.Config
     ( toConStr
