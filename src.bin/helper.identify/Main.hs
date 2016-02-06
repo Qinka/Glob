@@ -16,6 +16,8 @@ module Main
       import Data.Digest.Pure.SHA
       import System.Environment
       import Data.String(fromString)
+      import System.Process
+      import System.Exit
 
 
       main :: IO ()
@@ -25,8 +27,8 @@ module Main
         tzone <- getTimeZone ut
         let lTime = utcToLocalTime tzone ut
         let s = showDigest $ sha256 $ fromString $ P.concat [args,show $ localDay lTime,show $ localTimeOfDay lTime]
-        cmd <- P.getContents
-        P.putStr $ (concat.lines) cmd
+        cmd' <- P.getContents
+        let cmd = (concat.lines) cmd'
               ++ " -H \"Tokens:"
               ++ s
               ++ "\" -H \"Day:"
@@ -34,3 +36,4 @@ module Main
               ++ "\" -H \"TimeOfDay:"
               ++ show (localTimeOfDay lTime)
               ++ "\""
+        putStr cmd
