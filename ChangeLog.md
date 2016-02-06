@@ -1,9 +1,11 @@
 # The change log of Glob
 
 
-## [VERSION] 0.0.5.
+## [VERSION] 0.0.5.23
 
 1. 重新调整了全部的结构
+1. 添加了 TemplateHaskell 以简化代码
+1. 将部分页面在数据库中的前缀由 @# 转变为 $
 
 ## [VERSION] 0.0.3.56
 

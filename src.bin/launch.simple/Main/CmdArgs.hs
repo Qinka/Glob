@@ -15,7 +15,6 @@ module Main.CmdArgs
       import System.Console.CmdArgs
       import Paths_Glob
       import Data.Version(showVersion)
-      import Glob.Config(Config)
 
       data Launch = Launch
         { port :: Maybe String
@@ -33,6 +32,7 @@ module Main.CmdArgs
         , output :: String
         } deriving (Show,Typeable,Data)
 
+      launch :: Launch
       launch = Launch
         { output = "stdout"
             &= help "The way it output config-file."

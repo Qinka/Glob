@@ -17,11 +17,6 @@ module Main
       import qualified Glob.Config  as G
       import Data.Aeson
       import System.IO
-      import System.Exit
-      import System.Environment
-      import System.Process
-      import System.Directory
-      import Data.ByteString.Internal
       import Data.Maybe
       import System.Console.CmdArgs
 

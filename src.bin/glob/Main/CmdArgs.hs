@@ -20,6 +20,7 @@ module Main.CmdArgs
       data GlobCmdArgs = GlobCmdArgs
         { fromFile  :: String
         } deriving (Show,Typeable,Data)
+      globCMdArgs :: GlobCmdArgs
       globCMdArgs = GlobCmdArgs
         { fromFile = "stdin"
           &= name "file"

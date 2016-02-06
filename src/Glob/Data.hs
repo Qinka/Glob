@@ -10,6 +10,7 @@
            , ViewPatterns
            , TypeFamilies
            , OverloadedStrings
+           , FlexibleContexts
            #-}
 
 module Glob.Data where
@@ -88,13 +89,12 @@ module Glob.Data where
       globLayout w = do
         Glob _ (Config _ _ _ ti _ _ _) _<- getYesod
         pc <- widgetToPageContent w
-        [Entity _ (Htm _ topText _ _ _)] <- runDB $
-          selectList [HtmIndex ==. "$page.frame.top" , HtmTyp ==. "home"] []
-        [Entity _ (Htm _ bottomText _ _ _)] <- runDB $
-          selectList [HtmIndex ==. "$page.frame.bottom", HtmTyp ==. "home"] []
-        [Entity _ (Htm _ navText _ _ _)] <- runDB $
-          selectList [HtmIndex ==. "$page.frame.nav", HtmTyp ==. "home"] []
-        let topHtml = preEscapedToHtml topText
-        let bottomHtml = preEscapedToHtml bottomText
-        let navHtml = preEscapedToHtml navText
+        topHtml <- selectFromHtm "$page.frame.top"
+        bottomHtml <- selectFromHtm "$page.frame.top"
+        navHtml <- selectFromHtm "$page.frame.top"
         withUrlRenderer $(hamletFile "src/Glob/QQ/layout.hamlet")
+        where
+          selectFromHtm x =entHtm' `liftM`
+            liftHandlerT (runDB $ selectList [HtmIndex==.x,HtmTyp==."home"] [])
+          entHtm (Entity _ (Htm _ rt _ _ _)) = rt
+          entHtm' = P.head .P.map  (preEscapedToHtml.entHtm)

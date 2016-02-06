@@ -29,10 +29,8 @@ module Glob.Management
       import Glob.Management.Data
       import Glob.Management.TH
       import Data.Conduit
-      import Data.Aeson
       import Database.Persist.Postgresql
       import Data.ByteString.Char8 (unpack)
-      import Data.ByteString.Lazy(toStrict)
       import Data.Text.Encoding(decodeUtf8)
 
       instance YesodPersist Management where

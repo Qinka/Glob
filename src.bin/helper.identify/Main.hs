@@ -21,14 +21,16 @@ module Main
       main :: IO ()
       main = do
         args:_ <- getArgs
-        utc <- getCurrentTime
-        tzone <- getTimeZone utc
-        let lTime = utcToLocalTime tzone utc
+        ut <- getCurrentTime
+        tzone <- getTimeZone ut
+        let lTime = utcToLocalTime tzone ut
         let s = showDigest $ sha256 $ fromString $ P.concat [args,show $ localDay lTime,show $ localTimeOfDay lTime]
-        P.putStr $ "-H \"Tokens:"
+        cmd <- P.getContents
+        P.putStr $ (concat.lines) cmd
+              ++ " -H \"Tokens:"
               ++ s
               ++ "\" -H \"Day:"
-              ++ (show $ localDay lTime)
+              ++ show (localDay lTime)
               ++ "\" -H \"TimeOfDay:"
-              ++ (show $ localTimeOfDay lTime)
+              ++ show (localTimeOfDay lTime)
               ++ "\""

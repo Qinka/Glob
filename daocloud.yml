@@ -30,6 +30,7 @@ install:
   - cabal install time
   - cabal install cmdargs
   - cabal install warp-tls
+  - cabal install SHA
 before_script:
   - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
   - echo $PATH
