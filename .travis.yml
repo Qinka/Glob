@@ -16,6 +16,7 @@ before_install:
   - "cabal install cmdargs"
   - "cabal install warp-tls"
   - "cabal install hpc-coveralls"
+  - "cabal install SHA"
 script:
   - cabal configure -flaunch-docker
   - cabal build
