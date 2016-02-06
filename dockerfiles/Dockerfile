@@ -11,7 +11,7 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
 RUN apt-get update
 RUN apt-get -y install postgresql-server-dev-9.4
 RUN cabal update
-RUN cd /src && cabal install directory
+RUN cd /src && cabal install directory process
 RUN cd /src && cabal install yesod -j9
 RUN cd /src && cabal install persistent-postgresql -j9
 RUN cd /src && cabal install warp-tls
