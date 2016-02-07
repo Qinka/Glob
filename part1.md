@@ -29,3 +29,17 @@ To initialize database, there are some SQL files.
 
 To management database, psql, pgAdmin, and other tools and applications can manage database.
 At the same time, Glob has the APIs to do this.
+
+### PgAmdin
+  
+PgAdmin can manage database directly.
+But sometime we need manage database via Glob.
+ 
+### Glob's API for Management Database
+
+`/management/*` can be used to management database.
+
+* `/management/html`
+
+We can update or insert a row via this API.
+And we need 
