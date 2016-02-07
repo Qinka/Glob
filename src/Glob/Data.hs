@@ -90,8 +90,8 @@ module Glob.Data where
         Glob _ (Config _ _ _ ti _ _ _) _<- getYesod
         pc <- widgetToPageContent w
         topHtml <- selectFromHtm "$page.frame.top"
-        bottomHtml <- selectFromHtm "$page.frame.top"
-        navHtml <- selectFromHtm "$page.frame.top"
+        bottomHtml <- selectFromHtm "$page.frame.bottom"
+        navHtml <- selectFromHtm "$page.frame.nav"
         withUrlRenderer $(hamletFile "src/Glob/QQ/layout.hamlet")
         where
           selectFromHtm x =entHtm' `liftM`
