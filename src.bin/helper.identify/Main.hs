@@ -22,9 +22,10 @@ module Main
 
       main :: IO ()
       main = do
-        args:_ <- getArgs
-        ut <- getCurrentTime
-        tzone <- getTimeZone ut
+        (args:r:_) <- getArgs
+        ut' <- getCurrentTime
+        tzone <- getTimeZone ut'
+        let ut = addUTCTime (fromRational $ read r) ut'
         let lTime = utcToLocalTime tzone ut
         let s = showDigest $ sha256 $ fromString $ P.concat [args,show $ localDay lTime,show $ localTimeOfDay lTime]
         cmd' <- P.getContents
