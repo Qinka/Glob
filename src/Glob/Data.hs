@@ -60,30 +60,21 @@ module Glob.Data where
       managementAuthorCheck :: Handler AuthResult
       managementAuthorCheck = do
         token <- lookupHeaders "Tokens"
-        day <- lookupHeaders "Day"
-        time <- lookupHeaders "TimeOfDay"
-        let td = read $ b2s $ P.head day
+        time <- lookupHeaders "UTCTime"
         let tt = read $ b2s $ P.head time
         (lTu,lTd) <- liftIO $ timeUD 6
         (Glob _ (Config _ _ _ _ _ _ env) _) <- getYesod
         stoken <- liftIO $ getEnv env
-        let s1 = showDigest $ sha256 $ BL.fromStrict $ B.concat [s2b stoken,P.head day,P.head time]
+        let s1 = showDigest $ sha256 $ BL.fromStrict $ B.concat [s2b stoken,P.head time]
         if   (s1 `elem` P.map b2s token)
-          && (localDay lTu <= td)
-          && (localTimeOfDay lTu <= tt)
-          && (localDay lTd >= td)
-          && (localTimeOfDay lTd >= tt)
+          && (lTu <= tt)
+          && (lTd >= tt)
           then return Authorized
           else return $ Unauthorized ":( Who are you!"
         where
           timeUD x = do
             ut <- getCurrentTime
-            u <- toLocalTime $ addUTCTime (-x) ut
-            d <- toLocalTime $ addUTCTime x ut
-            return (u,d)
-          toLocalTime ut =
-            utcToLocalTime' ut `liftM` getTimeZone ut
-          utcToLocalTime' = flip utcToLocalTime
+            return (addUTCTime (-x) ut,addUTCTime x ut)
 
       globLayout :: Widget -> Handler Html
       globLayout w = do

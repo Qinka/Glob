@@ -109,8 +109,8 @@ module Glob.Management
         let fileinfo = case fileinfo' of {(Just x)-> [x];_ -> []}
         title <- lookupPostParams "title"
         typ <- lookupPostParams "type"
-        day <- lookupHeaders "Day"
-        if any null [index,title,typ] || any null [day] || null fileinfo
+        time <- lookupHeaders "UTCTime"
+        if any null [index,title,typ] || any null [time] || null fileinfo
           then selectRep $ provideRepType "application/json" $
             returnTJson $ rtMsg' "failed" "less and less."
           else do
@@ -121,7 +121,7 @@ module Glob.Management
               (decodeUtf8 $ head text)
               (head title)
               (head typ)
-              (read $ unpack $ head day)
+              (read $ unpack $ head time)
             selectRep $ provideRepType "application/json" $
               returnTJson $ rtMsg' "success" ""
 
@@ -132,6 +132,7 @@ module Glob.Management
         fileinfo' <- lookupFile "txt"
         let fileinfo = case fileinfo' of {(Just x)-> [x];_ -> []}
         typ <- lookupPostParams "type"
+        time <- lookupHeaders "UTCTime"
         if any null [index,typ] ||  null fileinfo
           then selectRep $ provideRepType "application/json" $
             returnTJson $ rtMsg' "failed" "less and less."
@@ -142,6 +143,7 @@ module Glob.Management
               (head index)
               (decodeUtf8 $ head text)
               (head typ)
+              (read $ unpack $ head time)
             selectRep $ provideRepType "application/json" $
               returnTJson $ rtMsg' "success" ""
 
@@ -151,6 +153,7 @@ module Glob.Management
         label <- lookupPostParams "label"
         order <- lookupPostParams "order"
         ref <- lookupPostParams "ref"
+        time <- lookupHeaders "UTCTime"
         if any null [label,order,ref]
           then selectRep $ provideRepType "application/json" $
             returnTJson $ rtMsg' "failed" "less and less."
@@ -160,6 +163,7 @@ module Glob.Management
               (head label)
               (Just $ read $ read $ show $ head order)
               (head ref)
+              (read $ unpack $ head time)
             selectRep $ provideRepType "application/json" $
               returnTJson $ rtMsg' "success" ""
 
@@ -170,6 +174,7 @@ module Glob.Management
         fileinfo' <- lookupFile "bin"
         let fileinfo = case fileinfo' of {(Just x)-> [x];_ -> []}
         typ <- lookupPostParams "type"
+        time <- lookupHeaders "UTCTime"
         if any null [index] || null fileinfo
           then selectRep $ provideRepType "application/json" $
             returnTJson $ rtMsg' "failed" "less and less."
@@ -180,6 +185,7 @@ module Glob.Management
               (head index)
               (head text)
               (head typ)
+              (read $ unpack $ head time)
             selectRep $ provideRepType "application/json" $
               returnTJson $ rtMsg' "success" ""
 
@@ -188,6 +194,7 @@ module Glob.Management
       postUpqryR = do
         index <- lookupPostParams "index"
         txt <- lookupPostParams "txt"
+        time <- lookupHeaders "UTCTime"
         if any null [index,txt]
           then selectRep $ provideRepType "application/json" $
             returnTJson $ rtMsg' "failed" "less and less."
@@ -197,6 +204,7 @@ module Glob.Management
             liftHandlerT $ runDB $ insert $ Qry
               (head index)
               (head txt)
+              (read $ unpack $ head time)
             selectRep $ provideRepType "application/json" $
               returnTJson $ rtMsg' "success" ""
 

@@ -1,5 +1,9 @@
 # The change log of Glob
 
+## [VERSION] 0.0.5.40
+
+1.改变了时间，使用 UTC time，取代 Day 与 TimeOfDay
+
 
 ## [VERSION] 0.0.5.23
 

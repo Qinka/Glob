@@ -43,7 +43,7 @@ module Glob
             x <- liftHandlerT $ runDB $ selectList [QryIndex ==. i] []
             if null x
               then return ""
-              else return $ (\[Entity _ (Qry _ t)]->t) x
+              else return $ (\[Entity _ (Qry _ t _)]->t) x
 
       getHomeR :: Handler Html
       getHomeR = do
@@ -97,12 +97,12 @@ module Glob
 
       getTxtR :: Text -> Handler TypedContent
       getTxtR i = do
-        [Entity _ (Txt _ txtText content)] <- liftHandlerT $ runDB $ selectList [TxtIndex ==. i] []
+        [Entity _ (Txt _ txtText content _ )] <- liftHandlerT $ runDB $ selectList [TxtIndex ==. i] []
         selectRep $ provideRepType (encodeUtf8 content) $ return txtText
 
       getBinR :: Text -> Handler TypedContent
       getBinR i = do
-        [Entity _ (Bin _ binText content)] <- liftHandlerT $ runDB $ selectList [BinIndex ==. i] []
+        [Entity _ (Bin _ binText content _)] <- liftHandlerT $ runDB $ selectList [BinIndex ==. i] []
         selectRep $ provideRepType (encodeUtf8 content) $ return binText
 
 
