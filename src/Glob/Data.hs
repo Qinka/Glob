@@ -22,6 +22,7 @@ module Glob.Data where
       import Glob.Management
       import Glob.Database
       import Glob.Common
+      import Glob.Auth(runToken)
       import Data.Text as T
       import Data.Time
       import Text.Blaze.Html
@@ -31,6 +32,7 @@ module Glob.Data where
       import Control.Monad(liftM)
       import qualified Data.ByteString as B
       import qualified Data.ByteString.Lazy as BL
+      import Control.Concurrent(threadDelay)
 
 
 
@@ -64,13 +66,16 @@ module Glob.Data where
         let tt = read $ b2s $ P.head time
         (lTu,lTd) <- liftIO $ timeUD 6
         (Glob _ (Config _ _ _ _ _ _ env) _) <- getYesod
-        stoken <- liftIO $ getEnv env
-        let s1 = showDigest $ sha256 $ BL.fromStrict $ B.concat [s2b stoken,P.head time]
+        stoken' <- liftIO $ getEnv env
+        let stoken = P.words stoken'
+        let s1 =  runToken stoken $ b2s $ P.head time
         if   (s1 `elem` P.map b2s token)
           && (lTu <= tt)
           && (lTd >= tt)
           then return Authorized
-          else return $ Unauthorized ":( Who are you!"
+          else do
+            liftIO $ threadDelay 10000000
+            return $ Unauthorized ":( Who are you!"
         where
           timeUD x = do
             ut <- getCurrentTime

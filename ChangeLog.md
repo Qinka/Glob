@@ -1,9 +1,16 @@
 # The change log of Glob
 
+## [VERSION] 0.0.5.60
+
+1. 添加了 进行 sql 查询的管理内容，可以直接执行 sql 的查询。
+
+## [VERSION] 0.0.5.50
+
+1. 更换了秘钥机制，加强秘钥破解难度。
+
 ## [VERSION] 0.0.5.40
 
-1.改变了时间，使用 UTC time，取代 Day 与 TimeOfDay
-
+1. 改变了时间，使用 UTC time，取代 Day 与 TimeOfDay
 
 ## [VERSION] 0.0.5.23
 

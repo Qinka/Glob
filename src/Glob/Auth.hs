@@ -3,23 +3,19 @@
 
 
 
--- tools.bin/helper.identify
+-- src/Glob/Auth.hs
 
-{-# LANGUAGE OverloadedStrings #-}
-
-module Main
-    ( main
+module Glob.Auth
+    ( runToken
     ) where
 
-      import Prelude as P
-      import Data.Time
+
       import Data.Digest.Pure.SHA
-      import System.Environment
-      import Data.String(fromString)
       import Glob.Common
       import qualified Data.ByteString.Lazy as BL
       import Data.List(elemIndex)
       import Data.Maybe(fromMaybe)
+
 
       runToken :: [String] -> String -> String
       runToken xs time = shaR $ BL.fromStrict $ s2b $ xs !! ca ++timeS
@@ -36,19 +32,3 @@ module Main
             3 -> showDigest.sha512
       oct :: Char -> Int
       oct = fromMaybe 0.flip elemIndex "0123456789abcdef"
-
-
-      main :: IO ()
-      main = do
-        (r:stoken) <- getArgs
-        ut' <- getCurrentTime
-        let ut = show $ addUTCTime (fromIntegral $ read r) ut'
-        let s = runToken stoken ut
-        cmd' <- P.getContents
-        let cmd = (concat.lines) cmd'
-              ++ " -H \"Tokens:"
-              ++ s
-              ++ "\" -H \"UTCTime:"
-              ++ ut
-              ++ "\""
-        putStr cmd

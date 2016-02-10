@@ -111,8 +111,7 @@ module Glob.Management
         typ <- lookupPostParams "type"
         time <- lookupHeaders "UTCTime"
         if any null [index,title,typ] || any null [time] || null fileinfo
-          then selectRep $ provideRepType "application/json" $
-            returnTJson $ rtMsg' "failed" "less and less."
+          then invalidArgs ["failed/less and less."]
           else do
             liftHandlerT $ runDB $ deleteWhere [HtmIndex ==. head index]
             text <- sourceToList $ fileSource $ head fileinfo
@@ -134,8 +133,7 @@ module Glob.Management
         typ <- lookupPostParams "type"
         time <- lookupHeaders "UTCTime"
         if any null [index,typ] ||  null fileinfo
-          then selectRep $ provideRepType "application/json" $
-            returnTJson $ rtMsg' "failed" "less and less."
+          then invalidArgs ["failed/less and less."]
           else do
             liftHandlerT $ runDB $ deleteWhere [TxtIndex ==. head index]
             text <- sourceToList $ fileSource $ head fileinfo
@@ -155,8 +153,7 @@ module Glob.Management
         ref <- lookupPostParams "ref"
         time <- lookupHeaders "UTCTime"
         if any null [label,order,ref]
-          then selectRep $ provideRepType "application/json" $
-            returnTJson $ rtMsg' "failed" "less and less."
+          then invalidArgs ["failed/less and less."]
           else do
             liftHandlerT $ runDB $ deleteWhere [NavLabel ==. head label]
             liftHandlerT $ runDB $ insert $ Nav
@@ -176,8 +173,7 @@ module Glob.Management
         typ <- lookupPostParams "type"
         time <- lookupHeaders "UTCTime"
         if any null [index] || null fileinfo
-          then selectRep $ provideRepType "application/json" $
-            returnTJson $ rtMsg' "failed" "less and less."
+          then invalidArgs ["failed/less and less."]
           else do
             liftHandlerT $ runDB $ deleteWhere [BinIndex ==. head index]
             text <- sourceToList $ fileSource $ head fileinfo
@@ -196,10 +192,8 @@ module Glob.Management
         txt <- lookupPostParams "txt"
         time <- lookupHeaders "UTCTime"
         if any null [index,txt]
-          then selectRep $ provideRepType "application/json" $
-            returnTJson $ rtMsg' "failed" "less and less."
+          then invalidArgs ["failed/less and less."]
           else do
-
             liftHandlerT $ runDB $ deleteWhere [QryIndex ==. head index]
             liftHandlerT $ runDB $ insert $ Qry
               (head index)
@@ -207,6 +201,18 @@ module Glob.Management
               (read $ unpack $ head time)
             selectRep $ provideRepType "application/json" $
               returnTJson $ rtMsg' "success" ""
+
+      postSqlR :: Yesod master
+               => HandlerT Management (HandlerT master IO) TypedContent
+      postSqlR = do
+        fileinfo' <- lookupFile "sql"
+        case fileinfo' of
+          Just fileinfo -> do
+            text <- sourceToList $ fileSource fileinfo
+            _ <- liftHandlerT $ runDB $ rawExecute (decodeUtf8 $ head text) []
+            selectRep $ provideRepType "application/json" $
+              returnTJson $ rtMsg' "success" ""
+          _ -> invalidArgs ["failed/less and less."]
 
 
       instance Yesod master => YesodSubDispatch  Management (HandlerT master IO) where
