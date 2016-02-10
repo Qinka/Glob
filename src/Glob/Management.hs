@@ -106,7 +106,7 @@ module Glob.Management
       postUphtmlR = do
         index <- lookupPostParams "index"
         fileinfo' <- lookupFile "html"
-        let fileinfo = case fileinfo' of {(Just x)-> [x];_ -> []}
+        let fileinfo = toList fileinfo'
         title <- lookupPostParams "title"
         typ <- lookupPostParams "type"
         time <- lookupHeaders "UTCTime"
@@ -129,8 +129,8 @@ module Glob.Management
       postUptxtR = do
         index <- lookupPostParams "index"
         fileinfo' <- lookupFile "txt"
-        let fileinfo = case fileinfo' of {(Just x)-> [x];_ -> []}
         typ <- lookupPostParams "type"
+        let fileinfo = toList fileinfo'
         time <- lookupHeaders "UTCTime"
         if any null [index,typ] ||  null fileinfo
           then invalidArgs ["failed/less and less."]
@@ -144,6 +144,9 @@ module Glob.Management
               (read $ unpack $ head time)
             selectRep $ provideRepType "application/json" $
               returnTJson $ rtMsg' "success" ""
+      toList :: Maybe a -> [a]
+      toList (Just x) = [x]
+      toList _ = []
 
       postUpnavR :: Yesod master
                   => HandlerT Management (HandlerT master IO) TypedContent
@@ -169,7 +172,7 @@ module Glob.Management
       postUpbinR = do
         index <- lookupPostParams "index"
         fileinfo' <- lookupFile "bin"
-        let fileinfo = case fileinfo' of {(Just x)-> [x];_ -> []}
+        let fileinfo = toList fileinfo'
         typ <- lookupPostParams "type"
         time <- lookupHeaders "UTCTime"
         if any null [index] || null fileinfo
