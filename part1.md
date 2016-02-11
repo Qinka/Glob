@@ -29,3 +29,5 @@ To initialize database, there are some SQL files.
 
 To management database, psql, pgAdmin, and other tools and applications can manage database.
 At the same time, Glob has the APIs to do this.
+
+And from 0.0.5.60, we can raw SQL file by hostname:port/management/sql via POST.
