@@ -4,8 +4,8 @@
 name:                Glob
 version:             0.0.5.60
 synopsis:            A simple blog system.
--- description:
--- license:
+description:         A small and simple blog framework.
+license:             AgasaLicense
 license-file:        license/LICENSE
 author:              Qinka
 maintainer:          qinka@live.com
