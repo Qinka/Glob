@@ -1,7 +1,7 @@
 FROM index.docker.io/library/haskell:7.10.2
 MAINTAINER qinka
 ADD . /src
-RUN ls -a /src/resource
+RUN ls -a /src
 RUN ls -a /src/resource
 RUN cp /src/resource/favicon.ico /favicon.ico
 RUN cd /src && cabal sandbox init
