@@ -12,25 +12,7 @@ install:
   - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
   - cabal sandbox init
   - cabal update
-  - cabal install directory
-  - cabal install process
-  - cabal install yesod -j9
-  - cabal install yesod-auth
-  - cabal install yesod-core
-  - cabal install monad-logger
-  - cabal install aeson
-  - cabal install bytestring
-  - cabal install text
-  - cabal install persistent
-  - cabal install persistent-template
-  - cabal install persistent-postgresql
-  - cabal install transformers
-  - cabal install resourcet
-  - cabal install blaze-html
-  - cabal install time
-  - cabal install cmdargs
-  - cabal install warp-tls
-  - cabal install SHA
+  - cabal install -j9 directory process persistent-template yesod persistent-postgresql  warp-tls cmdargs
 before_script:
   - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
   - echo $PATH
@@ -40,4 +22,4 @@ script:
   - echo $PATH
   - which cabal
   - cabal install -j9 -flaunch-docker -flaunch-simple -fwith-tls
-  - cabal install -j9 -flaunch-docker -flaunch-simpleß
+  - cabal install -j9 -flaunch-docker -flaunch-simple
