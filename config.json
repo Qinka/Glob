@@ -1,0 +1,16 @@
+{
+  "port":3000,
+  "dbConfig":{
+    "host":"localhost",
+    "port":"5432",
+    "usr":"qinka",
+    "psk":"johnjing",
+    "dbName":"postgres",
+    "conThd":10
+  },
+  "favicon-path":"",
+  "site-title":"Qinka's Blog",
+  "certificate-file":"",
+  "key-file":"",
+  "token-value-name":"GLOB_BACKEND_TOKEN"
+}

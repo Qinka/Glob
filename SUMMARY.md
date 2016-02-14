@@ -1,3 +1,3 @@
 # Summary
 
-* [Database Setting](part1.md)
+* [Database Setting](Database.md)
