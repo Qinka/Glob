@@ -1,6 +1,5 @@
-# Database Setting
-
----
+Database Settings
+===
 
 The database setting  is important.
 The whole website is based on the database.
@@ -45,3 +44,7 @@ We can update or insert a row via this API.
 And we need 
 
 And from 0.0.5.60, we can raw SQL file by hostname:port/management/sql via POST.
+
+* `/management/sql`
+
+Upload and run sql file via POST.
