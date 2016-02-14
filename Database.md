@@ -43,3 +43,5 @@ But sometime we need manage database via Glob.
 
 We can update or insert a row via this API.
 And we need 
+
+And from 0.0.5.60, we can raw SQL file by hostname:port/management/sql via POST.
