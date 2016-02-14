@@ -1,5 +1,11 @@
 # The change log of Glob
 
+## [VERSION] 0.0.6.0
+
+1. 0.1 的 alpha 测试
+1. 无重要调整
+
+
 ## [VERSION] 0.0.5.60
 
 1. 添加了 进行 sql 查询的管理内容，可以直接执行 sql 的查询。
