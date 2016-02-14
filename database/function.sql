@@ -3,7 +3,8 @@
 
 
 
--- database/database.sql
+-- database/function.sql
+-- add an delete function
 
 CREATE OR REPLACE FUNCTION
   drop_all_table(user_name IN VARCHAR,schema_name IN VARCHAR)

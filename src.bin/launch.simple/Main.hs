@@ -3,7 +3,7 @@
 
 
 
--- launch.bin/simple/Main.hs
+-- src.bin/launch.simple/Main.hs
 
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -11,7 +11,6 @@
 module Main
     ( main
     ) where
-
 
       import qualified Main.CmdArgs as C
       import qualified Glob.Config  as G

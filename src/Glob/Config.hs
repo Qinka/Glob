@@ -4,9 +4,11 @@
 
 
 -- src/Glob/Config.hs
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE RecordWildCards   #-}
+
+{-# LANGUAGE OverloadedStrings
+           , FlexibleContexts 
+           , RecordWildCards   
+           #-}
 
 module Glob.Config
     ( toConStr

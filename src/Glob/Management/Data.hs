@@ -4,6 +4,7 @@
 
 
 -- src/Glob/Management/Data.hs
+
 {-# LANGUAGE  QuasiQuotes
             , TemplateHaskell
             , OverloadedStrings
@@ -16,8 +17,6 @@ module Glob.Management.Data where
       import Yesod
       import Database.Persist.Postgresql
       import Glob.Config
-
-
 
       data Management = Management ConnectionPool Config
 

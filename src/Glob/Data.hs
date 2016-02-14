@@ -34,14 +34,11 @@ module Glob.Data where
       import qualified Data.ByteString.Lazy as BL
       import Control.Concurrent(threadDelay)
 
-
-
       data Glob = Glob
         { conPool :: ConnectionPool
         , config :: Config
         , subManagement :: Management
         }
-
 
       mkYesodData "Glob" $(parseRoutesFile "src/Glob/QQ/glob.route")
 

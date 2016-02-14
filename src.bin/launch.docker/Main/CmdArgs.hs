@@ -3,7 +3,7 @@
 
 
 
--- launch.bin/docker/Main/CmdArgs.hs
+-- src.bin/launch.docker/Main/CmdArgs.hs
 
 {-# LANGUAGE DeriveDataTypeable #-}
 

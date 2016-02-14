@@ -5,9 +5,10 @@
 
 -- src/GLob/Tls.hs
 
-{-# LANGUAGE CPP #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP
+           , TemplateHaskell
+           , OverloadedStrings
+           #-}
 
 module Glob.Tls
     ( warpTls

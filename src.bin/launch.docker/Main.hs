@@ -3,10 +3,9 @@
 
 
 
--- launch.bin/docker/Main.hs
+-- src.bin/launch.docker/Main.hs
 
 {-# LANGUAGE OverloadedStrings #-}
-
 
 module Main
     ( main

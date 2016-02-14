@@ -22,6 +22,7 @@ module Glob
       import Glob.Config
       import Glob.Database
       import Glob.Management
+      import Glob.Common
       import Yesod
       import Data.Text.Encoding(encodeUtf8,decodeUtf8)
       import Data.Text hiding(null,map,head)
@@ -31,12 +32,14 @@ module Glob
       import Data.Aeson
       import Data.Version(showVersion)
       import Glob.Data
+      import Data.Time
 
       getQueryR :: Text -> Handler Text
       getQueryR i =
         case i of
           "version" -> return $ pack $ showVersion version
           "name" -> return "Glob"
+          "servertime" -> liftIO $ getCurrentTime >>= return.s2t.show
           _ -> getQry
         where
           getQry = do
@@ -94,7 +97,6 @@ module Glob
           setTitle $ toHtml pageTitle_
           [whamlet|#{pageHtml}|]
 
-
       getTxtR :: Text -> Handler TypedContent
       getTxtR i = do
         [Entity _ (Txt _ txtText content _ )] <- liftHandlerT $ runDB $ selectList [TxtIndex ==. i] []
@@ -104,7 +106,6 @@ module Glob
       getBinR i = do
         [Entity _ (Bin _ binText content _)] <- liftHandlerT $ runDB $ selectList [BinIndex ==. i] []
         selectRep $ provideRepType (encodeUtf8 content) $ return binText
-
 
       postNavR :: Handler TypedContent
       postNavR = do

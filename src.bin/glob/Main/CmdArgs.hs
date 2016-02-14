@@ -3,7 +3,8 @@
 
 
 
--- bin.src/Main/CmdArgs.hs
+-- src.bin/glob/Main/CmdArgs.hs
+
 {-# LANGUAGE DeriveDataTypeable #-}
 
 module Main.CmdArgs

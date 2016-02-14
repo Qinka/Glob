@@ -4,6 +4,7 @@
 
 
 -- src.bin/glob/Main.hs
+
 {-# LANGUAGE RecordWildCards #-}
 
 module Main
@@ -27,9 +28,14 @@ module Main
       import Database.Persist.Postgresql
 
       import Control.Monad.Logger
+      
+      import Paths_Glob
+      import Data.Version
 
       main :: IO ()
       main = do
+        putStrLn $ "Glob - " ++ showVersion version
+        putStrLn "pass Crtl+C to stop"
         con <- runArgs withGlobCmdArgs
         let config = fromMaybe (error "glob:Error Config") con
         let (constr,conThd) = toConStr $ dbConfig config

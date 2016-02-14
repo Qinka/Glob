@@ -5,6 +5,8 @@
 
 -- database/table.sql
 
+-- Run ' SELECT drop_all_table();' first when those table existed.
+
 CREATE TABLE table_nav
 (
   key_label TEXT NOT NULL PRIMARY KEY,

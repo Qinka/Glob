@@ -3,7 +3,7 @@
 
 
 
---launch.bin/simple/Main/CmdArgs.hs
+-- src.bin/launch.simple/Main/CmdArgs.hs
 
 {-# LANGUAGE DeriveDataTypeable #-}
 
