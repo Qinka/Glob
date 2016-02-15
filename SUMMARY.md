@@ -4,6 +4,4 @@
 * [Database Setting](Database.md)
 * [Source](Source.md)
 * [Docker](Docker.md)
-* [Build]()
-* [Install]()
-* [Glob]()
+* [Glob](Glob.md)
