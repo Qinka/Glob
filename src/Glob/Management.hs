@@ -30,6 +30,7 @@ module Glob.Management
       import Database.Persist.Postgresql
       import Data.ByteString.Char8 (unpack)
       import Data.Text.Encoding(decodeUtf8)
+      import qualified Data.ByteString.Char8 as BC8
 
       instance YesodPersist Management where
         type YesodPersistBackend Management = SqlBackend
@@ -105,15 +106,22 @@ module Glob.Management
           then invalidArgs ["failed/less and less"]
           else do
             liftHandlerT $ runDB $ deleteWhere [HtmIndex ==. head index]
-            text <- sourceToList $ fileSource $ head fileinfo
+            text <- fileInfo fileinfo
             liftHandlerT $ runDB $ insert $ Htm
               (head index)
-              (decodeUtf8 $ head text)
+              (decodeUtf8 text)
               (head title)
               (head typ)
               (read $ unpack $ head time)
             selectRep $ provideRepType "application/json" $
               returnTJson $ rtMsg' "success" ""
+
+
+      fileInfo :: (MonadResource a,MonadHandler a) => [FileInfo] -> a BC8.ByteString
+      fileInfo [] = invalidArgs ["failed/less and less"]
+      fileInfo (x:_) = do
+        rt <- sourceToList $ fileSource x
+        return $ BC8.concat rt
 
       postUptxtR :: Yesod master
                   => HandlerT Management (HandlerT master IO) TypedContent
@@ -127,10 +135,10 @@ module Glob.Management
           then invalidArgs ["failed/less and less"]
           else do
             liftHandlerT $ runDB $ deleteWhere [TxtIndex ==. head index]
-            text <- sourceToList $ fileSource $ head fileinfo
+            text <- fileInfo fileinfo
             liftHandlerT $ runDB $ insert $ Txt
               (head index)
-              (decodeUtf8 $ head text)
+              (decodeUtf8 text)
               (head typ)
               (read $ unpack $ head time)
             selectRep $ provideRepType "application/json" $
@@ -170,10 +178,10 @@ module Glob.Management
           then invalidArgs ["failed/less and less"]
           else do
             liftHandlerT $ runDB $ deleteWhere [BinIndex ==. head index]
-            text <- sourceToList $ fileSource $ head fileinfo
+            text <- fileInfo fileinfo
             liftHandlerT $ runDB $ insert $ Bin
               (head index)
-              (head text)
+              text
               (head typ)
               (read $ unpack $ head time)
             selectRep $ provideRepType "application/json" $
@@ -203,7 +211,7 @@ module Glob.Management
         case fileinfo' of
           Just fileinfo -> do
             text <- sourceToList $ fileSource fileinfo
-            _ <- liftHandlerT $ runDB $ rawExecute (decodeUtf8 $ head text) []
+            _ <- liftHandlerT $ runDB $ rawExecute (decodeUtf8 $ BC8.concat text) []
             selectRep $ provideRepType "application/json" $
               returnTJson $ rtMsg' "success" ""
           _ -> invalidArgs ["failed/less and less."]

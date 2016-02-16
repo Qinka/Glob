@@ -1,6 +1,6 @@
 FROM index.docker.io/library/haskell:7.10.2
 MAINTAINER qinka
-ADD . /src
+ADD .. /src
 RUN ls -a /src
 RUN ls -a /src/resource
 RUN cp /src/resource/favicon.ico /favicon.ico

@@ -9,3 +9,4 @@ ssl.csr
 ssl.key
 ssl.crt
 client_session_key.aes
+.DS_Store

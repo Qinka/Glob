@@ -22,10 +22,12 @@ module Glob
       import Glob.Config
       import Glob.Database
       import Glob.Management
+      import Glob.Management.TH(a2o)
       import Glob.Common
       import Yesod
       import Data.Text.Encoding(encodeUtf8,decodeUtf8)
       import Data.Text hiding(null,map,head)
+      import qualified Data.Text as T
       import Text.Blaze.Html
       import qualified Data.ByteString.Lazy as BL
       import Paths_Glob
@@ -33,13 +35,14 @@ module Glob
       import Data.Version(showVersion)
       import Glob.Data
       import Data.Time
+      import Control.Monad
 
       getQueryR :: Text -> Handler Text
       getQueryR i =
         case i of
           "version" -> return $ pack $ showVersion version
           "name" -> return "Glob"
-          "servertime" -> liftIO $ getCurrentTime >>= return.s2t.show
+          "servertime" -> liftIO $ liftM (s2t.show)getCurrentTime
           _ -> getQry
         where
           getQry = do
@@ -73,11 +76,20 @@ module Glob
 
       postBlogListR :: Handler TypedContent
       postBlogListR = do
-        blogs' <- liftHandlerT $ runDB $ selectList [HtmTyp ==. "blog"] []
+        inde <- lookupPostParams "index"
+        len <- liftHandlerT $ lookupPostParam "lenlimit"
+        blogs' <- liftHandlerT $ runDB $ selectList ((HtmTyp ==. "blog"):ind inde) []
         let blogs = map (\(Entity _ x) -> x) blogs'
         selectRep $ provideRepType "application/json" $
           return $ decodeUtf8 $ BL.toStrict $ encode $
-            map (\(Htm i _ tit _ tim) -> object ["index" .= i,"title" .= tit,"time" .= tim]) blogs
+            map (\(Htm i h tit _ tim) -> object $
+              ["index" .= i,"title" .= tit,"time" .= (show tim)] ++ from len h
+            ) blogs
+          where
+            from (Just len) x= ["content" .= T.take (read $ t2s len) x]
+            from _ _ = []
+            ind [] = []
+            ind xs = a2o $ map (\x -> [HtmIndex ==. x]) xs
 
       getBlogListR :: Handler Html
       getBlogListR = do
