@@ -16,6 +16,8 @@ module Glob.Common
     , s2b
     , b2t
     , t2b
+    , ws2s
+    , s2ws
     ) where
 
       import Data.Aeson
@@ -69,3 +71,10 @@ module Glob.Common
 
       s2b :: String ->ByteString
       s2b = t2b.s2t
+
+      ws2s :: [Text] -> Text
+      ws2s [] = ""
+      ws2s (x:xs) = T.concat ["/",x,ws2s xs]
+
+      s2ws :: Text -> [Text]
+      s2ws = Prelude.tail.splitOn "/"

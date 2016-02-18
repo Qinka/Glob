@@ -5,17 +5,17 @@
 
 -- src/Glob/Database.hs
 
-{-# LANGUAGE OverloadedStrings          
-           , QuasiQuotes                
-           , TemplateHaskell            
-           , FlexibleInstances          
-           , TypeFamilies               
-           , GADTs                      
-           , GeneralizedNewtypeDeriving 
+{-# LANGUAGE OverloadedStrings
+           , QuasiQuotes
+           , TemplateHaskell
+           , FlexibleInstances
+           , TypeFamilies
+           , GADTs
+           , GeneralizedNewtypeDeriving
            #-}
 
 module Glob.Database where
-  
+
       import Data.Text
       import Data.Text.Encoding(decodeUtf8,encodeUtf8)
       import qualified Data.ByteString as B

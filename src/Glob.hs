@@ -37,16 +37,16 @@ module Glob
       import Data.Time
       import Control.Monad
 
-      getQueryR :: Text -> Handler Text
+      getQueryR :: Texts -> Handler Text
       getQueryR i =
         case i of
-          "version" -> return $ pack $ showVersion version
-          "name" -> return "Glob"
-          "servertime" -> liftIO $ liftM (s2t.show)getCurrentTime
+          "version":_ -> return $ pack $ showVersion version
+          "name":_ -> return "Glob"
+          "servertime":_ -> liftIO $ liftM (s2t.show)getCurrentTime
           _ -> getQry
         where
           getQry = do
-            x <- liftHandlerT $ runDB $ selectList [QryIndex ==. i] []
+            x <- liftHandlerT $ runDB $ selectList [QryIndex ==. ws2s i] []
             if null x
               then return ""
               else return $ (\[Entity _ (Qry _ t _)]->t) x
@@ -54,16 +54,16 @@ module Glob
       getHomeR :: Handler Html
       getHomeR = do
         [Entity _ (Htm _ mainText mainTitle _ _)] <- liftHandlerT $ runDB $
-          selectList [HtmIndex ==. "$page.main",HtmTyp ==. "home"] []
+          selectList [HtmIndex ==. ws2s ["home","page","main"],HtmTyp ==. "home"] []
         let mainHtml = preEscapedToHtml mainText
         defaultLayout $ do
           setTitle $ toHtml mainTitle
           [whamlet|#{mainHtml}|]
 
-      getBlogItemR :: Text -> Text -> Handler Html
+      getBlogItemR :: Text -> Texts -> Handler Html
       getBlogItemR t i= do
         [Entity _ (Htm _ blogText blogTitle _ _)] <- liftHandlerT $ runDB $
-          selectList [HtmIndex ==. i,HtmTime ==. read (read $ show t),HtmTyp ==. "blog"] []
+          selectList [HtmIndex ==. ws2s ("blog":i),HtmTime ==. read (read $ show t),HtmTyp ==. "blog"] []
         let blogHtml = preEscapedToHtml blogText
         defaultLayout $ do
           setTitle $ toHtml blogTitle
@@ -94,29 +94,29 @@ module Glob
       getBlogListR :: Handler Html
       getBlogListR = do
         [Entity _ (Htm _ blogText blogTitle _ _)] <- liftHandlerT $ runDB $
-          selectList [HtmIndex ==. "$page.blog",HtmTyp ==. "home"] []
+          selectList [HtmIndex ==. ws2s ["home","page","blog"],HtmTyp ==. "home"] []
         let blogHtml = preEscapedToHtml blogText
         defaultLayout $ do
           setTitle $ toHtml blogTitle
           [whamlet|#{blogHtml}|]
 
-      getPageR :: Text -> Handler Html
+      getPageR :: Texts -> Handler Html
       getPageR i = do
         [Entity _ (Htm _ pageText pageTitle_ _ _)] <- liftHandlerT $ runDB $
-          selectList [HtmIndex ==. i,HtmTyp ==. "page"] []
+          selectList [HtmIndex ==. ws2s ("page":i),HtmTyp ==. "page"] []
         let pageHtml = preEscapedToHtml pageText
         defaultLayout $ do
           setTitle $ toHtml pageTitle_
           [whamlet|#{pageHtml}|]
 
-      getTxtR :: Text -> Handler TypedContent
+      getTxtR :: Texts -> Handler TypedContent
       getTxtR i = do
-        [Entity _ (Txt _ txtText content _ )] <- liftHandlerT $ runDB $ selectList [TxtIndex ==. i] []
+        [Entity _ (Txt _ txtText content _ )] <- liftHandlerT $ runDB $ selectList [TxtIndex ==. ws2s i] []
         selectRep $ provideRepType (encodeUtf8 content) $ return txtText
 
-      getBinR :: Text -> Handler TypedContent
+      getBinR :: Texts -> Handler TypedContent
       getBinR i = do
-        [Entity _ (Bin _ binText content _)] <- liftHandlerT $ runDB $ selectList [BinIndex ==. i] []
+        [Entity _ (Bin _ binText content _)] <- liftHandlerT $ runDB $ selectList [BinIndex ==. ws2s i] []
         selectRep $ provideRepType (encodeUtf8 content) $ return binText
 
       postNavR :: Handler TypedContent

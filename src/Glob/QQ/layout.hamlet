@@ -9,7 +9,7 @@ $doctype 5
     <meta name=viewport content=width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no>
     ^{pageHead pc}
   <body>
-    <link rel=stylesheet href=@{TxtR "css.frame.css"}>
+    <link rel=stylesheet href=@{TxtR ["css","frame.css"]}>
     #{topHtml}
     #{navHtml}
     ^{pageBody pc}

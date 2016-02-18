@@ -82,12 +82,12 @@ module Glob.Data where
       globLayout w = do
         Glob _ (Config _ _ _ ti _ _ _) _<- getYesod
         pc <- widgetToPageContent w
-        topHtml <- selectFromHtm "$page.frame.top"
-        bottomHtml <- selectFromHtm "$page.frame.bottom"
-        navHtml <- selectFromHtm "$page.frame.nav"
+        topHtml <- selectFromHtm ["page","frame","top"]
+        bottomHtml <- selectFromHtm ["page","frame","bottom"]
+        navHtml <- selectFromHtm ["page","frame","nav"]
         withUrlRenderer $(hamletFile "src/Glob/QQ/layout.hamlet")
         where
           selectFromHtm x =entHtm' `liftM`
-            liftHandlerT (runDB $ selectList [HtmIndex==.x,HtmTyp==."home"] [])
+            liftHandlerT (runDB $ selectList [HtmIndex==. ws2s ("home":x),HtmTyp==."home"] [])
           entHtm (Entity _ (Htm _ rt _ _ _)) = rt
           entHtm' = P.head .P.map  (preEscapedToHtml.entHtm)

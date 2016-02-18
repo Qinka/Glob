@@ -105,10 +105,10 @@ module Glob.Management
         if any null [index,title,typ] || any null [time] || null fileinfo
           then invalidArgs ["failed/less and less"]
           else do
-            liftHandlerT $ runDB $ deleteWhere [HtmIndex ==. head index]
+            liftHandlerT $ runDB $ deleteWhere [HtmIndex ==. ws2s index]
             text <- fileInfo fileinfo
             liftHandlerT $ runDB $ insert $ Htm
-              (head index)
+              (ws2s index)
               (decodeUtf8 text)
               (head title)
               (head typ)
@@ -134,10 +134,10 @@ module Glob.Management
         if any null [index,typ] ||  null fileinfo
           then invalidArgs ["failed/less and less"]
           else do
-            liftHandlerT $ runDB $ deleteWhere [TxtIndex ==. head index]
+            liftHandlerT $ runDB $ deleteWhere [TxtIndex ==. ws2s index]
             text <- fileInfo fileinfo
             liftHandlerT $ runDB $ insert $ Txt
-              (head index)
+              (ws2s index)
               (decodeUtf8 text)
               (head typ)
               (read $ unpack $ head time)
@@ -174,13 +174,13 @@ module Glob.Management
         let fileinfo = toList fileinfo'
         typ <- lookupPostParams "type"
         time <- lookupHeaders "UTCTime"
-        if any null [index] || null fileinfo
+        if any null [index,typ] || null fileinfo
           then invalidArgs ["failed/less and less"]
           else do
-            liftHandlerT $ runDB $ deleteWhere [BinIndex ==. head index]
+            liftHandlerT $ runDB $ deleteWhere [BinIndex ==. ws2s index]
             text <- fileInfo fileinfo
             liftHandlerT $ runDB $ insert $ Bin
-              (head index)
+              (ws2s index)
               text
               (head typ)
               (read $ unpack $ head time)
@@ -196,9 +196,9 @@ module Glob.Management
         if any null [index,txt]
           then invalidArgs ["failed/less and less"]
           else do
-            liftHandlerT $ runDB $ deleteWhere [QryIndex ==. head index]
+            liftHandlerT $ runDB $ deleteWhere [QryIndex ==. ws2s index]
             liftHandlerT $ runDB $ insert $ Qry
-              (head index)
+              (ws2s index)
               (head txt)
               (read $ unpack $ head time)
             selectRep $ provideRepType "application/json" $
