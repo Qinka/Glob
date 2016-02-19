@@ -34,7 +34,7 @@ module Main
       toConfig x = do
         port <- getEnv $ C.port x
         conThd <- getEnv $ C.conThd x
-        favPath <- getEnv $ C.favPath x
+        staticPath <- getEnv $ C.staticPath x
         siteTitle <- getEnv $ C.siteTitle x
         certPath <- getEnv $ C.certPath x
         keyPath <- getEnv $ C.keyPath x
@@ -47,7 +47,7 @@ module Main
         return $ G.Config
           (read port)
           (G.DbConfig dbAddr dbPort dbUsr dbPsk dbName $ read conThd)
-          favPath
+          staticPath
           siteTitle
           certPath
           keyPath
