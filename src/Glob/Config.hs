@@ -6,8 +6,8 @@
 -- src/Glob/Config.hs
 
 {-# LANGUAGE OverloadedStrings
-           , FlexibleContexts 
-           , RecordWildCards   
+           , FlexibleContexts
+           , RecordWildCards
            #-}
 
 module Glob.Config
@@ -25,7 +25,7 @@ module Glob.Config
       data Config = Config
         { port :: Int
         , dbConfig :: DbConfig
-        , faviconPath :: FilePath
+        , staticPath :: FilePath
         , siteTitle :: String
         , certPath  :: FilePath
         , keyPath   :: FilePath
@@ -36,7 +36,7 @@ module Glob.Config
         parseJSON (Object v) = Config
           <$> v .: "port"
           <*> v .: "dbConfig"
-          <*> v .: "favicon-path"
+          <*> v .: "static-path"
           <*> v .: "site-title"
           <*> v .: "certificate-file"
           <*> v .: "key-file"
@@ -46,7 +46,7 @@ module Glob.Config
         toJSON Config{..} = object
           [ "port" .= port
           , "dbConfig" .= dbConfig
-          , "favicon-path" .= faviconPath
+          , "static-path" .= staticPath
           , "site-title" .= siteTitle
           , "certificate-file" .= certPath
           , "key-file" .= keyPath

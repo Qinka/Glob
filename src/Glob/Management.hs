@@ -26,11 +26,14 @@ module Glob.Management
       import Glob.Common
       import Glob.Management.Data
       import Glob.Management.TH
+      import Glob.Config
       import Data.Conduit
       import Database.Persist.Postgresql
       import Data.ByteString.Char8 (unpack)
       import Data.Text.Encoding(decodeUtf8)
+      import System.Directory
       import qualified Data.ByteString.Char8 as BC8
+      import qualified Data.Text.IO as TIO
 
       instance YesodPersist Management where
         type YesodPersistBackend Management = SqlBackend
@@ -215,6 +218,28 @@ module Glob.Management
             selectRep $ provideRepType "application/json" $
               returnTJson $ rtMsg' "success" ""
           _ -> invalidArgs ["failed/less and less."]
+
+      postStatR :: Yesod master
+                => HandlerT Management (HandlerT master IO) TypedContent
+      postStatR = do
+        index <- lookupPostParams "index"
+        typ <- lookupPostParams "type"
+        fileinfo' <- lookupFile "file"
+        let fileinfo = toList fileinfo'
+        if any null [index,typ] || null fileinfo
+          then invalidArgs ["failed/less and less"]
+          else do
+            let path' = t2s $ ws2s index
+            sp <- fmap (staticPath.configM) getYesod
+            let path = sp ++ path'
+            text <- fileInfo fileinfo
+            liftIO $ createDirectoryIfMissing True $ reverse $ dropWhile (/='/') $ reverse path
+            liftIO $ BC8.writeFile path text
+            liftIO $ TIO.writeFile (path++".mime") $ head typ
+            selectRep $ provideRepType "application/json" $
+              returnTJson $ rtMsg' "success" ""
+
+
 
       instance Yesod master => YesodSubDispatch  Management (HandlerT master IO) where
         yesodSubDispatch = $(mkYesodSubDispatch resourcesManagement)

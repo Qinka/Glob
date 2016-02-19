@@ -17,6 +17,7 @@
 module Glob
     ( module Glob
     , module Glob.Management
+    , module Glob.Static
     ) where
 
       import Glob.Config
@@ -24,6 +25,7 @@ module Glob
       import Glob.Management
       import Glob.Management.TH(a2o)
       import Glob.Common
+      import Glob.Static
       import Yesod
       import Data.Text.Encoding(encodeUtf8,decodeUtf8)
       import Data.Text hiding(null,map,head)
@@ -69,10 +71,6 @@ module Glob
           setTitle $ toHtml blogTitle
           [whamlet|#{blogHtml}|]
 
-      getFaviconR :: Handler Html
-      getFaviconR = do
-        (Glob _ (Config _ _ path _ _ _ _) _) <- getYesod
-        sendFile "applcation/x-ico" path
 
       postBlogListR :: Handler TypedContent
       postBlogListR = do

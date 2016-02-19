@@ -28,7 +28,7 @@ module Main
       import Database.Persist.Postgresql
 
       import Control.Monad.Logger
-      
+
       import Paths_Glob
       import Data.Version
 

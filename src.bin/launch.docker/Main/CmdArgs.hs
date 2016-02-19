@@ -21,7 +21,7 @@ module Main.CmdArgs
       data DockerLaunch = DockerLaunch
         { port :: String
         , conThd :: String
-        , favPath :: String
+        , staticPath :: String
         , siteTitle :: String
         , certPath :: String
         , keyPath :: String
@@ -45,8 +45,8 @@ module Main.CmdArgs
             &= name "conthd"
             &= explicit
             &= groupname "Glob Settings"
-        , favPath = "FAVICON_PATH"
-            &= help "The environment value(\'s name) of this web site's favicon.ico."
+        , staticPath = "STATIC_PATH"
+            &= help "The environment value(\'s name) of this web site's static files."
             &= name "favicon"
             &= explicit
             &= groupname "Glob Settings"

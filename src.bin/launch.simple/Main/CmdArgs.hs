@@ -19,7 +19,7 @@ module Main.CmdArgs
       data Launch = Launch
         { port :: Maybe String
         , conThd :: Maybe String
-        , favPath :: Maybe String
+        , staticPath :: Maybe String
         , siteTitle :: Maybe String
         , certPath ::Maybe String
         , keyPath ::Maybe String
@@ -47,8 +47,8 @@ module Main.CmdArgs
             &= name "conthd"
             &= explicit
             &= groupname "Glob Settings"
-        , favPath = def
-            &= help "The value of this web site's favicon.ico."
+        , staticPath = def
+            &= help "The value of this web site's static files."
             &= name "favicon"
             &= explicit
             &= groupname "Glob Settings"

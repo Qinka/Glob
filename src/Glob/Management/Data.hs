@@ -18,7 +18,10 @@ module Glob.Management.Data where
       import Database.Persist.Postgresql
       import Glob.Config
 
-      data Management = Management ConnectionPool Config
+      data Management = Management
+        { cpM :: ConnectionPool
+        , configM :: Config
+        } 
 
       mkYesodSubData "Management" $(parseRoutesFile "src/Glob/QQ/management.route")
 

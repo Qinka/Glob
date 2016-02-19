@@ -6,3 +6,4 @@
 /del  DelR    POST
 /list ListR   POST
 /sql  SqlR    POST
+/static StatR POST
