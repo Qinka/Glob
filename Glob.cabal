@@ -70,9 +70,9 @@ executable launch.simple
   else
     build-depends:   process >= 1.4 && < 1.5
   if flag(unlimit-version)
-    build-depends:   directory >= 1.2.4
+    build-depends:   directory
   else
-    build-depends:   directory >=1.2.4 && <1.3
+    build-depends:   directory >=1.2 && <1.3
 
 
   other-modules:     Main.CmdArgs
@@ -106,9 +106,9 @@ executable launch.docker
   else
     build-depends:   process >= 1.4 && < 1.5
   if flag(unlimit-version)
-    build-depends:   directory >= 1.2.4
+    build-depends:   directory
   else
-    build-depends:   directory >=1.2.4 && <1.3
+    build-depends:   directory >=1.2 && <1.3
 
   default-language:  Haskell2010
   other-modules:     Main.CmdArgs
@@ -192,9 +192,9 @@ executable glob
   else
     build-depends:   process >= 1.4 && < 1.5
   if flag(unlimit-version)
-    build-depends:   directory >= 1.2.4
+    build-depends:   directory
   else
-    build-depends:   directory >=1.2.4 && <1.3
+    build-depends:   directory >=1.2 && <1.3
   if flag(unlimit-version)
     build-depends:   conduit
   else
@@ -203,7 +203,10 @@ executable glob
     build-depends:    SHA
   else
     build-depends:    SHA >= 1.5 && < 2.3
-
+  if flag(unlimit-version)
+    build-depends:    transformers
+  else
+    build-depends:    transformers >= 0.4 && <= 0.5
 
   if flag(with-tls)
     cpp-options:     -DWithTls

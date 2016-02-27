@@ -89,5 +89,5 @@ module Glob.Data where
         where
           selectFromHtm x =entHtm' `liftM`
             liftHandlerT (runDB $ selectList [HtmIndex==. ws2s ("home":x),HtmTyp==."home"] [])
-          entHtm (Entity _ (Htm _ rt _ _ _)) = rt
+          entHtm (Entity _ (Htm _ rt _ _ _ _)) = rt
           entHtm' = P.head .P.map  (preEscapedToHtml.entHtm)

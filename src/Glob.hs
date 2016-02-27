@@ -51,11 +51,11 @@ module Glob
             x <- liftHandlerT $ runDB $ selectList [QryIndex ==. ws2s i] []
             if null x
               then return ""
-              else return $ (\[Entity _ (Qry _ t _)]->t) x
+              else return $ (\[Entity _ (Qry _ t _ _)]->t) x
 
       getHomeR :: Handler Html
       getHomeR = do
-        [Entity _ (Htm _ mainText mainTitle _ _)] <- liftHandlerT $ runDB $
+        [Entity _ (Htm _ mainText mainTitle _ _ _)] <- liftHandlerT $ runDB $
           selectList [HtmIndex ==. ws2s ["home","page","main"],HtmTyp ==. "home"] []
         let mainHtml = preEscapedToHtml mainText
         defaultLayout $ do
@@ -64,8 +64,8 @@ module Glob
 
       getBlogItemR :: Text -> Texts -> Handler Html
       getBlogItemR t i= do
-        [Entity _ (Htm _ blogText blogTitle _ _)] <- liftHandlerT $ runDB $
-          selectList [HtmIndex ==. ws2s ("blog":i),HtmTime ==. read (read $ show t),HtmTyp ==. "blog"] []
+        [Entity _ (Htm _ blogText blogTitle _ _ _)] <- liftHandlerT $ runDB $
+          selectList [HtmIndex ==. ws2s ("blog":i),HtmCtime ==. read (t2s t),HtmTyp ==. "blog"] []
         let blogHtml = preEscapedToHtml blogText
         defaultLayout $ do
           setTitle $ toHtml blogTitle
@@ -76,12 +76,12 @@ module Glob
       postBlogListR = do
         inde <- lookupPostParams "index"
         len <- liftHandlerT $ lookupPostParam "lenlimit"
-        blogs' <- liftHandlerT $ runDB $ selectList ((HtmTyp ==. "blog"):ind inde) []
+        blogs' <- liftHandlerT $ runDB $ selectList ((HtmTyp ==. "blog"):ind inde) [Desc HtmCtime]
         let blogs = map (\(Entity _ x) -> x) blogs'
         selectRep $ provideRepType "application/json" $
           return $ decodeUtf8 $ BL.toStrict $ encode $
-            map (\(Htm i h tit _ tim) -> object $
-              ["index" .= i,"title" .= tit,"time" .= (show tim)] ++ from len h
+            map (\(Htm i h tit _ _ tim) -> object $
+              ["index" .= i,"title" .= tit,"time" .= show tim] ++ from len h
             ) blogs
           where
             from (Just len) x= ["content" .= T.take (read $ t2s len) x]
@@ -91,7 +91,7 @@ module Glob
 
       getBlogListR :: Handler Html
       getBlogListR = do
-        [Entity _ (Htm _ blogText blogTitle _ _)] <- liftHandlerT $ runDB $
+        [Entity _ (Htm _ blogText blogTitle _ _ _)] <- liftHandlerT $ runDB $
           selectList [HtmIndex ==. ws2s ["home","page","blog"],HtmTyp ==. "home"] []
         let blogHtml = preEscapedToHtml blogText
         defaultLayout $ do
@@ -100,7 +100,7 @@ module Glob
 
       getPageR :: Texts -> Handler Html
       getPageR i = do
-        [Entity _ (Htm _ pageText pageTitle_ _ _)] <- liftHandlerT $ runDB $
+        [Entity _ (Htm _ pageText pageTitle_ _ _ _)] <- liftHandlerT $ runDB $
           selectList [HtmIndex ==. ws2s ("page":i),HtmTyp ==. "page"] []
         let pageHtml = preEscapedToHtml pageText
         defaultLayout $ do
@@ -109,12 +109,12 @@ module Glob
 
       getTxtR :: Texts -> Handler TypedContent
       getTxtR i = do
-        [Entity _ (Txt _ txtText content _ )] <- liftHandlerT $ runDB $ selectList [TxtIndex ==. ws2s i] []
+        [Entity _ (Txt _ txtText content _ _)] <- liftHandlerT $ runDB $ selectList [TxtIndex ==. ws2s i] []
         selectRep $ provideRepType (encodeUtf8 content) $ return txtText
 
       getBinR :: Texts -> Handler TypedContent
       getBinR i = do
-        [Entity _ (Bin _ binText content _)] <- liftHandlerT $ runDB $ selectList [BinIndex ==. ws2s i] []
+        [Entity _ (Bin _ binText content _ _)] <- liftHandlerT $ runDB $ selectList [BinIndex ==. ws2s i] []
         selectRep $ provideRepType (encodeUtf8 content) $ return binText
 
       postNavR :: Handler TypedContent
