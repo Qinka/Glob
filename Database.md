@@ -6,7 +6,7 @@ The whole website is based on the database.
 
 ## PostgreSQL
 
-This site is based on PostgreSQL, a great open-source database.
+This framework, Glob is based on PostgreSQL, a great open-source database.
 
 Wherever you host your site, you need a database.
 And for some docker-ships, integrated services about database are needed.

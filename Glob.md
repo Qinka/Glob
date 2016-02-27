@@ -21,7 +21,7 @@ Example:
 [{"time":"2016-02-10 06:21:41.234 UTC","title":"My First Blog","index":"myfirstBlog"},{"time":"2016-02-10 06:21:41.234 UTC","title":"My First Blog-1","index":"myfirstBlog1"},{"time":"2016-02-10 06:21:41.234 UTC","title":"My First Blog","index":"myfirstBlog2"},{"time":"2016-02-10 06:21:41.234 UTC","title":"My First Blog","index":"myfirstBlog3"},{"time":"2016-02-10 06:21:41.234 UTC","title":"My First Blog","index":"myfirstBlog4"}]
 ```
 
-# Data
+# Data [update before beta-2]
 
 ## [TABLE] table_html
 
