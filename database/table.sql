@@ -7,7 +7,7 @@
 
 -- Run ' SELECT drop_all_table();' first when those table existed.
 
-REPLACE OR CREATE TABLE table_nav
+CREATE TABLE table_nav
 (
   key_label TEXT NOT NULL PRIMARY KEY,
   key_order INT ,
@@ -16,7 +16,7 @@ REPLACE OR CREATE TABLE table_nav
   key_create_time TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
-REPLACE OR CREATE TABLE table_html
+CREATE TABLE table_html
 (
   key_index TEXT NOT NULL PRIMARY KEY,
   key_html TEXT NOT NULL,
@@ -26,7 +26,7 @@ REPLACE OR CREATE TABLE table_html
   key_create_time TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
-REPLACE OR CREATE TABLE table_txt
+CREATE TABLE table_txt
 (
   key_index TEXT NOT NULL PRIMARY KEY,
   key_text Text NOT NULL,
@@ -35,7 +35,7 @@ REPLACE OR CREATE TABLE table_txt
   key_create_time TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
-REPLACE OR CREATE TABLE table_bin
+CREATE TABLE table_bin
 (
   key_index TEXT NOT NULL PRIMARY KEY,
   key_binary BYTEA NOT NULL,
@@ -44,7 +44,7 @@ REPLACE OR CREATE TABLE table_bin
   key_create_time TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
-REPLACE OR CREATE TABLE table_query
+CREATE TABLE table_query
 (
   key_index TEXT NOT NULL PRIMARY KEY,
   key_text TEXT NOT NULL,
