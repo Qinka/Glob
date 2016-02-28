@@ -80,8 +80,8 @@ module Glob
         let blogs = map (\(Entity _ x) -> x) blogs'
         selectRep $ provideRepType "application/json" $
           return $ decodeUtf8 $ BL.toStrict $ encode $
-            map (\(Htm i h tit _ _ tim) -> object $
-              ["index" .= i,"title" .= tit,"time" .= show tim] ++ from len h
+            map (\(Htm i h tit _ utim ctim) -> object $
+              ["index" .= i,"title" .= tit,"createtime" .= show ctim,"updatetime" .= show utim] ++ from len h
             ) blogs
           where
             from (Just len) x= ["content" .= T.take (read $ t2s len) x]

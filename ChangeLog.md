@@ -1,5 +1,14 @@
 # The change log of Glob
 
+## [VERSION] 0.0.6.67
+
+1. 添加了执行 SQL 的一些方法
+
+## [VESION] 0.0.6.60
+
+1. beta-2
+2. 忘了
+
 ## [VERSION] 0.0.6.50
 
 1. 添加了 直接获取静态内容的功能

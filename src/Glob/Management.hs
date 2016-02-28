@@ -33,6 +33,8 @@ module Glob.Management
       import Data.ByteString.Char8 (unpack)
       import Data.Text.Encoding(decodeUtf8)
       import System.Directory
+      --import Database.Persist.Types(Persist
+      import qualified Data.Text.Internal as TI
       import qualified Data.ByteString.Char8 as BC8
       import qualified Data.Text.IO as TIO
       import Control.Monad(mapM)
@@ -237,13 +239,31 @@ module Glob.Management
                => HandlerT Management (HandlerT master IO) TypedContent
       postSqlR = do
         fileinfo' <- lookupFile "sql"
+        rawWays <- lookupPostParams "raw-way"
         case fileinfo' of
           Just fileinfo -> do
             text <- sourceToList $ fileSource fileinfo
-            _ <- liftHandlerT $ runDB $ rawExecute (decodeUtf8 $ BC8.concat text) []
-            selectRep $ provideRepType "application/json" $
-              returnTJson $ rtMsg' "success" ""
+            let cmd = b2t $ BC8.concat text
+            case rawWays of
+              "raw-sql":_ -> do
+                trt <- liftHandlerT $ runDB $ rawSql' cmd
+                rt $ show trt
+              "raw-execute-cols":_ -> do
+                c <- liftHandlerT $ runDB $ rawExecuteCount cmd []
+                rt $ show c
+              _ -> do
+                liftHandlerT $ runDB $ rawExecuteCount cmd []
+                rt ""
           _ -> invalidArgs ["failed/less and less."]
+        where
+          rt x = selectRep $ provideRepType "application/json" $ returnTJson $ rtMsg' "success" x
+          rawSql' :: MonadIO m
+                  => TI.Text -> ReaderT SqlBackend m [Single PersistValue]
+          rawSql' t = rawSql t []
+            {-
+            rt' <- rawSql t []
+            let rt = map (\[Single (PersistText x)] -> x) rt'
+            return rt-}
 
       postStatR :: Yesod master
                 => HandlerT Management (HandlerT master IO) TypedContent
