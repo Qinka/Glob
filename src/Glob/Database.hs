@@ -22,8 +22,6 @@ module Glob.Database where
       import Data.Time
       import Yesod
       import qualified Data.Aeson as A
-      import Database.Persist
-      import Database.Persist.TH
       import Database.Persist.Quasi
 
       instance A.ToJSON B.ByteString where
