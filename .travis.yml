@@ -9,7 +9,7 @@ before_install:
   - "sudo apt-get install ghc-$GHCVER cabal-install-$CABALVER"
   - "export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH"
   - "cabal update"
-  - "cabal install -j9 directory process persistent-template yesod persistent-postgresql  warp-tls cmdargs"
+  - "cabal install -j9 directory process persistent-template yesod persistent-postgresql  warp-tls cmdargs SHA"
 script:
   - cabal configure -flaunch-docker
   - cabal build
