@@ -66,7 +66,7 @@ module Glob.Data where
         stoken' <- liftIO $ getEnv env
         let stoken = P.words stoken'
         let s1 =  runToken stoken $ b2s $ P.head time
-        if   (s1 `elem` P.map b2s token)
+        if   (s2b s1 `elem` token)
           && (lTu <= tt)
           && (lTd >= tt)
           then return Authorized

@@ -18,7 +18,7 @@ module Glob.Auth
 
 
       runToken :: [String] -> String -> String
-      runToken xs time = shaR $ BL.fromStrict $ s2b $ xs !! ca ++timeS
+      runToken xs time = shaR $ BL.fromStrict $ s2b $ concat (loop xs ca) ++ timeS
         where
           stdToken = showDigest $ sha256 $ BL.fromStrict $ s2b $ head xs ++ timeS
           ca' = foldr ((+).oct) 0 $ take (len `quot` 16 +1) stdToken
@@ -32,3 +32,6 @@ module Glob.Auth
             3 -> showDigest.sha512
       oct :: Char -> Int
       oct = fromMaybe 0.flip elemIndex "0123456789abcdef"
+      loop :: [a] -> Int -> [a]
+      loop xs i = let len = length xs in
+        take len $ drop i $ concat $ replicate 2 xs

@@ -4,9 +4,9 @@
 dist
 cabal.sandbox.config
 .cabal-sandbox
-config.json
 ssl.csr
 ssl.key
 ssl.crt
 client_session_key.aes
 .DS_Store
+test.config

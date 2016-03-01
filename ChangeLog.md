@@ -1,5 +1,9 @@
 # The change log of Glob
 
+## [VERSION] 0.0.6.70
+
+1. 更新了认证的密码验证算法。消除小概率事件。
+
 ## [VERSION] 0.0.6.67
 
 1. 添加了执行 SQL 的一些方法
