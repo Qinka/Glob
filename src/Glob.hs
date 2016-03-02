@@ -64,11 +64,13 @@ module Glob
 
       getBlogItemR :: Text -> Texts -> Handler Html
       getBlogItemR t i= do
+        let bi = ws2s ("blog":i)
         [Entity _ (Htm _ blogText blogTitle _ _ _)] <- liftHandlerT $ runDB $
-          selectList [HtmIndex ==. ws2s ("blog":i),HtmCtime ==. read (t2s t),HtmTyp ==. "blog"] []
+          selectList [HtmIndex ==. bi,HtmCtime ==. read (t2s t),HtmTyp ==. "blog"] []
         let blogHtml = preEscapedToHtml blogText
         defaultLayout $ do
           setTitle $ toHtml blogTitle
+          toWidget [julius| $(globblogid=#{bi}); |]
           [whamlet|#{blogHtml}|]
 
 
