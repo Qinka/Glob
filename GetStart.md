@@ -58,3 +58,71 @@ The easiest way to get a quick start is using Docker.
   that when some sources chanageed, you need to rebuild it, for the algorithm might be chanaged.
   
   And that application is just a tool to help you create tokens, and you might need cURL.
+
+# Run in Local Environment
+
+ It is easy to run Glob in any PC, when the OS is Linux.
+But, until now, it is hard to run Glob on Windows. This is because some linker in Windows
+will breake down when build Glob, even Yesod. And some time linker will also breake down,
+on mac, but it  will be ok in ghci to run.
+
+## Gi(e)t Source
+
+Just run the following commands:
+```
+$ git clone https://github.com/Qinka/Glob.git
+``` 
+
+## Build
+
+Make sure you installed GHC, and make sure that GHC's version is greater then 7.10 .
+
+And if you need tls, when configuring via cabal, the flag -fwith-tls is need. 
+
+Build Glob just need these:
+```
+$ cd Glob
+$ cabal update
+$ cabal configure
+$ cabal install ... # Install dependance package
+$ cabal install
+```
+The `cabal install` will build Glob and copy binary to `~/.cabal/bin` or `%AppData%\\.cabal\\bin`.
+But if you just only what the binay without copy. The following is for this.
+```
+$ cd Glob
+$ cabal update
+$ cabal sandbox init
+$ cabal install
+```
+The binary is avaliable at `.cabal_sandbox/bin` .
+```
+$ cd Glob
+$ cabal update
+$ cabal configure
+$ cabal install ... # Install the dependance package
+$ cabal build
+```
+The binary is avaliable at `dist/build`.
+
+## Run
+
+There are two way to launch Glob:
+1. Using config file
+1. Using launcher
+
+Config file  example :
+```json
+{"foo":"bar"}
+```
+### Launcher
+
+ When need launch, the flag -flaunch-docker and -flaunch-simple is needed.
+
+Docker's launcher []
+
+Simple launcher [TODO]
+
+## Update
+
+[SAME WITH DOCKER]
