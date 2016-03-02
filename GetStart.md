@@ -40,4 +40,21 @@ The easiest way to get a quick start is using Docker.
   
   And then you can launch it.
   
-  After it launched, you need upload you site.
+  tips:
+    1. When using Docker, please make sure that the network is availbale between the containers of Glob and PostgreSQL
+    2. Configure pg_hba.conf rightly. PostgreSQL some times only allow those who are in the list of pg_hba.conf to connecte database.
+ 
+## Upload
+
+  After it launched, you need upload you site. And [Qinka-Blog](https://github.com/Qinka/Qinka-Blog)
+  is an example, and which is also my persion website.
+  
+  To upload, you need to clone Glob's source, and build a binary.It's source localed
+  at Glob/src.bin/helper.identify.Use :
+  ```
+ $ ghc Main -i"../../src/"
+  ```
+  And this binary will help you in identify.At the same time, it is important
+  that when some sources chanageed, you need to rebuild it, for the algorithm might be chanaged.
+  
+  And that application is just a tool to help you create tokens, and you might need cURL.
