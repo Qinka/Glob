@@ -13,3 +13,5 @@ My blog website's framework
 [![Stories in Ready](https://badge.waffle.io/Qinka/Glob.svg?label=ready&title=Ready)](http://waffle.io/Qinka/Glob)
 
 ---
+
+[Qinka-Blog](https://github.com/Qinka/Qinka-Blog) is a simple example.
