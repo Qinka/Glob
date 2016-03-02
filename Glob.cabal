@@ -2,11 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                Glob
-<<<<<<< HEAD
 version:             0.0.6.70
-=======
-version:             0.0.6.69
->>>>>>> 9a640dddd5d61875da014e5df4cad4e834c5dd7e
 synopsis:            A simple blog system.
 description:         A small and simple blog framework.
 license:             AgasaLicense
