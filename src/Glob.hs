@@ -38,6 +38,7 @@ module Glob
       import Glob.Data
       import Data.Time
       import Control.Monad
+      import Text.Julius(rawJS)
 
       getQueryR :: Texts -> Handler Text
       getQueryR i =
@@ -68,9 +69,10 @@ module Glob
         [Entity _ (Htm _ blogText blogTitle _ _ _)] <- liftHandlerT $ runDB $
           selectList [HtmIndex ==. bi,HtmCtime ==. read (t2s t),HtmTyp ==. "blog"] []
         let blogHtml = preEscapedToHtml blogText
+        let biH = rawJS bi
         defaultLayout $ do
           setTitle $ toHtml blogTitle
-          toWidget [julius| globblogid=#{bi}; |]
+          toWidget [julius| globblogid="#{biH}"; |]
           [whamlet|#{blogHtml}|]
 
 
