@@ -70,7 +70,7 @@ module Glob
         let blogHtml = preEscapedToHtml blogText
         defaultLayout $ do
           setTitle $ toHtml blogTitle
-          toWidget [julius| $(globblogid=#{bi}); |]
+          toWidget [julius| globblogid=#{bi}; |]
           [whamlet|#{blogHtml}|]
 
 
