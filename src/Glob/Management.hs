@@ -110,7 +110,7 @@ module Glob.Management
         title <- lookupPostParams "title"
         typ <- lookupPostParams "type"
         time <- lookupHeaders "UTCTime"
-        sum <- lookupPostParams "summary"
+        sum <- lookupPostParam "summary"
         if any null [index,title,typ] || any null [time] || null fileinfo
           then invalidArgs ["failed/less and less"]
           else do

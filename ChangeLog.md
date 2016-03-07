@@ -1,5 +1,9 @@
 # The change log of Glob
 
+## [VERSION] 0.0.6.75
+
+添加了 Html 部分的摘要部分。
+
 ## [VERSION] 0.0.6.71
 
 试图添加评论功能，目前只添加了文章的id。
