@@ -39,42 +39,52 @@ module Glob
       import Data.Time
       import Control.Monad
       import Text.Julius(rawJS)
+      import Data.Maybe(fromMaybe)
 
       getQueryR :: Texts -> Handler Text
       getQueryR i =
         case i of
           "version":_ -> return $ pack $ showVersion version
           "name":_ -> return "Glob"
-          "servertime":_ -> liftIO $ liftM (s2t.show)getCurrentTime
+          "servertime":_ -> liftIO $ liftM (s2t.show) getCurrentTime
           _ -> getQry
         where
           getQry = do
             x <- liftHandlerT $ runDB $ selectList [QryIndex ==. ws2s i] []
             if null x
               then return ""
-              else return $ (\[Entity _ (Qry _ t _ _)]->t) x
+              else return $ (\[Entity _ q]- qryTxt q>) x
 
       getHomeR :: Handler Html
       getHomeR = do
-        [Entity _ (Htm _ mainText mainTitle _ _ _)] <- liftHandlerT $ runDB $
+        [Entity _ h] <- liftHandlerT $ runDB $
           selectList [HtmIndex ==. ws2s ["home","page","main"],HtmTyp ==. "home"] []
-        let mainHtml = preEscapedToHtml mainText
+        let mainHtml = preEscapedToHtml $ htmHtml h
+        let sumHtml = preEscapedtoHtml $ fromMaybe "" $ htmSum h
         defaultLayout $ do
-          setTitle $ toHtml mainTitle
-          [whamlet|#{mainHtml}|]
+          setTitle $ toHtml $ htmTitle h
+          [whamlet|
+            <div class=summaryS id=summaryI>
+              #{sumHtml}
+            #{mainHtml}
+          |]
 
       getBlogItemR :: Text -> Texts -> Handler Html
       getBlogItemR t i= do
         let bi = ws2s ("blog":i)
         [Entity _ (Htm _ blogText blogTitle _ _ _)] <- liftHandlerT $ runDB $
           selectList [HtmIndex ==. bi,HtmCtime ==. read (t2s t),HtmTyp ==. "blog"] []
-        let blogHtml = preEscapedToHtml blogText
+        let blogHtml = preEscapedToHtml $ htmHtml b -- blogText
+        let blogSum = preEscapedToHtml $ htmSum b
         let biH = rawJS bi
         defaultLayout $ do
-          setTitle $ toHtml blogTitle
+          setTitle $ toHtml $ htmTitle b -- blogTitle
           toWidget [julius| globblogid="#{biH}"; |]
-          [whamlet|#{blogHtml}|]
-
+          [whamlet|
+            <div class=summaryS id=summaryI>
+              #{blogSum}
+            #{blogHtml}
+          |]
 
       postBlogListR :: Handler TypedContent
       postBlogListR = do
@@ -84,32 +94,40 @@ module Glob
         let blogs = map (\(Entity _ x) -> x) blogs'
         selectRep $ provideRepType "application/json" $
           return $ decodeUtf8 $ BL.toStrict $ encode $
-            map (\(Htm i h tit _ utim ctim) -> object $
-              ["index" .= i,"title" .= tit,"createtime" .= show ctim,"updatetime" .= show utim] ++ from len h
+            map (\h -> object $
+              ["index" .= htmIndex h,"title" .= htmTitle h,"createtime" .= show $ htmCtime h,"updatetime" .= show $ htmUtime h,"summary" .= htmSum h]
             ) blogs
           where
-            from (Just len) x= ["content" .= T.take (read $ t2s len) x]
-            from _ _ = []
             ind [] = []
             ind xs = a2o $ map (\x -> [HtmIndex ==. x]) xs
 
       getBlogListR :: Handler Html
       getBlogListR = do
-        [Entity _ (Htm _ blogText blogTitle _ _ _)] <- liftHandlerT $ runDB $
+        [Entity _ h] <- liftHandlerT $ runDB $
           selectList [HtmIndex ==. ws2s ["home","page","blog"],HtmTyp ==. "home"] []
-        let blogHtml = preEscapedToHtml blogText
+        let blogHtml = preEscapedToHtml $ htmHtml h -- blogText
+        let blogSum = preEscapedtoHtml $ htmSum h
         defaultLayout $ do
-          setTitle $ toHtml blogTitle
-          [whamlet|#{blogHtml}|]
+          setTitle $ toHtml $ htmTitle h -- blogTitle
+          [whamlet|
+            <div class=summaryS id=summaryI>
+              #{blogSum}
+            #{blogHtml}
+          |]
 
       getPageR :: Texts -> Handler Html
       getPageR i = do
         [Entity _ (Htm _ pageText pageTitle_ _ _ _)] <- liftHandlerT $ runDB $
           selectList [HtmIndex ==. ws2s ("page":i),HtmTyp ==. "page"] []
-        let pageHtml = preEscapedToHtml pageText
+        let pageHtml = preEscapedToHtml $ htmHtml p -- pageText
+        let pageSum = preEscapedToHtml $ htmSum p
         defaultLayout $ do
-          setTitle $ toHtml pageTitle_
-          [whamlet|#{pageHtml}|]
+          setTitle $ toHtml $ htmTitle p
+          [whamlet|
+            <div class=summaryS id=summaryI>
+              #{pageSum}
+            #{pageHtml}
+          |]
 
       getTxtR :: Texts -> Handler TypedContent
       getTxtR i = do

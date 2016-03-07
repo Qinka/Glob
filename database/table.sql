@@ -22,6 +22,7 @@ CREATE TABLE table_html
   key_html TEXT NOT NULL,
   key_title TEXT NOT NULL,
   key_content TEXT NOT NULL,
+  key_summary TEXT,
   key_update_time TIMESTAMP WITH TIME ZONE NOT NULL,
   key_create_time TIMESTAMP WITH TIME ZONE NOT NULL
 );
