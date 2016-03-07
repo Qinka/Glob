@@ -117,7 +117,7 @@ module Glob.Management
             keys <- liftHandlerT $ runDB $ selectKeysList [HtmIndex ==. ws2s index] []
             let t = read $ unpack $ head time
             text <- fileInfo fileinfo
-            let sum  fmap (fileInfo.(:[])) sum' 
+            let sum = fmap (fileInfo.(:[])) sum' 
             let h = Htm (ws2s index) (decodeUtf8 text) (head title) (head typ) (decodeUtf8 sum) t t
             case keys of
               [] -> liftHandlerT $ runDB $ insert' h
