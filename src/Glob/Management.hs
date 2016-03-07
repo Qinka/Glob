@@ -110,13 +110,14 @@ module Glob.Management
         title <- lookupPostParams "title"
         typ <- lookupPostParams "type"
         time <- lookupHeaders "UTCTime"
-        sum <- lookupPostParam "summary"
+        sum' <- lookupFile "summary"
         if any null [index,title,typ] || any null [time] || null fileinfo
           then invalidArgs ["failed/less and less"]
           else do
             keys <- liftHandlerT $ runDB $ selectKeysList [HtmIndex ==. ws2s index] []
             let t = read $ unpack $ head time
             text <- fileInfo fileinfo
+            sum <- fmap (fileInfo.(:[])) sum' 
             let h = Htm (ws2s index) (decodeUtf8 text) (head title) (head typ) sum t t
             case keys of
               [] -> liftHandlerT $ runDB $ insert' h
