@@ -117,8 +117,8 @@ module Glob.Management
             keys <- liftHandlerT $ runDB $ selectKeysList [HtmIndex ==. ws2s index] []
             let t = read $ unpack $ head time
             text <- fileInfo fileinfo
-            let sum = fmap (fileInfo.(:[])) sum' 
-            let h = Htm (ws2s index) (decodeUtf8 text) (head title) (head typ) (decodeUtf8 sum) t t
+            sum <- sumF sum'
+            let h = Htm (ws2s index) (decodeUtf8 text) (head title) (head typ) ( sum) t t
             case keys of
               [] -> liftHandlerT $ runDB $ insert' h
               xs -> mapM (up h) xs
@@ -127,7 +127,10 @@ module Glob.Management
         where
           up h x = liftHandlerT $ runDB $ update x
             [HtmIndex =. htmIndex h,HtmHtml =. htmHtml h, HtmTitle =. htmTitle h,HtmTyp =. htmTyp h,HtmUtime =. htmUtime h,HtmSum =. htmSum h]
-
+          sumF Nothing = return Nothing
+          sumF (Just sum) = do
+            rt <- fileInfo [sum]
+            return $ Just $ decodeUtf8 rt
       insert' :: forall val (m :: * -> *).(MonadIO m, PersistStore (PersistEntityBackend val),PersistEntity val)
               => val
               -> ReaderT (PersistEntityBackend val) m [()]
