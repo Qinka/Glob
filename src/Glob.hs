@@ -20,6 +20,7 @@ module Glob
     , module Glob.Static
     ) where
 
+      import Prelude as P
       import Glob.Config
       import Glob.Database
       import Glob.Management
@@ -90,16 +91,23 @@ module Glob
       postBlogListR = do
         inde <- lookupPostParams "index"
         len <- liftHandlerT $ lookupPostParam "lenlimit"
+        page' <- liftHandlerT $ lookupPostParam "page"
+        let page = fromMaybe 1 $ fmap (read.t2s) page'
+        split' <- liftHandlerT $ lookupHeader "page-split"
+        let split = fmap (read.b2s) split'
         blogs' <- liftHandlerT $ runDB $ selectList ((HtmTyp ==. "blog"):ind inde) [Desc HtmCtime]
         let blogs = map (\(Entity _ x) -> x) blogs'
         selectRep $ provideRepType "application/json" $
           return $ decodeUtf8 $ BL.toStrict $ encode $
-            map (\h -> object $
+            sized split page $ map (\h -> object $
               ["index" .= htmIndex h,"title" .= htmTitle h,"createtime" .= show (htmCtime h),"updatetime" .= show (htmUtime h),"summary" .= htmSum h]
             ) blogs
           where
             ind [] = []
             ind xs = a2o $ map (\x -> [HtmIndex ==. x]) xs
+            sized (Just s) p xs = P.take s $ P.drop (p*s-s) $ xs
+            sized _ _ xs = xs
+            
 
       getBlogListR :: Handler Html
       getBlogListR = do

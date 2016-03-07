@@ -1,5 +1,9 @@
 # The change log of Glob
 
+## [VERSION] 0.0.6.82
+
+增加了 博客列表翻页的功能，从提供JSON 的技术角度上。
+
 ## [VERSION] 0.0.6.75
 
 添加了 Html 部分的摘要部分。
