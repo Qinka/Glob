@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                Glob
-version:             0.0.6.82
+version:             0.0.7.14
 synopsis:            A simple blog system.
 description:         A small and simple blog framework.
 license:             AgasaLicense
@@ -148,10 +148,16 @@ executable glob
     build-depends:   text
   else
     build-depends:   text >=1.2 && <1.4
-  if flag(unlimit-version)
-    build-depends:   persistent-postgresql
-  else
-    build-depends:   persistent-postgresql >= 2.1 && < 2.3
+  if flag(with-postgresql)
+    if flag(unlimit-version)
+      build-depends: persistent-postgresql
+    else
+      build-depends: persistent-postgresql >= 2.1 && < 2.3
+  if flag(with-mongodb)
+    if flag(unlimit-version)
+      build-depends: persistent-mongodb
+    else
+      build-depends: persistent-mongodb >= 2.1 && < 2.4
   if flag(unlimit-version)
     build-depends:   persistent
   else
@@ -188,10 +194,11 @@ executable glob
     build-depends:   warp
   else
     build-depends:   warp >= 3.2 && < 3.4
-  if flag(unlimit-version)
-    build-depends:   warp-tls
-  else
-    build-depends:   warp-tls >= 3.2 && < 3.4
+  if flag(with-tls)
+    if flag(unlimit-version)
+      build-depends:   warp-tls
+    else
+      build-depends:   warp-tls >= 3.2 && < 3.4
   if flag(unlimit-version)
     build-depends:   template-haskell
   else
@@ -219,6 +226,10 @@ executable glob
 
   if flag(with-tls)
     cpp-options:     -DWithTls
+  if flag(with-mongodb)
+    cpp-options:     -DWithMongoDB
+  if flag(with-postgresql)
+    cpp-options:     -DWithPostgres
 
   hs-source-dirs:    src.bin/glob
                    , src

@@ -17,7 +17,7 @@ module Glob.Data where
 
       import Prelude as P
       import Yesod
-      import Database.Persist.Postgresql
+      import MDB
       import Glob.Config
       import Glob.Management
       import Glob.Database
@@ -51,10 +51,8 @@ module Glob.Data where
         defaultLayout = globLayout
 
       instance YesodPersist Glob where
-        type YesodPersistBackend Glob = SqlBackend
-        runDB a = do
-          (Glob p _ _) <- getYesod
-          runSqlPool a p
+        type YesodPersistBackend Glob = DBBackend
+        runDB a = getYesod >>= (runWithPool a.conPool)
 
       managementAuthorCheck :: Handler AuthResult
       managementAuthorCheck = do

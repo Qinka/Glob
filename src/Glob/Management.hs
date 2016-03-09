@@ -15,6 +15,7 @@
             , DeriveGeneric
             , MultiParamTypeClasses
             , RankNTypes
+            , CPP
             #-}
 
 module Glob.Management
@@ -23,34 +24,32 @@ module Glob.Management
     ) where
 
       import Yesod
+      import MDB
       import Glob.Database
       import Glob.Common
       import Glob.Management.Data
       import Glob.Management.TH
       import Glob.Config
       import Data.Conduit
-      import Database.Persist.Postgresql
       import Data.ByteString.Char8 (unpack)
       import Data.Text.Encoding(decodeUtf8)
       import System.Directory
-      --import Database.Persist.Types(Persist
       import qualified Data.Text.Internal as TI
       import qualified Data.ByteString.Char8 as BC8
       import qualified Data.Text.IO as TIO
       import Control.Monad(mapM)
       import Control.Monad.Trans.Reader
+      import Database.Persist.Sql
 
       instance YesodPersist Management where
-        type YesodPersistBackend Management = SqlBackend
-        runDB a = do
-          Management p _ <- getYesod
-          runSqlPool a p
+        type YesodPersistBackend Management = DBBackend
+        runDB a = getYesod >>= (runWithPool a.cpM)
 
       plItem :: ( Yesod master
                 , PersistQuery (PersistEntityBackend v)
                 , PersistEntity v
                 , ToJSON v
-                , PersistEntityBackend v ~ SqlBackend
+                , PersistEntityBackend v ~ DBBackend
                 )
              => [Filter v]
              -> HandlerT Management (HandlerT master IO) TypedContent
@@ -63,7 +62,7 @@ module Glob.Management
                 , PersistQuery (PersistEntityBackend v)
                 , PersistEntity v
                 , ToJSON v
-                , PersistEntityBackend v ~ SqlBackend
+                , PersistEntityBackend v ~ DBBackend
                 )
              => [Filter v]
              -> HandlerT Management (HandlerT master IO) TypedContent
@@ -240,8 +239,13 @@ module Glob.Management
           up q x = liftHandlerT $ runDB $ update x
             [QryIndex =. qryIndex q,QryTxt =. qryTxt q,QryUtime =. qryUtime q]
 
+
       postSqlR :: Yesod master
                => HandlerT Management (HandlerT master IO) TypedContent
+#ifdef WithMongoDB
+      postSqlR = error "With NoSQL!"
+#endif
+#ifdef WithPostgres
       postSqlR = do
         fileinfo' <- lookupFile "sql"
         rawWays <- lookupPostParams "raw-way"
@@ -263,13 +267,13 @@ module Glob.Management
         where
           rt x = selectRep $ provideRepType "application/json" $ returnTJson $ rtMsg' "success" x
           rawSql' :: MonadIO m
-                  => TI.Text -> ReaderT SqlBackend m [Single PersistValue]
+                  => TI.Text -> ReaderT DBBackend m [Single PersistValue]
           rawSql' t = rawSql t []
             {-
             rt' <- rawSql t []
             let rt = map (\[Single (PersistText x)] -> x) rt'
             return rt-}
-
+#endif
       postStatR :: Yesod master
                 => HandlerT Management (HandlerT master IO) TypedContent
       postStatR = do

@@ -10,18 +10,24 @@
             , OverloadedStrings
             , TypeFamilies
             , RecordWildCards
+            , CPP
             #-}
 
 module Glob.Management.Data where
 
       import Yesod
+#ifdef WithMongoDB
+      import Database.Persist.MongoDB
+#endif
+#ifdef WithPostgres
       import Database.Persist.Postgresql
+#endif
       import Glob.Config
 
       data Management = Management
         { cpM :: ConnectionPool
         , configM :: Config
-        } 
+        }
 
       mkYesodSubData "Management" $(parseRoutesFile "src/Glob/QQ/management.route")
 

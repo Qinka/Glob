@@ -18,7 +18,9 @@ module Glob.Tls
       import Yesod.Core.Dispatch
       import Control.Monad.Logger
       import Control.Monad(when)
+#ifdef WithTls
       import qualified Network.Wai.Handler.WarpTLS as W
+#endif
       import qualified Network.Wai.Handler.Warp as Warp
       import qualified Data.ByteString.Char8 as S8
       import Language.Haskell.TH.Syntax(qLocation)

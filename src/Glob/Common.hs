@@ -21,7 +21,7 @@ module Glob.Common
     ) where
 
       import Data.Aeson
-      import Yesod
+      import Yesod hiding (ToJSON)
       import Data.Text as T
       import Data.ByteString.Internal as BI
       import Data.Text.Lazy(toStrict)

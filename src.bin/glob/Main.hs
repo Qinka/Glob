@@ -5,7 +5,11 @@
 
 -- src.bin/glob/Main.hs
 
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards
+           , CPP
+           , FlexibleContexts
+           , TemplateHaskell
+           #-}
 
 module Main
     ( main
@@ -19,18 +23,19 @@ module Main
       import Glob
       import Glob.Data
       import Glob.Config
+      import Glob.Common
       import Main.CmdArgs
 
       import Data.String(fromString)
       import Data.Maybe
       import Data.Aeson
-
-      import Database.Persist.Postgresql
-
+      import MDB
       import Control.Monad.Logger
 
       import Paths_Glob
       import Data.Version
+
+      withCNPTH
 
       main :: IO ()
       main = do
@@ -38,8 +43,7 @@ module Main
         putStrLn "pass Crtl+C to stop"
         con <- runArgs withGlobCmdArgs
         let config = fromMaybe (error "glob:Error Config") con
-        let (constr,conThd) = toConStr $ dbConfig config
-        runStderrLoggingT $ withPostgresqlPool constr conThd $
+        runStderrLoggingT $ withConfigAndPool config $
           \pool -> liftIO $
             warpTls
               (certPath config)

@@ -1,5 +1,9 @@
 # The change log of Glob
 
+## [VERSION] 0.0.7.14
+
+进行了对多种 数据库的支持，但 rawSql 部分未解决
+
 ## [VERSION] 0.0.6.82
 
 增加了 博客列表翻页的功能，从提供JSON 的技术角度上。
