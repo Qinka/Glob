@@ -2,11 +2,13 @@
 {-# LANGUAGE CPP
            , FlexibleContexts
            , TemplateHaskell
+           , OverloadedStrings
            #-}
 
 module MDB
     ( module MDB
     , ConnectionPool
+    , insertMG
     ) where
 
 
@@ -25,6 +27,7 @@ module MDB
 
 #ifdef WithMongoDB
       import Database.Persist.MongoDB
+      import qualified Database.MongoDB as MG
       import Network
 #endif
 
@@ -57,10 +60,17 @@ module MDB
       withCNPTH = [d|
         withConfigAndPool :: (MonadIO m, Applicative m,MonadBaseControl IO m, MonadLogger m)
                           => Config -> (ConnectionPool -> m b) -> m b
-        withConfigAndPool c a = withMongoPool mdbConfig a
+        withConfigAndPool c a = mdb a
           where
-            mdbConfig = MongoConf (s2t $ dbName dbc) (s2t $ hostname dbc) (Service $ dbPort dbc) (Just $ MongoAuth (s2t $ usr dbc) (s2t $ password dbc)) defaultAccessMode 1 (conThd dbc) defaultConnectionIdleTime Nothing
+            mdb = withMongoDBPool (s2t $ dbName dbc) (hostname dbc) (Service $ dbPort dbc) (Just $ MongoAuth (s2t $ usr dbc) (s2t $ password dbc)) (conThd dbc) (conThd dbc) defaultConnectionIdleTime
             dbc = dbConfig c
         |]
 
+#endif
+
+#ifdef WithMongoDB
+      insert'' = MG.insert "mg" . toInsertDoc
+#endif
+#ifdef WithPostgres
+      insert'' = insert
 #endif

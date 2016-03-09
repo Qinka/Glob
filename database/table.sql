@@ -9,7 +9,8 @@
 
 CREATE TABLE table_nav
 (
-  key_label TEXT NOT NULL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
+  key_label TEXT NOT NULL,
   key_order INT ,
   key_ref TEXT NOT NULL,
   key_update_time TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -18,7 +19,8 @@ CREATE TABLE table_nav
 
 CREATE TABLE table_html
 (
-  key_index TEXT NOT NULL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
+  key_index TEXT NOT NULL,
   key_html TEXT NOT NULL,
   key_title TEXT NOT NULL,
   key_content TEXT NOT NULL,
@@ -29,7 +31,8 @@ CREATE TABLE table_html
 
 CREATE TABLE table_txt
 (
-  key_index TEXT NOT NULL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
+  key_index TEXT NOT NULL,
   key_text Text NOT NULL,
   key_content Text NOT NULL,
   key_update_time TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -38,7 +41,8 @@ CREATE TABLE table_txt
 
 CREATE TABLE table_bin
 (
-  key_index TEXT NOT NULL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
+  key_index TEXT NOT NULL,
   key_binary BYTEA NOT NULL,
   key_content TEXT NOT NULL,
   key_update_time TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -47,7 +51,8 @@ CREATE TABLE table_bin
 
 CREATE TABLE table_query
 (
-  key_index TEXT NOT NULL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
+  key_index TEXT NOT NULL,
   key_text TEXT NOT NULL,
   key_update_time TIMESTAMP WITH TIME ZONE NOT NULL,
   key_create_time TIMESTAMP WITH TIME ZONE NOT NULL

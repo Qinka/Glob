@@ -117,7 +117,7 @@ module Glob.Management
             let t = read $ unpack $ head time
             text <- fileInfo fileinfo
             sum <- sumF sum'
-            let h = Htm (ws2s index) (decodeUtf8 text) (head title) (head typ) ( sum) t t
+            let h = Htm (ws2s index) (decodeUtf8 text) (head title) (head typ) sum t t
             case keys of
               [] -> liftHandlerT $ runDB $ insert' h
               xs -> mapM (up h) xs
@@ -134,6 +134,7 @@ module Glob.Management
               => val
               -> ReaderT (PersistEntityBackend val) m [()]
       insert' i = do
+        liftIO $ print "sd"
         insert i
         return [()]
 
@@ -207,16 +208,19 @@ module Glob.Management
           else do
             let t = read $ unpack $ head time
             text <- fileInfo fileinfo
-            let b = Bin (ws2s index) text (head typ) t t
+            let b =  Bin (ws2s index) text (head typ) t t
             keys <- liftHandlerT $ runDB $ selectKeysList [BinIndex ==. ws2s index] []
+            liftIO $ print index
             case keys of
               [] -> liftHandlerT $ runDB $ insert' b
               xs -> mapM (up b) xs
             selectRep $ provideRepType "application/json" $
               returnTJson $ rtMsg' "success" ""
         where
-          up b x = liftHandlerT $ runDB $ update x
-            [BinIndex =. binIndex b,BinBin =. binBin b, BinContent =. binContent b,BinUtime =. binUtime b]
+          up b x =
+            liftHandlerT $ runDB $ update x
+              [BinIndex =. binIndex b,BinBin =. binBin b, BinContent =. binContent b,BinUtime =. binUtime b]
+
 
       postUpqryR :: Yesod master
                   => HandlerT Management (HandlerT master IO) TypedContent

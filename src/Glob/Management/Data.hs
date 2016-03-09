@@ -29,7 +29,7 @@ module Glob.Management.Data where
         , configM :: Config
         }
 
-      mkYesodSubData "Management" $(parseRoutesFile "src/Glob/QQ/management.route")
+      mkYesodSubData "Management" $(parseRoutesFile "src/QuasiContext/management.route")
 
       data RtMsg a = RtMsg
         { rtStatus :: String

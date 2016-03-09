@@ -13,6 +13,7 @@
            , GADTs
            , GeneralizedNewtypeDeriving
            , CPP
+           , MultiParamTypeClasses
            #-}
 
 module Glob.Database where
@@ -38,11 +39,11 @@ module Glob.Database where
 
 
 #ifdef WithMongoDB
-      let mongoSettings = (mkPersistSettings (ConT ''MongoContext)) {mpsGeneric = False}
+      let mongoSettings = (mkPersistSettings (ConT ''MongoContext)) -- {mpsGeneric = False}
         in share [mkPersist mongoSettings]
-          $(persistFileWith lowerCaseSettings "src/Glob/QQ/database")
+          $(persistFileWith lowerCaseSettings "src/QuasiContext/database")
 #endif
 #ifdef WithPostgres
       share [mkPersist sqlSettings,mkMigrate "migrateAll"]
-        $(persistFileWith lowerCaseSettings "src/Glob/QQ/database")
+        $(persistFileWith lowerCaseSettings "src/QuasiContext/database")
 #endif

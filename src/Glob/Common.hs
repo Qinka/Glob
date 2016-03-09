@@ -18,12 +18,14 @@ module Glob.Common
     , t2b
     , ws2s
     , s2ws
+    , parts
     ) where
 
       import Data.Aeson
       import Yesod hiding (ToJSON)
       import Data.Text as T
       import Data.ByteString.Internal as BI
+      import Data.ByteString as BS
       import Data.Text.Lazy(toStrict)
       import qualified Data.Text.Encoding as TE
       import Data.Text.Lazy.Encoding(decodeUtf8)
@@ -78,3 +80,7 @@ module Glob.Common
 
       s2ws :: Text -> [Text]
       s2ws = Prelude.tail.splitOn "/"
+
+      parts :: Int -> ByteString -> [ByteString]
+      parts _ "" = []
+      parts i b = let (l,r) = BS.splitAt i b in l:parts i r

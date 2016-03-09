@@ -40,7 +40,7 @@ module Glob.Data where
         , subManagement :: Management
         }
 
-      mkYesodData "Glob" $(parseRoutesFile "src/Glob/QQ/glob.route")
+      mkYesodData "Glob" $(parseRoutesFile "src/QuasiContext/glob.route")
 
       instance Yesod Glob where
         errorHandler x = selectRep $ do
@@ -83,7 +83,7 @@ module Glob.Data where
         topHtml <- selectFromHtm ["page","frame","top"]
         bottomHtml <- selectFromHtm ["page","frame","bottom"]
         navHtml <- selectFromHtm ["page","frame","nav"]
-        withUrlRenderer $(hamletFile "src/Glob/QQ/layout.hamlet")
+        withUrlRenderer $(hamletFile "src/QuasiContext/layout.hamlet")
         where
           selectFromHtm x =entHtm' `liftM`
             liftHandlerT (runDB $ selectList [HtmIndex==. ws2s ("home":x),HtmTyp==."home"] [])

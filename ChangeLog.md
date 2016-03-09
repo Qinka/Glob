@@ -1,8 +1,15 @@
 # The change log of Glob
 
+## [VERSION] 0.0.7.30
+
+对目录结构做了优化
+
 ## [VERSION] 0.0.7.14
 
 进行了对多种 数据库的支持，但 rawSql 部分未解决
+
+### 已知 BUG
+1. MongoDB 无法上传大于 131489 字节的文件（在 MongoDB 3.2.3 - win64 版本设置中。）
 
 ## [VERSION] 0.0.6.82
 
