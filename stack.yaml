@@ -18,6 +18,9 @@ flags:
 # Extra package databases containing global packages
 extra-package-dbs: []
 
+# Messages for User
+user-message: ! 'Warning: You have to choose only a flags from "with-mongodb'"", or 'with-postgresql'.  If you do not, IT MUST BE FAILED.'
+
 # Control whether we use the GHC we find on the path
 # system-ghc: true
 
