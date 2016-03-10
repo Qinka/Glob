@@ -192,6 +192,10 @@ executable glob
   else
     build-depends:   monad-logger >= 0.3 && < 0.4
   if flag(unlimit-version)
+    build-depends:   monad-control
+  else
+    build-depends:   monad-control >= 1.0 && <1.1
+  if flag(unlimit-version)
     build-depends:   yesod-core
   else
     build-depends:   yesod-core >= 1.14 && < 1.16
