@@ -106,7 +106,6 @@ module Glob.Handler
             sized (Just s) p xs = P.take s $ P.drop (p*s-s) $ xs
             sized _ _ xs = xs
 
-
       getBlogListR :: Handler Html
       getBlogListR = do
         [Entity _ h] <- liftHandlerT $ runDB $
@@ -126,8 +125,6 @@ module Glob.Handler
         defaultLayout $ do
           setTitle $ toHtml $ htmTitle p
           $(whamletFile "src/QuasiContext/Page.hamlet")
-          [whamlet|
-          |]
 
       getTxtR :: Texts -> Handler TypedContent
       getTxtR i = do

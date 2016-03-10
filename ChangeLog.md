@@ -1,5 +1,11 @@
 # The change log of Glob
 
+## [VERSION] 0.0.7.31
+
+一些无用的调整，与修复。
+
+同时开始使用 Stack
+
 ## [VERSION] 0.0.7.30
 
 对目录结构做了优化

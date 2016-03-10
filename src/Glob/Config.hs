@@ -20,7 +20,6 @@ module Glob.Config
       import qualified Data.ByteString.Internal as B
       import Data.Aeson
 
-
       -- 全局设置
       data Config = Config
         { port :: Int
@@ -80,7 +79,6 @@ module Glob.Config
           , "dbName" .= dbName
           , "conThd" .= conThd
           ]
-
 
       -- 转换成连接字符串
       toConStr :: DbConfig -> (B.ByteString,Int)

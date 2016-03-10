@@ -14,7 +14,6 @@ module Glob.Static
       import Glob.Common
       import Glob.Config
       import Yesod
-
       import System.Directory
       import Data.Text
       import qualified Data.ByteString as BIO

@@ -55,7 +55,6 @@ module Glob.Common
           , "content" .= show x
           ]
 
-
       t2s :: Text -> String
       t2s = T.unpack
 

@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                Glob
-version:             0.0.7.30
+version:             0.0.7.31
 synopsis:            A simple blog system.
 description:         A small and simple blog framework.
 license:             AgasaLicense
@@ -22,10 +22,15 @@ extra-source-files:  README.md
                    , database/script.sql
                    , database/function.sql
                    , resource/favicon.ico
-                   , src/Glob/QQ/glob.route
-                   , src/Glob/QQ/layout.hamlet
-                   , src/Glob/QQ/management.route
-                   , src/Glob/QQ/database
+                   , src/QuasiContext/BlogItem.hamlet
+                   , src/QuasiContext/BlogItem.julius
+                   , src/QuasiContext/BlogList.hamlet
+                   , src/QuasiContext/database
+                   , src/QuasiContext/glob.route
+                   , src/QuasiContext/Home.hamlet
+                   , src/QuasiContext/layout.hamlet
+                   , src/QuasiContext/management.route
+                   , src/QuasiContext/Page.hamlet
 
 flag unlimit-version
   description:       不对版本进行限制，已解决一些应为版本带来的问题。
