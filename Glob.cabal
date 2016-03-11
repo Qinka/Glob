@@ -194,11 +194,7 @@ executable glob
   if flag(unlimit-version)
     build-depends:   monad-control
   else
-<<<<<<< HEAD
     build-depends:   monad-control >=1 && < 1.1
-=======
-    build-depends:   monad-control >= 1.0 && <1.1
->>>>>>> bfce459ce1f07979926996c1288b247618c8b917
   if flag(unlimit-version)
     build-depends:   yesod-core
   else
