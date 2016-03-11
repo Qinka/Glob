@@ -20,8 +20,6 @@ module Glob.Database where
 
       import Data.Text
       import Data.Text.Encoding(decodeUtf8,encodeUtf8)
-      import qualified Data.ByteString as B
-      import Data.Time
       import Yesod
       import MDB
       import Database.Persist.Quasi
@@ -37,12 +35,12 @@ module Glob.Database where
       instance FromJSON B.ByteString where
         parseJSON (String x) = pure $ encodeUtf8 x
 
-
 #ifdef WithMongoDB
       let mongoSettings = (mkPersistSettings (ConT ''MongoContext)) -- {mpsGeneric = False}
         in share [mkPersist mongoSettings]
           $(persistFileWith lowerCaseSettings "src/QuasiContext/database")
 #endif
+
 #ifdef WithPostgres
       share [mkPersist sqlSettings,mkMigrate "migrateAll"]
         $(persistFileWith lowerCaseSettings "src/QuasiContext/database")

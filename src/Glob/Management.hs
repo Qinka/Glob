@@ -41,6 +41,10 @@ module Glob.Management
       import Control.Monad.Trans.Reader
       import Database.Persist.Sql
 
+#ifdef WithMongoDB
+      import Database.MongoDB (runCommand1)
+#endif
+
       instance YesodPersist Management where
         type YesodPersistBackend Management = DBBackend
         runDB a = getYesod >>= (runWithPool a.cpM)
@@ -125,16 +129,18 @@ module Glob.Management
               returnTJson $ rtMsg' "success" ""
         where
           up h x = liftHandlerT $ runDB $ update x
-            [HtmIndex =. htmIndex h,HtmHtml =. htmHtml h, HtmTitle =. htmTitle h,HtmTyp =. htmTyp h,HtmUtime =. htmUtime h,HtmSum =. htmSum h]
+            [ HtmIndex =. htmIndex h,HtmHtml =. htmHtml h, HtmTitle =. htmTitle h
+            , HtmTyp =. htmTyp h,HtmUtime =. htmUtime h,HtmSum =. htmSum h
+            ]
           sumF Nothing = return Nothing
           sumF (Just sum) = do
             rt <- fileInfo [sum]
             return $ Just $ decodeUtf8 rt
+
       insert' :: forall val (m :: * -> *).(MonadIO m, PersistStore (PersistEntityBackend val),PersistEntity val)
               => val
               -> ReaderT (PersistEntityBackend val) m [()]
       insert' i = do
-        liftIO $ print "sd"
         insert i
         return [()]
 
@@ -166,7 +172,9 @@ module Glob.Management
               returnTJson $ rtMsg' "success" ""
         where
           up tx x = liftHandlerT $ runDB $ update x
-            [TxtIndex =. txtIndex tx, TxtTxt =. txtTxt tx, TxtContent =. txtContent tx, TxtUtime =. txtUtime tx]
+            [ TxtIndex =. txtIndex tx, TxtTxt =. txtTxt tx
+            , TxtContent =. txtContent tx, TxtUtime =. txtUtime tx
+            ]
 
       toList :: Maybe a -> [a]
       toList (Just x) = [x]
@@ -210,7 +218,6 @@ module Glob.Management
             text <- fileInfo fileinfo
             let b =  Bin (ws2s index) text (head typ) t t
             keys <- liftHandlerT $ runDB $ selectKeysList [BinIndex ==. ws2s index] []
-            liftIO $ print index
             case keys of
               [] -> liftHandlerT $ runDB $ insert' b
               xs -> mapM (up b) xs
@@ -219,8 +226,9 @@ module Glob.Management
         where
           up b x =
             liftHandlerT $ runDB $ update x
-              [BinIndex =. binIndex b,BinBin =. binBin b, BinContent =. binContent b,BinUtime =. binUtime b]
-
+              [ BinIndex =. binIndex b,BinBin =. binBin b
+              , BinContent =. binContent b,BinUtime =. binUtime b
+              ]
 
       postUpqryR :: Yesod master
                   => HandlerT Management (HandlerT master IO) TypedContent
@@ -243,12 +251,21 @@ module Glob.Management
           up q x = liftHandlerT $ runDB $ update x
             [QryIndex =. qryIndex q,QryTxt =. qryTxt q,QryUtime =. qryUtime q]
 
-
       postSqlR :: Yesod master
                => HandlerT Management (HandlerT master IO) TypedContent
+
 #ifdef WithMongoDB
-      postSqlR = error "With NoSQL!"
+      postSqlR = do
+        fileinfo' <- lookupFile "js"
+        case fileinfo' of
+          Just fileInfo -> do
+            text <- sourceToList $ fileSource fileInfo
+            let cmd = b2t $ BC8.concat text
+            liftHandlerT $ runDB $ runCommand1 cmd
+            selectRep $ provideRepType "application/json" $ returnTJson $ rtMsg' "success" ""
+          _ -> invalidArgs ["failed/less and less."]
 #endif
+
 #ifdef WithPostgres
       postSqlR = do
         fileinfo' <- lookupFile "sql"
@@ -273,11 +290,8 @@ module Glob.Management
           rawSql' :: MonadIO m
                   => TI.Text -> ReaderT DBBackend m [Single PersistValue]
           rawSql' t = rawSql t []
-            {-
-            rt' <- rawSql t []
-            let rt = map (\[Single (PersistText x)] -> x) rt'
-            return rt-}
 #endif
+
       postStatR :: Yesod master
                 => HandlerT Management (HandlerT master IO) TypedContent
       postStatR = do
@@ -297,8 +311,6 @@ module Glob.Management
             liftIO $ TIO.writeFile (path++".mime") $ head typ
             selectRep $ provideRepType "application/json" $
               returnTJson $ rtMsg' "success" ""
-
-
 
       instance Yesod master => YesodSubDispatch  Management (HandlerT master IO) where
         yesodSubDispatch = $(mkYesodSubDispatch resourcesManagement)

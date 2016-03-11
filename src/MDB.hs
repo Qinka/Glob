@@ -8,7 +8,6 @@
 module MDB
     ( module MDB
     , ConnectionPool
-    , insertMG
     ) where
 
 
@@ -27,7 +26,6 @@ module MDB
 
 #ifdef WithMongoDB
       import Database.Persist.MongoDB
-      import qualified Database.MongoDB as MG
       import Network
 #endif
 
@@ -66,11 +64,4 @@ module MDB
             dbc = dbConfig c
         |]
 
-#endif
-
-#ifdef WithMongoDB
-      insert'' = MG.insert "mg" . toInsertDoc
-#endif
-#ifdef WithPostgres
-      insert'' = insert
 #endif

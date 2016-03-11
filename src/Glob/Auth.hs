@@ -9,13 +9,11 @@ module Glob.Auth
     ( runToken
     ) where
 
-
       import Data.Digest.Pure.SHA
       import Glob.Common
       import qualified Data.ByteString.Lazy as BL
       import Data.List(elemIndex)
       import Data.Maybe(fromMaybe)
-
 
       runToken :: [String] -> String -> String
       runToken xs time = shaR $ BL.fromStrict $ s2b $ concat (loop xs ca) ++ timeS
