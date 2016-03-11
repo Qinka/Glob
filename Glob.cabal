@@ -155,9 +155,9 @@ executable glob
       build-depends: persistent-postgresql >= 2.1 && < 2.3
   if flag(with-mongodb)
     if flag(unlimit-version)
-      build-depends: persistent-mongodb
+      build-depends: persistent-mongoDB
     else
-      build-depends: persistent-mongodb >= 2.1 && < 2.4
+      build-depends: persistent-mongoDB >= 2.1 && < 2.4
   if flag(unlimit-version)
     build-depends:   persistent
   else
@@ -186,6 +186,10 @@ executable glob
     build-depends:   monad-logger
   else
     build-depends:   monad-logger >= 0.3 && < 0.4
+  if flag(unlimit-version)
+    build-depends:   monad-control
+  else
+    build-depends:   monad-control >=1 && < 1.1
   if flag(unlimit-version)
     build-depends:   yesod-core
   else
