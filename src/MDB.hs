@@ -66,3 +66,11 @@ module MDB
             dbN = (s2t $ dbName dbc)
         |]
 #endif
+
+      dbKind :: Q Exp
+#ifdef WithMongoDB
+      dbKind = [e|"MongoDB"|]
+#endif
+#ifdef WithPostgres
+      dbKind = [e|"PostgreSQL"|]
+#endif

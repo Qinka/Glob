@@ -47,6 +47,7 @@ module Glob.Handler
       import Control.Monad
       import Text.Julius(rawJS,juliusFile)
       import Data.Maybe(fromMaybe)
+      import MDB(dbKind)
 
       getQueryR :: Texts -> Handler Text
       getQueryR i =
@@ -54,6 +55,7 @@ module Glob.Handler
           "version":_ -> return $ pack $ showVersion version
           "name":_ -> return "Glob"
           "servertime":_ -> liftIO $ liftM (s2t.show) getCurrentTime
+          "database-kind":_ -> return $(dbKind)
           _ -> getQry
         where
           getQry = do

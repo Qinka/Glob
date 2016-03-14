@@ -12,7 +12,7 @@ install:
   - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
   - cabal sandbox init
   - cabal update
-  - cabal install -j9 directory process persistent-template yesod persistent-postgresql  warp-tls cmdargs
+  - cabal install -j9 directory process persistent-template yesod persistent-postgresql persistent-mongoDB warp-tls cmdargs
 before_script:
   - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
   - echo $PATH
@@ -21,5 +21,7 @@ script:
   - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
   - echo $PATH
   - which cabal
-  - cabal install -j9 -flaunch-docker -flaunch-simple -fwith-tls
-  - cabal install -j9 -flaunch-docker -flaunch-simple
+  - cabal install -j9 -flaunch-docker -flaunch-simple -fwith-tls -fwith-postgresql
+  - cabal install -j9 -flaunch-docker -flaunch-simple -fwith-postgresql
+  - cabal install -j9 -flaunch-docker -flaunch-simple -fwith-tls -fwith-mongodb
+  - cabal install -j9 -flaunch-docker -flaunch-simple -fwith-mongodb

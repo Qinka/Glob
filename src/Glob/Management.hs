@@ -137,6 +137,7 @@ module Glob.Management
             rt <- fileInfo [sum]
             return $ Just $ decodeUtf8 rt
 
+
       insert' :: forall val (m :: * -> *).(MonadIO m, PersistStore (PersistEntityBackend val),PersistEntity val)
               => val
               -> ReaderT (PersistEntityBackend val) m [()]
@@ -202,7 +203,9 @@ module Glob.Management
         where
           up n x = liftHandlerT $ runDB $ update x
             [NavLabel =. navLabel n,NavOrder =. navOrder n,NavRef =. navRef n,NavUtime =. navUtime n]
-
+#ifdef WithMongoDB
+      {-# WARNING postUpbinR "You can just upload the file which is smaller then 128k." #-}
+#endif
       postUpbinR :: Yesod master
                   => HandlerT Management (HandlerT master IO) TypedContent
       postUpbinR = do
@@ -216,7 +219,11 @@ module Glob.Management
           else do
             let t = read $ unpack $ head time
             text <- fileInfo fileinfo
+#ifdef WithMongoDB
+            let b =  Bin (ws2s index) (BC8.take (1024*128) text) (head typ) t t
+#else
             let b =  Bin (ws2s index) text (head typ) t t
+#endif
             keys <- liftHandlerT $ runDB $ selectKeysList [BinIndex ==. ws2s index] []
             case keys of
               [] -> liftHandlerT $ runDB $ insert' b

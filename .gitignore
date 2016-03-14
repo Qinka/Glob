@@ -11,3 +11,4 @@ client_session_key.aes
 .DS_Store
 test.config
 .stack-work
+.cabal-sandbox.bak
