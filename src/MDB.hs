@@ -10,7 +10,6 @@ module MDB
     , ConnectionPool
     ) where
 
-
       import Yesod
       import Control.Monad.Logger
       import Glob.Config
@@ -19,16 +18,15 @@ module MDB
       import Control.Monad.IO.Class
       import Control.Monad.Trans.Control
       import Data.Text
+
 #ifdef WithPostgres
       import Database.Persist.Postgresql
       import Database.Persist.Sql
 #endif
-
 #ifdef WithMongoDB
       import Database.Persist.MongoDB
       import Network
 #endif
-
 
 #ifdef WithPostgres
       type DBBackend = SqlBackend
@@ -60,8 +58,19 @@ module MDB
                           => Config -> (ConnectionPool -> m b) -> m b
         withConfigAndPool c a = mdb a
           where
-            mdb = withMongoDBPool (s2t $ dbName dbc) (hostname dbc) (Service $ dbPort dbc) (Just $ MongoAuth (s2t $ usr dbc) (s2t $ password dbc)) (conThd dbc) (conThd dbc) defaultConnectionIdleTime
+            mdb = withMongoDBPool dbN hn sport auth (conThd dbc) (conThd dbc) defaultConnectionIdleTime
             dbc = dbConfig c
+            auth = Just $ MongoAuth (s2t $ usr dbc) $ s2t $ password dbc
+            sport = Service $ dbPort dbc
+            hn = hostname dbc
+            dbN = (s2t $ dbName dbc)
         |]
+#endif
 
+      dbKind :: Q Exp
+#ifdef WithMongoDB
+      dbKind = [e|"MongoDB"|]
+#endif
+#ifdef WithPostgres
+      dbKind = [e|"PostgreSQL"|]
 #endif

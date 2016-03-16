@@ -161,8 +161,12 @@ executable glob
   if flag(with-mongodb)
     if flag(unlimit-version)
       build-depends: persistent-mongoDB
+                   , network
+                   , mongoDB
     else
       build-depends: persistent-mongoDB >= 2.1 && < 2.4
+                   , mongoDB >= 2.0 && < 2.2
+                   , network >= 2.6 && < 2.8
   if flag(unlimit-version)
     build-depends:   persistent
   else
@@ -198,7 +202,7 @@ executable glob
   if flag(unlimit-version)
     build-depends:   yesod-core
   else
-    build-depends:   yesod-core >= 1.14 && < 1.16
+    build-depends:   yesod-core >= 1.4 && < 1.6
   if flag(unlimit-version)
     build-depends:   warp
   else
