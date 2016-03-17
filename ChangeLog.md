@@ -1,5 +1,11 @@
 # The change log of Glob
 
+## [VERSION] 0.0.7.40
+
+1. 不重要的调整
+2. 在MongoDB 驱动解决之前 限制大小
+3. 更改 Docker 文件
+
 ## [VERSION] 0.0.7.31
 
 一些无用的调整，与修复。

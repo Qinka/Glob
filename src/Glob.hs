@@ -12,18 +12,15 @@
 
 module Glob
     ( module Glob
-    , module Glob.Management
-    , module Glob.Static
-    , module Glob.Handler
-    , module Glob.Config
+    , module Export
     ) where
 
       import Prelude as P
-      import Glob.Config
-      import Glob.Management
-      import Glob.Static
-      import Yesod
-      import Glob.Handler
-      import Glob.Data
+      import Glob.Config as Export
+      import Glob.Management as Export
+      import Glob.Static as Export
+      import Yesod as Export
+      import Glob.Handler as Export
+      import Glob.Data as Export
 
       mkYesodDispatch "Glob" resourcesGlob

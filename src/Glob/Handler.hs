@@ -92,20 +92,20 @@ module Glob.Handler
         inde <- lookupPostParams "index"
         len <- liftHandlerT $ lookupPostParam "lenlimit"
         page' <- liftHandlerT $ lookupPostParam "page"
-        let page = fromMaybe 1 $ fmap (read.t2s) page'
+        let page = maybe 1 (read.t2s) page'
         split' <- liftHandlerT $ lookupHeader "page-split"
         let split = fmap (read.b2s) split'
         blogs' <- liftHandlerT $ runDB $ selectList ((HtmTyp ==. "blog"):ind inde) [Desc HtmCtime]
         let blogs = map (\(Entity _ x) -> x) blogs'
         selectRep $ provideRepType "application/json" $
           return $ decodeUtf8 $ BL.toStrict $ encode $
-            sized split page $ map (\h -> object $
+            sized split page $ map (\h -> object 
               ["index" .= htmIndex h,"title" .= htmTitle h,"createtime" .= show (htmCtime h),"updatetime" .= show (htmUtime h),"summary" .= htmSum h]
             ) blogs
           where
             ind [] = []
             ind xs = a2o $ map (\x -> [HtmIndex ==. x]) xs
-            sized (Just s) p xs = P.take s $ P.drop (p*s-s) $ xs
+            sized (Just s) p xs = P.take s $ P.drop (p*s-s)  xs
             sized _ _ xs = xs
 
       getBlogListR :: Handler Html

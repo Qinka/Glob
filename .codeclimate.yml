@@ -1,6 +1,8 @@
 engines:
   fixme:
     enabled: true
+    exclude_fingerprints:
+    - 9952aca80e0b8f791dad06e6dae349ef
   hlint:
     enabled: true
 ratings:
