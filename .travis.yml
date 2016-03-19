@@ -29,5 +29,5 @@ after_script: |
   cabal build
   ls dist
   ls dist/build/bin
-  docker build -f ./dockerfiles/Travis-CI/Dockerfile -t glob-travis/$TRAVIS_BUILD_NUMBER .
-  docker push
+  docker build -f ./dockerfiles/Travis-CI/Dockerfile -t qinka/glob:$TRAVIS_BUILD_NUMBER .
+  docker push  qinka/glob
