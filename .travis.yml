@@ -25,6 +25,7 @@ script:
 after_script: |
   echo "There should build a docker image."
   rm -rf dist
-  cabal build -flaunch-docker -fwith-postgresql
-  docker build -f ./dockerfiles/Travis-CI/Dockerfile -t glob-travis/$TRAVIS_COMMIT-$TRAVIS_TAG .
+  cabal configure -flaunch-docker -fwith-postgresql
+  cabal build
+  docker build -f ./dockerfiles/Travis-CI/Dockerfile -t glob-travis/$TRAVIS_BUILD_NUMBER .
   docker push
