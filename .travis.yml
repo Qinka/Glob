@@ -27,5 +27,7 @@ after_script: |
   rm -rf dist
   cabal configure -flaunch-docker -fwith-postgresql
   cabal build
+  ls dist
+  ls dist/bin
   docker build -f ./dockerfiles/Travis-CI/Dockerfile -t glob-travis/$TRAVIS_BUILD_NUMBER .
   docker push
