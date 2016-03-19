@@ -90,7 +90,6 @@ module Glob.Handler
       postBlogListR :: Handler TypedContent
       postBlogListR = do
         inde <- lookupPostParams "index"
-        len <- liftHandlerT $ lookupPostParam "lenlimit"
         page' <- liftHandlerT $ lookupPostParam "page"
         let page = maybe 1 (read.t2s) page'
         split' <- liftHandlerT $ lookupHeader "page-split"
@@ -99,7 +98,7 @@ module Glob.Handler
         let blogs = map (\(Entity _ x) -> x) blogs'
         selectRep $ provideRepType "application/json" $
           return $ decodeUtf8 $ BL.toStrict $ encode $
-            sized split page $ map (\h -> object 
+            sized split page $ map (\h -> object
               ["index" .= htmIndex h,"title" .= htmTitle h,"createtime" .= show (htmCtime h),"updatetime" .= show (htmUtime h),"summary" .= htmSum h]
             ) blogs
           where
