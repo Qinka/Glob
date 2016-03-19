@@ -22,8 +22,6 @@ script:
   - cabal install dist/Glob-*.tar.gz -fwith-tls -fwith-postgresql
   - cabal install dist/Glob-*.tar.gz -flaunch-docker -flaunch-simple -fwith-mongodb
   - cabal install dist/Glob-*.tar.gz -fwith-tls -fwith-mongodb
-after_script:
-  -
 after_sucess: |
   echo "There should build a docker image."
   rm -rf dist
