@@ -22,9 +22,9 @@ script:
   - cabal install dist/Glob-*.tar.gz -fwith-tls -fwith-postgresql
   - cabal install dist/Glob-*.tar.gz -flaunch-docker -flaunch-simple -fwith-mongodb
   - cabal install dist/Glob-*.tar.gz -fwith-tls -fwith-mongodb
-after_sucess: |
+after_script: |
   echo "There should build a docker image."
   rm -rf dist
-  cabal install -flaunch-docker -fwith-postgresql
+  cabal build -flaunch-docker -fwith-postgresql
   docker build -f ./dockerfiles/Travis-CI/Dockerfile -t glob-travis/$TRAVIS_COMMIT-$TRAVIS_TAG .
   docker push
