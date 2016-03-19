@@ -30,4 +30,5 @@ after_script: |
   ls dist
   ls dist/build/bin
   docker build -f ./dockerfiles/Travis-CI/Dockerfile -t qinka/glob:$TRAVIS_BUILD_NUMBER .
+  docker images
   docker push  qinka/glob
