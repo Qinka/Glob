@@ -26,10 +26,15 @@ script:
 after_script: |
   echo "There should build a docker image."
   rm -rf dist
+  if [ -n $TRAVIS_TAG ]
+    export DOCKER_IMAGE_TAG=$TRAVIS_TAG-$TRAVIS_BUILD_NUMBER
+  else
+    export DOCKER_IMAGE_TAG=$TRAVIS_COMMIT-$TRAVIS_BUILD_NUMBER
+  fi
   cabal configure -flaunch-docker -fwith-postgresql
   cabal build
-  docker build -f ./dockerfiles/Travis-CI/PostgreSQL/Dockerfile -t qinka/glob:postgresql-$TRAVIS_BUILD_NUMBER$TRAVIS_TAG .
+  docker build -f ./dockerfiles/Travis-CI/PostgreSQL/Dockerfile -t qinka/glob:postgresql-$DOCKER_IMAGE_TAG .
   cabal configure -flaunch-docker -fwith-mongodb
   cabal build
-  docker build -f ./dockerfiles/Travis-CI/MongoDB/Dockerfile -t qinka/glob:mongodb-$TRAVIS_BUILD_NUMBER$TRAVIS_TAG .
+  docker build -f ./dockerfiles/Travis-CI/MongoDB/Dockerfile -t qinka/glob:mongodb-$DOCKER_IMAGE_TAG .
   docker push  qinka/glob
