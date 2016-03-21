@@ -32,9 +32,9 @@ after_script: |
     else
       export DOCKER_IMAGE_TAG=$TRAVIS_COMMIT-$TRAVIS_BUILD_NUMBER
     fi
-    cd dsp && docker build -f ./dockerfiles/Travis-CI/PostgreSQL/Dockerfile -t qinka/glob:postgresql-$DOCKER_IMAGE_TAG dsp && cd ..
-    cd dspt && docker build -f ./dockerfiles/Travis-CI/PostgreSQL/Dockerfile -t qinka/glob:tls-postgresql-$DOCKER_IMAGE_TAG dspt && cd ..
-    cd dsm && docker build -f ./dockerfiles/Travis-CI/MongoDB/Dockerfile -t qinka/glob:mongodb-$DOCKER_IMAGE_TAG dsm && cd ..
-    cd dsmt && docker build -f ./dockerfiles/Travis-CI/MongoDB/Dockerfile -t qinka/glob:tls-mongodb-$DOCKER_IMAGE_TAG dsmt && cd ..
+    cd dsp && docker build -f ./dockerfiles/Travis-CI/PostgreSQL/Dockerfile -t qinka/glob:postgresql-$DOCKER_IMAGE_TAG . && cd ..
+    cd dspt && docker build -f ./dockerfiles/Travis-CI/PostgreSQL/Dockerfile -t qinka/glob:tls-postgresql-$DOCKER_IMAGE_TAG . && cd ..
+    cd dsm && docker build -f ./dockerfiles/Travis-CI/MongoDB/Dockerfile -t qinka/glob:mongodb-$DOCKER_IMAGE_TAG . && cd ..
+    cd dsmt && docker build -f ./dockerfiles/Travis-CI/MongoDB/Dockerfile -t qinka/glob:tls-mongodb-$DOCKER_IMAGE_TAG . && cd ..
     docker push  qinka/glob
   fi
