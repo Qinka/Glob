@@ -6,7 +6,7 @@
 -- src.bin/launch.docker/Main.hs
 
 {-# LANGUAGE OverloadedStrings
-             CPP
+           , CPP
              #-}
 
 module Main
