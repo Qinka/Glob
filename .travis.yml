@@ -19,10 +19,10 @@ script:
   - cabal sdist
   - cabal install dist/Glob-*.tar.gz -fwith-postgresql
   - cabal install dist/Glob-*.tar.gz -fwith-mongodb
-  - cabal install dist/Glob-*.tar.gz -flaunch-docker -flaunch-simple -fwith-postgresql && mkdir dsp && mv dist dsp
-  - cabal install dist/Glob-*.tar.gz -fwith-tls -fwith-postgresql -flaunch-docker -flaunch-simple && mkdir dspt && mv dist dspt
-  - cabal install dist/Glob-*.tar.gz -flaunch-docker -flaunch-simple -fwith-mongodb && mkdir dsm && mv dist dsm
-  - cabal install dist/Glob-*.tar.gz -fwith-tls -fwith-mongodb -flaunch-docker -flaunch-simple && mkdir dsmt && mv dist dsmt
+  - cabal install dist/Glob-*.tar.gz -flaunch-docker -flaunch-simple -fwith-postgresql && mkdir dsp && cp dist dsp
+  - cabal install dist/Glob-*.tar.gz -fwith-tls -fwith-postgresql -flaunch-docker -flaunch-simple && mkdir dspt && cp dist dspt
+  - cabal install dist/Glob-*.tar.gz -flaunch-docker -flaunch-simple -fwith-mongodb && mkdir dsm && cp dist dsm
+  - cabal install dist/Glob-*.tar.gz -fwith-tls -fwith-mongodb -flaunch-docker -flaunch-simple && mkdir dsmt && cp dist dsmt
 after_script: |
   if [ $TRAVIS_TEST_RESULT -eq 0 ]; then
     echo "There should build a docker image."
