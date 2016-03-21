@@ -45,7 +45,7 @@ module Main
 #else
         let certPath = ""
         let keyPath = ""
-#end
+#endif
         let token = C.tokenEnv x
         dbAddr <- getEnv $ C.dbAddr x
         dbPort <- getEnv $ C.dbPort x
