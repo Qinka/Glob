@@ -302,22 +302,36 @@ module Glob.Management
       postStatR :: Yesod master
                 => HandlerT Management (HandlerT master IO) TypedContent
       postStatR = do
-        index <- lookupPostParams "index"
-        typ <- lookupPostParams "type"
-        fileinfo' <- lookupFile "file"
-        let fileinfo = toList fileinfo'
-        if any null [index,typ] || null fileinfo
-          then invalidArgs ["failed/less and less"]
-          else do
-            let path' = t2s $ ws2s index
-            sp <- fmap (staticPath.configM) getYesod
-            let path = sp ++ path'
-            text <- fileInfo fileinfo
-            liftIO $ createDirectoryIfMissing True $ reverse $ dropWhile (/='/') $ reverse path
-            liftIO $ BC8.writeFile path text
-            liftIO $ TIO.writeFile (path++".mime") $ head typ
-            selectRep $ provideRepType "application/json" $
-              returnTJson $ rtMsg' "success" ""
+        isDel <- lookupPostParam "isdel"
+        case isDel of
+          Just true -> delS
+          _ -> addS
+        where
+          delS = do
+            index <- lookupPostParams "index"
+            is <- doesFileExist $ t2s index
+            if is
+              then do
+                removeFile $ t2s index
+                returnTJson $ rtMsg' "success" ""
+              else returnTJson $ rtMsg' "failed" "no such file"
+          addS = do
+            index <- lookupPostParams "index"
+            typ <- lookupPostParams "type"
+            fileinfo' <- lookupFile "file"
+            let fileinfo = toList fileinfo'
+            if any null [index,typ] || null fileinfo
+              then invalidArgs ["failed/less and less"]
+              else do
+                let path' = t2s $ ws2s index
+                sp <- fmap (staticPath.configM) getYesod
+                let path = sp ++ path'
+                text <- fileInfo fileinfo
+                liftIO $ createDirectoryIfMissing True $ reverse $ dropWhile (/='/') $ reverse path
+                liftIO $ BC8.writeFile path text
+                liftIO $ TIO.writeFile (path++".mime") $ head typ
+                selectRep $ provideRepType "application/json" $
+                  returnTJson $ rtMsg' "success" ""
 
       instance Yesod master => YesodSubDispatch  Management (HandlerT master IO) where
         yesodSubDispatch = $(mkYesodSubDispatch resourcesManagement)
