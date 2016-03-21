@@ -5,7 +5,9 @@
 
 -- src.bin/launch.docker/Main.hs
 
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings
+             CPP
+             #-}
 
 module Main
     ( main
@@ -25,7 +27,8 @@ module Main
         where
           main' :: G.Config -> IO()
           main' c = do
-            (hIn,_,_,hProc) <- createProcess (shell $ "glob" ++ exeExtension ++ " --file=stdin") {std_in=CreatePipe}
+            otherFlag <- getContents
+            (hIn,_,_,hProc) <- createProcess (shell $ "glob" ++ exeExtension ++ " --file=stdin "++otherFlag) {std_in=CreatePipe}
             hPutStrLn (fromMaybe stdout hIn) $ read $ show $ encode c
             hClose (fromMaybe stdout hIn)
             print =<< waitForProcess hProc
@@ -36,8 +39,13 @@ module Main
         conThd <- getEnv $ C.conThd x
         staticPath <- getEnv $ C.staticPath x
         siteTitle <- getEnv $ C.siteTitle x
+#ifdef WithTls
         certPath <- getEnv $ C.certPath x
         keyPath <- getEnv $ C.keyPath x
+#else
+        let certPath = ""
+        let keyPath = ""
+#end
         let token = C.tokenEnv x
         dbAddr <- getEnv $ C.dbAddr x
         dbPort <- getEnv $ C.dbPort x
