@@ -1,8 +1,7 @@
 FROM index.docker.io/library/debian:latest
 MAINTAINER qinka
 RUN apt-get update && apt-get -y install libgmp10
-ADD ./dist/build/glob /usr/bin/
-ADD ./dist/build/launch.docker /usr/bin
-ADD ./resource/favicon.ico /favicon.ico
+ADD dist/build/glob /usr/bin/
+ADD dist/build/launch.docker /usr/bin
 CMD cat /dev/null | launch.docker
 EXPOSE 3000

@@ -1,5 +1,10 @@
 # The change log of Glob
 
+## [VERSION] 0.0.7.60
+
+1. 修复若干 BUG 包括 未设置启动命令与缺少几个关键的 ShareObject 。
+2. 完成了 TODO list 中 0.0.7.60 中所涉及的问题。
+
 ## [VERSION] 0.0.7.40
 
 1. 不重要的调整
