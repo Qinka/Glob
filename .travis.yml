@@ -24,7 +24,7 @@ script:
   - cabal install dist/Glob-*.tar.gz -flaunch-docker -flaunch-simple -fwith-mongodb && mkdir dsm && mv dist dsm
   - cabal install dist/Glob-*.tar.gz -fwith-tls -fwith-mongodb -flaunch-docker -flaunch-simple && mkdir dsmt && mv dist dsmt
 after_script: |
-  if [ $TRAVIS_TEST_RESULT -eq 0]; then
+  if [ $TRAVIS_TEST_RESULT -eq 0 ]; then
     echo "There should build a docker image."
     rm -rf dist
     if [ -n "$TRAVIS_TAG" ]; then
