@@ -9,7 +9,7 @@ before_install:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - "sudo add-apt-repository -y ppa:hvr/ghc"
   - "sudo apt-get update"
-  - "sudo apt-get install ghc-$GHCVER cabal-install-$CABALVER"
+  - "sudo apt-get -y install ghc-$GHCVER cabal-install-$CABALVER"
   - "export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH"
   - "cabal update"
   - "cabal install -j9 directory process persistent-template yesod persistent-postgresql persistent-mongoDB warp-tls cmdargs SHA"
@@ -19,13 +19,12 @@ script:
   - cabal sdist
   - cabal install dist/Glob-*.tar.gz -fwith-postgresql
   - cabal install dist/Glob-*.tar.gz -fwith-mongodb
-  - cabal install dist/Glob-*.tar.gz -flaunch-docker -flaunch-simple -fwith-postgresql && mkdir dsp && cp dist dsp
-  - cabal install dist/Glob-*.tar.gz -fwith-tls -fwith-postgresql -flaunch-docker -flaunch-simple && mkdir dspt && cp dist dspt
-  - cabal install dist/Glob-*.tar.gz -flaunch-docker -flaunch-simple -fwith-mongodb && mkdir dsm && cp dist dsm
-  - cabal install dist/Glob-*.tar.gz -fwith-tls -fwith-mongodb -flaunch-docker -flaunch-simple && mkdir dsmt && cp dist dsmt
+  - cabal install dist/Glob-*.tar.gz -flaunch-docker -flaunch-simple -fwith-postgresql && mkdir dsp && cp -r dist dsp
+  - cabal install dist/Glob-*.tar.gz -fwith-tls -fwith-postgresql -flaunch-docker -flaunch-simple && mkdir dspt && cp -r dist dspt
+  - cabal install dist/Glob-*.tar.gz -flaunch-docker -flaunch-simple -fwith-mongodb && mkdir dsm && cp -r dist dsm
+  - cabal install dist/Glob-*.tar.gz -fwith-tls -fwith-mongodb -flaunch-docker -flaunch-simple && mkdir dsmt && cp -r dist dsmt
 after_script: |
   if [ $TRAVIS_TEST_RESULT -eq 0 ]; then
-  
     echo "There should build a docker image."
     rm -rf dist
     if [ -n "$TRAVIS_TAG" ]; then
