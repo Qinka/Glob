@@ -309,12 +309,15 @@ module Glob.Management
         where
           delS = do
             index <- lookupPostParams "index"
-            is <- liftIO $ doesFileExist $ t2s index
+            let fn = t2s $ head index
+            is <- liftIO $ doesFileExist fn
             if is
               then do
-                liftIO $ removeFile $ t2s index
-                returnTJson $ rtMsg' "success" ""
-              else returnTJson $ rtMsg' "failed" "no such file"
+                liftIO $ removeFile fn
+                selectRep $ provideRepType "application/json" $
+                  returnTJson $ rtMsg' "success" ""
+              else selectRep $ provideRepType "application/json" $
+                returnTJson $ rtMsg' "failed" "no such file"
           addS = do
             index <- lookupPostParams "index"
             typ <- lookupPostParams "type"
