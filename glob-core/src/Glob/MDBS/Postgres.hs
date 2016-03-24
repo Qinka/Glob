@@ -23,6 +23,7 @@ module Glob.MDBS.Postgres
     , mdbsRaw
     , shareEntitDef
     , ConnectionPool
+    , DbConfig
     ) where
 #else
       where
@@ -31,7 +32,6 @@ module Glob.MDBS.Postgres
 #ifdef WithPostgres
 
       import Yesod
-      import Glob.Foundation.Config
       import Glob.Foundation.Common
       import Import.TH
       import Import.Text as T
@@ -48,8 +48,8 @@ module Glob.MDBS.Postgres
       runWithPool = runSqlPool
 
       withConfigAndPool :: (MonadIO m,Applicative m,MonadBaseControl IO m, MonadLogger m)
-                        => GlobConfig -> (ConnectionPool -> m b) -> m b
-      withConfigAndPool c a = let (constr,conThd) = toConStr $ globDb c
+                        => DbConfig -> (ConnectionPool -> m b) -> m b
+      withConfigAndPool c a = let (constr,conThd) = toConStr c
         in withPostgresqlPool constr conThd a
 
       toConStr :: DbConfig -> (ByteString,Int)
@@ -94,6 +94,34 @@ module Glob.MDBS.Postgres
           rawSql' :: MonadIO m
                   => T.Text -> ReaderT DBBackend m [Single PersistValue]
           rawSql' t = rawSql t []
+
+      data DbConfig = DbConfig
+        { dbAddr :: String
+        , dbPort     :: String
+        , dbUser      :: String
+        , dbPsk :: String
+        , dbName   :: String
+        , dbConThd   :: Int
+        }
+
+      instance FromJSON DbConfig where
+        parseJSON (Object v) = DbConfig
+          <$> v .: "host"
+          <*> v .: "port"
+          <*> v .: "usr"
+          <*> v .: "psk"
+          <*> v .: "dbName"
+          <*> v .: "conThd"
+      instance ToJSON DbConfig where
+        toJSON DbConfig{..} = object
+          [ "host"   .= dbAddr
+          , "port"   .= dbPort
+          , "usr"    .= dbUser
+          , "psk"    .= dbPsk
+          , "dbName" .= dbName
+          , "conThd" .= dbConThd
+          ]
+
 #else
       import Prelude
 #endif

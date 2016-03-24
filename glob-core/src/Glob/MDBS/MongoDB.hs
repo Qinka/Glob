@@ -21,6 +21,7 @@ module Glob.MDBS.MongoDB
     , mdbsRaw
     , shareEntitDef
     , ConnectionPool
+    , DbConfig
     ) where
 #else
       where
@@ -29,7 +30,6 @@ module Glob.MDBS.MongoDB
 #ifdef WithMongoDB
 
       import Yesod
-      import Glob.Foundation.Config
       import Glob.Foundation.Common
       import Import.TH
       import Control.Monad.Logger
@@ -47,11 +47,10 @@ module Glob.MDBS.MongoDB
                   => Action m a -> ConnectionPool -> m a
       runWithPool = runMongoDBPoolDef
       withConfigAndPool :: (MonadIO m,Applicative m,MonadBaseControl IO m,MonadLogger m)
-                        => GlobConfig -> (ConnectionPool -> m b) -> m b
-      withConfigAndPool c = mdb
+                        => DbConfig -> (ConnectionPool -> m b) -> m b
+      withConfigAndPool dbc = mdb
         where
           mdb = withMongoDBPool dbN hn sport auth (dbConThd dbc) (dbConThd dbc) defaultConnectionIdleTime
-          dbc = globDb c
           auth = Just $ MongoAuth (s2t $ dbUser dbc) $ s2t $ dbPsk dbc
           sport = Service $ dbPort dbc
           hn = dbAddr dbc
@@ -77,6 +76,34 @@ module Glob.MDBS.MongoDB
              liftHandlerT $ runDB $ runCommand1 cmd
              selectRep $ provideRepType "application/json" $ returnTJson $ rtMsg' "success" ""
            _ -> invalidArgs ["failed/less and less."]
+
+      data DbConfig = DbConfig
+        { dbAddr :: String
+        , dbPort     :: String
+        , dbUser      :: String
+        , dbPsk :: String
+        , dbName   :: String
+        , dbConThd   :: Int
+        }
+
+      instance FromJSON DbConfig where
+        parseJSON (Object v) = DbConfig
+          <$> v .: "host"
+          <*> v .: "port"
+          <*> v .: "usr"
+          <*> v .: "psk"
+          <*> v .: "dbName"
+          <*> v .: "conThd"
+      instance ToJSON DbConfig where
+        toJSON DbConfig{..} = object
+          [ "host"   .= dbAddr
+          , "port"   .= dbPort
+          , "usr"    .= dbUser
+          , "psk"    .= dbPsk
+          , "dbName" .= dbName
+          , "conThd" .= dbConThd
+          ]
+
 
 #else
       import Prelude

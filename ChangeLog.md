@@ -1,8 +1,18 @@
 # The change log of Glob
 
+## [VERSION] 0.0.8.1
+
+### glob-launcher
+
+1. 修正了由于顺序问题带来的错误。
+
+### glob-core & glob-main
+
+1. 改变了数据库配置的问题，使得数据库配置会因数据库的不同而不同。
+
 ## [VERSION] 0.0.8.0
 
-1.按照 TODO list 中的部分内容，大范围修改了 Glob。
+1. 按照 TODO list 中的部分内容，大范围修改了 Glob。
 
 ## [VERSION] 0.0.7.60
 

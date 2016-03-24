@@ -17,6 +17,7 @@ module Glob.Foundation.Config
       import Import.ByteString as B
       import Data.Aeson
       import Data.String
+      import Glob.MDBS
 
       data GlobConfig = GlobConfig
         { globPort :: Int
@@ -47,30 +48,3 @@ module Glob.Foundation.Config
           <*> v .: "static-path"
           <*> v .: "key-file"
           <*> v .: "certificate-file"
-
-      data DbConfig = DbConfig
-        { dbAddr :: String
-        , dbPort     :: String
-        , dbUser      :: String
-        , dbPsk :: String
-        , dbName   :: String
-        , dbConThd   :: Int
-        }
-
-      instance FromJSON DbConfig where
-        parseJSON (Object v) = DbConfig
-          <$> v .: "host"
-          <*> v .: "port"
-          <*> v .: "usr"
-          <*> v .: "psk"
-          <*> v .: "dbName"
-          <*> v .: "conThd"
-      instance ToJSON DbConfig where
-        toJSON DbConfig{..} = object
-          [ "host"   .= dbAddr
-          , "port"   .= dbPort
-          , "usr"    .= dbUser
-          , "psk"    .= dbPsk
-          , "dbName" .= dbName
-          , "conThd" .= dbConThd
-          ]

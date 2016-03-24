@@ -51,8 +51,8 @@ module Main
         return $ G.GlobConfig
           (read port)
           (G.DbConfig dbAddr dbPort dbUsr dbPsk dbName $ read conThd)
-          staticPath
           siteTitle
-          certPath
-          keyPath
           token
+          staticPath
+          keyPath
+          certPath

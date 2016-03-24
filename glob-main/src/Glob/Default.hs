@@ -38,16 +38,20 @@ module Glob.Default
 
       defaultMainWithConfig :: GlobConfig -> IO ()
       defaultMainWithConfig config =
-        runStderrLoggingT $ withConfigAndPool config $
+        runStderrLoggingT $ withConfigAndPool dbconfig $
           \pool -> liftIO $ warp
               (globPort config)
               (Glob pool config (Background pool config))
+        where
+          dbconfig = globDb config
 
       defaultMainTlsWithConfig :: GlobConfig -> IO ()
       defaultMainTlsWithConfig config =
-        runStderrLoggingT $ withConfigAndPool config $
+        runStderrLoggingT $ withConfigAndPool dbconfig $
           \pool -> liftIO $ warpTls
               (globCertPath config)
               (globKeyPath config)
               (globPort config)
               (Glob pool config (Background pool config))
+        where
+          dbconfig = globDb config
