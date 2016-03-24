@@ -10,6 +10,7 @@
            , FlexibleContexts
            , OverloadedStrings
            , TypeFamilies
+           , RecordWildCards
            #-}
 
 module Glob.MDBS.MongoDB
