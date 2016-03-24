@@ -1,30 +1,30 @@
 The Plan To Do
 ===
 
-This document is about the to do list of Glob, which is including the fixings of bug, to do list and so on.
+This document is about the todo list of Glob, which is including the fixings of bug, to do list and so on.
 
 # TODO list
+
+## Unmarked
+
+* Add the tags to blogs, pages, and so on.
+* To support more kinds of database, including SQLite and MySQL.
+* To support Microsoft SQL Server, Oracle.
+* To support some NoSQL databases.
+* Add the handler of searching blogs, and pages.
+  tags, created date, updated date.
+* Trying to make glob worked well with Nginx.
+* Trying to make glob worked well with PostgreSQL-XC
+* Add more launchers.
+
+## For 0.0.8.0
+
+* Rebuild the structure of project.
 
 ## For 0.0.7.60
 
 * The first we need to do is change some part of the launcher of docker.
+* Split Glob(Data) and main Module and launcher.
 
   The we used now (0.0.7.40) is not strong for a launcher. We need add
-  some support of GHC's runtime, and change it's reaction of without-tls
-  version.
-
-  Sometimes when images are hosted on multi-cpu pc, when need use the following:
-  ```
-  glob --file=config.json +RTS -Nx -RTS
-  ```
-  And launcher of docker (it is same with simple-launch) does not support.
-
-  And if you used a version without tls, you still need to set the settings of
-  the files' path about tls.This is bad.
-
-* The second we need to do is add a handler to delete to static files.
-
-* The next thing to do is add with-tls version of glob's docker images.
-
-
-# BUG FIX
+  some support of GHC's runtime, and change it's reaction of with

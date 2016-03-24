@@ -1,0 +1,16 @@
+/ HomeR GET
+
+/nav NavR POST
+
+/page/*Texts PageR GET
+
+/blog BlogListR POST GET
+/blog/#Text/*Texts BlogItemR GET
+
+/txt/*Texts TxtR GET
+/bin/*Texts BinR GET
+/query/*Texts QueryR GET
+
+/background BackgroundR Background globSubBg
+
+!/*Texts StaticR GET

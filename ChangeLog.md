@@ -1,5 +1,9 @@
 # The change log of Glob
 
+## [VERSION] 0.0.8.0
+
+1.按照 TODO list 中的部分内容，大范围修改了 Glob。
+
 ## [VERSION] 0.0.7.60
 
 1. 修复若干 BUG 包括 未设置启动命令与缺少几个关键的 ShareObject 。
