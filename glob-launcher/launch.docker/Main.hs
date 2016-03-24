@@ -13,6 +13,7 @@ module Main
 
       import qualified Main.CmdArgs as C
       import qualified Glob.Foundation.Config as G
+      import qualified Glob.MDBS as G
       import Glob.Default
       import Data.Yaml
       import System.IO
