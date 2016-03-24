@@ -22,7 +22,7 @@ flag unlimit-version
 library
   exposed-modules:   Glob.Default
                    , Glob.Tls
-  -- other-modules:
+  other-modules:     Paths_glob_main
   -- other-extensions:
   build-depends:     base >=4.8 && <4.9
                    , glob-core == 0.0.8.0

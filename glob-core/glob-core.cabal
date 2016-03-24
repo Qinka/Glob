@@ -64,6 +64,7 @@ library
                    , Import.Oth2
                    , Import.Text
                    , Import.TH
+                   , Paths_glob_core
   -- other-extensions:
   build-depends:     base >=4.8 && <4.9
   if flag(unlimit-version)
