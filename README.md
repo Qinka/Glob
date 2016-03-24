@@ -1,12 +1,7 @@
 Glob Usage
 =======
-The document of Glob.
 
-# GitBook
+This GitBook is the document of Glob, and it rebuilt after 0.0.8.0.
+If you need the old one, you can just find what you need in "old" folder.
 
-There, this site, are some documents about Glob.
-And at the same time, these documents are available in gitbook branch in [repo](https://github.com/Qinka/Glob).
 
-# Mascot
-
-There Glob has a mascot, an 1:72 tank model -- British tank Bishop, a SPG.
