@@ -11,7 +11,6 @@
 
 module Glob.Foundation.Config
     ( GlobConfig(..)
-    , DbConfig(..)
     ) where
 
       import Import.ByteString as B

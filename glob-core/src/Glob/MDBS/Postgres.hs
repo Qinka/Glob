@@ -23,7 +23,7 @@ module Glob.MDBS.Postgres
     , mdbsRaw
     , shareEntitDef
     , ConnectionPool
-    , DbConfig
+    , DbConfig(..)
     ) where
 #else
       where

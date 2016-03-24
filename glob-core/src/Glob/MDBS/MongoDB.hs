@@ -22,7 +22,7 @@ module Glob.MDBS.MongoDB
     , mdbsRaw
     , shareEntitDef
     , ConnectionPool
-    , DbConfig
+    , DbConfig(..)
     ) where
 #else
       where
