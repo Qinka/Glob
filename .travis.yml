@@ -30,7 +30,6 @@ script:
 after_script: |
   if [ $TRAVIS_TEST_RESULT -eq 0 ]; then
     echo "There should build a docker image."
-    rm -rf dist
     if [ -n "$TRAVIS_TAG" ]; then
       export DOCKER_IMAGE_TAG=$GLOB_DT-$TRAVIS_TAG-$TRAVIS_BUILD_NUMBER
     else
