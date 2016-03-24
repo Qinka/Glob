@@ -12,7 +12,6 @@
            , OverloadedStrings
            , TypeFamilies
            , AllowAmbiguousTypes
-           , RecordWildCards
            #-}
 
 module Glob.MDBS.Postgres
