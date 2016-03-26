@@ -2,7 +2,7 @@
 --  documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-launcher
-version:             0.0.8.1
+version:             0.0.8.10
 synopsis:            The launcher of Glob.
 description:         The launcher of Glob.
 license:             AgasaLicense
@@ -41,7 +41,7 @@ executable launch.docker
                      , yaml
                      , cmdargs
                      , glob-core >= 0.0.8.1
-                     , glob-main == 0.0.8.1
+                     , glob-main >= 0.0.8.1
   hs-source-dirs:      launch.docker
   default-language:    Haskell2010
   ghc-options:       -Wall -O2 -threaded
