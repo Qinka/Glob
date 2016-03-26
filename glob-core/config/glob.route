@@ -10,6 +10,7 @@
 /txt/*Texts TxtR GET
 /bin/*Texts BinR GET
 /query/*Texts QueryR GET
+/tag TagR POST
 
 /background BackgroundR Background globSubBg
 

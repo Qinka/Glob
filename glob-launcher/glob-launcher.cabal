@@ -40,7 +40,7 @@ executable launch.docker
   build-depends:       base >=4.8 && <4.9
                      , yaml
                      , cmdargs
-                     , glob-core == 0.0.8.1
+                     , glob-core >= 0.0.8.1
                      , glob-main == 0.0.8.1
   hs-source-dirs:      launch.docker
   default-language:    Haskell2010

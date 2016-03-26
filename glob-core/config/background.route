@@ -7,3 +7,4 @@
 /list ListR   POST
 /raw  RawR    POST
 /static StatR POST
+/tag  TagBR   POST

@@ -10,6 +10,7 @@
 module Glob.Handler.Post
     ( postBlogListR
     , postNavR
+    , postTagR
     ) where
 
       import Prelude as P
@@ -48,3 +49,11 @@ module Glob.Handler.Post
         navs' <- liftHandlerT $ runDB $ selectList [] [Asc NavOrder]
         let navs = map (\(Entity _ x) -> x) navs'
         selectRep $ provideRepValue navs
+
+      postTagR :: Handler TypedContent
+      postTagR = do
+        tags <- liftHandlerT $ lookupPostParams "tag"
+        typs <- liftHandlerT $ lookupPostParams "type"
+        infos' <- liftHandlerT $ runDB $ selectList [TagTag <-. tags,TagTyp <-. typs] []
+        let infos = map (\(Entity _ x)->x) infos'
+        selectRep $ provideRepValue infos

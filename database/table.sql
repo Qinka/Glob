@@ -26,7 +26,7 @@ CREATE TABLE table_html
   key_content TEXT NOT NULL,
   key_summary TEXT,
   key_update_time TIMESTAMP WITH TIME ZONE NOT NULL,
-  key_create_time TIMESTAMP WITH TIME ZONE NOT NULL
+  key_create_time TIMESTAMP WITH TIME ZONE NOT NULL,
 );
 
 CREATE TABLE table_txt
@@ -56,4 +56,14 @@ CREATE TABLE table_query
   key_text TEXT NOT NULL,
   key_update_time TIMESTAMP WITH TIME ZONE NOT NULL,
   key_create_time TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+
+CREATE TABLE table_tag
+(
+  id SERIAL PRIMARY KEY,
+  key_tag TEXT NOT NULL,
+  key_index TEXT NOT NULL,
+  key_type TEXT NOT NULL,
+  key_url TEXT
 );

@@ -24,7 +24,7 @@ module Import.TH
       import Text.Julius as X
       import Text.Cassius as X
       import Text.Lucius as X
-      import Text.Blaze.Html as X
+      import Text.Blaze.Html as X hiding (Tag)
       import Yesod as X hiding (Env)
 
       persistFileWithC :: PersistSettings

@@ -25,8 +25,8 @@ module Glob.Sub.Background
       import Import hiding (insert)
       import Import.Oth2
       import Glob.MDBS
-      import Import.Text as T hiding (head,take,dropWhile,null,any,unpack)
-      import Import.ByteString as B hiding (head,take,dropWhile,null,any,unpack)
+      import Import.Text as T hiding (head,take,dropWhile,null,any,unpack,index,map)
+      import Import.ByteString as B hiding (head,take,dropWhile,null,any,unpack,index,map)
       import Data.ByteString.Char8(unpack)
       import Yesod
       import Glob.Sub.Background.Data
@@ -49,10 +49,10 @@ module Glob.Sub.Background
                 , PersistEntityBackend v ~ DBBackend
                 )
              => [Filter v]
-             -> HandlerT Background (HandlerT master IO) TypedContent
+             -> HandlerT Background (HandlerT master IO) Value
       plItem fil = do
         da <- liftHandlerT $ runDB $ selectList fil []
-        selectRep $ provideRepValue $ RtMsg "success" $ ent da
+        return $ toJSON $ map (\(Entity _ x)-> x) da
 
       pdItem :: ( Yesod master
                 , PersistQuery (PersistEntityBackend v)
@@ -67,16 +67,31 @@ module Glob.Sub.Background
         selectRep $ provideRepValue $ rtMsg' "success" ""
 
       postListR :: Yesod master
-               => HandlerT Background (HandlerT master IO) TypedContent
+                => HandlerT Background (HandlerT master IO) TypedContent
       postListR = do
         index <- lookupPostParams "index"
         typ <- lookupPostParams "type"
-        case typ of
-          ("html":_) -> plItem $ $(mkPLFunc "HtmIndex") index
-          ("nav" :_) -> plItem $ $(mkPLFunc "NavLabel") index
-          ("txt" :_) -> plItem $ $(mkPLFunc "TxtIndex") index
-          ("bin" :_) -> plItem $ $(mkPLFunc "BinIndex") index
-          ("qry" :_) -> plItem $ $(mkPLFunc "QryIndex") index
+        mapM (mapTyp index) typ >>= (selectRep.provideRepValue)
+        where
+          mapTyp index typ = case typ of
+            "html" -> plItem $ $(mkPLFunc "HtmIndex") index
+            "nav"  -> plItem $ $(mkPLFunc "NavLabel") index
+            "txt"  -> plItem $ $(mkPLFunc "TxtIndex") index
+            "bin"  -> plItem $ $(mkPLFunc "BinIndex") index
+            "qry"  -> plItem $ $(mkPLFunc "QryIndex") index
+            _ -> invalidArgs ["failed/less and less"]
+
+      postTagBR :: Yesod master
+                => HandlerT Background (HandlerT master IO) TypedContent
+      postTagBR = do
+        tag <- liftHandlerT $ lookupPostParam "tag"
+        typ <- liftHandlerT $ lookupPostParam "type"
+        url <- liftHandlerT $ lookupPostParam "url"
+        index <- liftHandlerT $ lookupPostParam "index"
+        case (tag,typ,index) of
+          (Just ta,Just ty,Just i) -> do
+            liftHandlerT $ runDB $ insert $ Tag i ta ty url
+            selectRep $ provideRepValue $ rtMsg' "success" ""
           _ -> invalidArgs ["failed/less and less"]
 
       postDelR :: Yesod master
