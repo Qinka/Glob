@@ -15,8 +15,9 @@ module Glob.Default
     ) where
 
       import Glob
-      import Glob.Tls
+      import Glob.Warp
       import Glob.Foundation.Common
+      import Glob.Foundation.Base
       import Data.Yaml
       import Data.Maybe
 
@@ -37,21 +38,23 @@ module Glob.Default
         defaultMainTlsWithConfig.fromMaybe (error "glob: Can not decode config context.").decode.s2b
 
       defaultMainWithConfig :: GlobConfig -> IO ()
-      defaultMainWithConfig config =
-        runStderrLoggingT $ withConfigAndPool dbconfig $
-          \pool -> liftIO $ warp
+      defaultMainWithConfig config = do
+        lg <- globMkLogger False (Glob undefined config undefined undefined)
+        runStdoutLoggingT $ withConfigAndPool dbconfig $
+          \pool -> liftIO $ warpStd
               (globPort config)
-              (Glob pool config (Background pool config))
+              (Glob pool config (Background pool config) lg)
         where
           dbconfig = globDb config
 
       defaultMainTlsWithConfig :: GlobConfig -> IO ()
-      defaultMainTlsWithConfig config =
-        runStderrLoggingT $ withConfigAndPool dbconfig $
+      defaultMainTlsWithConfig config = do
+        lg <- globMkLogger False (Glob undefined config undefined undefined)
+        runStdoutLoggingT $ withConfigAndPool dbconfig $
           \pool -> liftIO $ warpTls
               (globCertPath config)
               (globKeyPath config)
               (globPort config)
-              (Glob pool config (Background pool config))
+              (Glob pool config (Background pool config) lg)
         where
           dbconfig = globDb config

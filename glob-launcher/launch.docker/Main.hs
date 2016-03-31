@@ -5,32 +5,45 @@
 
 -- src/Main.hs
 
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP
+           , TemplateHaskell
+           , QuasiQuotes
+           , DeriveDataTypeable
+           #-}
 
 module Main
     ( main
     ) where
 
-      import qualified Main.CmdArgs as C
-      import qualified Glob.Foundation.Config as G
-      import Glob.MDBS as G
+      import Main.CmdArgs
+      import System.Console.CmdArgs
+      import Data.Version
+      import Paths_glob_launcher
+      import Glob.Foundation.Config
+      import Glob.MDBS hiding (dbAddr,dbPort,dbUser,dbPsk,dbName,dbConThd)
       import Glob.Default
       import Data.Yaml
       import System.IO
       import System.Environment
       import Data.Maybe
+      import MDBS
+      import System.Console.CmdArgs.Quote
+
+      dlD
+      dl
+      tocfgi
 
       main :: IO ()
-      main = C.runArgs toConfig >>= main'
+      main = runArgs toConfig >>= main'
         where
-          main' :: G.GlobConfig -> IO()
+          main' :: GlobConfig -> IO()
 #ifdef WithTls
           main' = defaultMainTlsWithConfig
 #else
           main' = defaultMainWithConfig
 #endif
-
-      toConfig :: C.DockerLaunch -> IO G.GlobConfig
+{-
+      toConfig :: DockerLaunch -> IO GlobConfig
       toConfig x = do
         port <- getEnv $ C.port x
         conThd <- getEnv $ C.conThd x
@@ -49,6 +62,7 @@ module Main
         dbName <- getEnv $ C.dbName x
         dbPsk <- getEnv $ C.dbPsk x
         dbUsr <- getEnv $ C.dbUsr x
+        logpath <- getEnv $ C.logpath x
         return $ G.GlobConfig
           (read port)
           (G.DbConfig dbAddr dbPort dbUsr dbPsk dbName $ read conThd)
@@ -57,3 +71,8 @@ module Main
           staticPath
           keyPath
           certPath
+          logpath
+
+-}
+      runArgs :: (DockerLaunch -> IO GlobConfig) -> IO GlobConfig
+      runArgs = (cmdArgs dockerLaunch >>=)

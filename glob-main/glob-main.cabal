@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-main
-version:             0.0.8.10
+version:             0.0.8.30
 synopsis:            The main enterpoint of Glob.
 description:         This package defined the something for MAIN function.
 license:             AgasaLicense
@@ -21,11 +21,11 @@ flag unlimit-version
 
 library
   exposed-modules:   Glob.Default
-                   , Glob.Tls
+                   , Glob.Warp
   other-modules:     Paths_glob_main
   -- other-extensions:
   build-depends:     base >=4.8 && <4.9
-                   , glob-core >= 0.0.8.1
+                   , glob-core >= 0.0.8.30
   if flag(unlimit-version)
     build-depends:   warp-tls
   else

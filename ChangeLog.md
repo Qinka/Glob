@@ -1,5 +1,14 @@
 # The change log of Glob
 
+## [VERSION] 0.0.8.30
+
+1. 重大更新，使用 TemplateHaskell 解决掉了 docker-launcher 对不同数据库支持上带来的障碍，同时解决了
+  内部版本 0.0.8.15 中 对 log 文件重复占用的问题。
+
+## [VERSION] 0.0.8.10
+
+1. 添加了 TAG，并进行了一些修正。
+
 ## [VERSION] 0.0.8.1
 
 ### glob-launcher

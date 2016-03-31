@@ -21,16 +21,18 @@ module Glob.Foundation.Base where
       import Import.TH
       import Import.Monad
       import Import.Text as T
+      import Import.Oth3
       import Glob.Auth
       import Glob.MDBS
-      import Glob.Foundation.Config as X
-      import Glob.Foundation.Common as X
       import Glob.Sub.Background
+      import Glob.Foundation.Config
+      import Glob.Foundation.Common
 
       data Glob = Glob
         { globConnPool :: ConnectionPool
         , globConfig :: GlobConfig
         , globSubBg :: Background
+        , globLogger :: Logger
         }
 
       mkYesodData "Glob" $(parseRoutesFileC "glob.route")
@@ -42,6 +44,7 @@ module Glob.Foundation.Base where
         isAuthorized (BackgroundR _) _ = getYesod >>= (bgAuth.globTokenEnv.globConfig)
         isAuthorized _ _ = return Authorized
         defaultLayout = globLayout
+        makeLogger = globMkLogger True
 
       instance YesodPersist Glob where
         type YesodPersistBackend Glob = DBBackend
@@ -61,3 +64,15 @@ module Glob.Foundation.Base where
             liftHandlerT (runDB $ selectList [HtmIndex==. ws2s ("home":x),HtmTyp==."home"] [])
           entHtm (Entity _ htmT) = htmHtml htmT
           entHtm' = P.head .P.map  (preEscapedToHtml.entHtm)
+
+      globMkLogger ::  Bool -> Glob -> IO Logger
+      globMkLogger True gi = return $ globLogger gi
+      globMkLogger False gi = do
+        loggerSet' <- newGlobLoggerSet logfile defaultBufSize
+        (getter,_) <- clockDateCacher
+        return $! Logger loggerSet' getter
+        where
+          logfile = globLogFile $ globConfig $ gi
+          newGlobLoggerSet "stdout" d = newStdoutLoggerSet d
+          newGlobLoggerSet "stderr" d = newStderrLoggerSet d
+          newGlobLoggerSet file     d = newFileLoggerSet d file

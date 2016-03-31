@@ -24,6 +24,7 @@ module Glob.Foundation.Config
         , globSiteTitle :: String
         , globTokenEnv :: String
         , globStaticPath :: FilePath
+        , globLogFile :: FilePath
         , globKeyPath :: FilePath
         , globCertPath :: FilePath
         }
@@ -36,6 +37,7 @@ module Glob.Foundation.Config
           , "static-path" .= globStaticPath
           , "key-file" .= globKeyPath
           , "certificate-file" .= globCertPath
+          , "logger-file" .= globLogFile
           ]
 
       instance FromJSON GlobConfig where
@@ -45,5 +47,6 @@ module Glob.Foundation.Config
           <*> v .: "title"
           <*> v .: "token-env"
           <*> v .: "static-path"
+          <*> v .: "logger-file"
           <*> v .: "key-file"
           <*> v .: "certificate-file"

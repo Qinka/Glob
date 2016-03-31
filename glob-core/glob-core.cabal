@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-core
-version:             0.0.8.10
+version:             0.0.8.30
 synopsis:            A framework of blog, used by myself.
 description:         A framework of blog, used by myself.
 license:             AgasaLicense
@@ -62,6 +62,7 @@ library
                    , Import.Monad
                    , Import.Oth1
                    , Import.Oth2
+                   , Import.Oth3
                    , Import.Text
                    , Import.TH
                    , Paths_glob_core
@@ -83,6 +84,14 @@ library
     build-depends:   yesod
   else
     build-depends:   yesod > 1.4.1 && <1.4.3
+  if flag(unlimit-version)
+    build-depends:   wai-logger
+  else
+    build-depends:   wai-logger >= 2.2 && < 2.4
+  if flag(unlimit-version)
+    build-depends:   fast-logger
+  else
+    build-depends:   fast-logger >= 2.4 && < 2.6
   if flag(unlimit-version)
     build-depends:   text
   else

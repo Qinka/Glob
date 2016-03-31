@@ -7,7 +7,6 @@ This document is about the todo list of Glob, which is including the fixings of 
 
 ## Unmarked
 
-* Add the tags to blogs, pages, and so on.
 * To support more kinds of database, including SQLite and MySQL.
 * To support Microsoft SQL Server, Oracle.
 * To support some NoSQL databases.
@@ -16,6 +15,11 @@ This document is about the todo list of Glob, which is including the fixings of 
 * Trying to make glob worked well with Nginx.
 * Trying to make glob worked well with PostgreSQL-XC
 * Add more launchers.
+
+
+## [DONE] SINCE 0.0.8.10
+
+* Add the tags to blogs, pages, and so on.
 
 ## For 0.0.8.0
 
