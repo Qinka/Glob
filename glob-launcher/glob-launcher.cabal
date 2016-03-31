@@ -50,3 +50,5 @@ executable launch.docker
     cpp-options:     -DWithTls
   if flag(with-postgresql)
     cpp-options:     -DWithPostgres
+  if flag(with-mongodb)
+    cpp-options:     -DWithMongoDB

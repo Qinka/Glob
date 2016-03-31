@@ -23,7 +23,7 @@ script:
   - cd ../glob-main
   - cabal install $GLOB_TLS
   - cd ../glob-launcher
-  - cabal configure $GLOB_LA $GLOB_TLS
+  - cabal configure $GLOB_LA $GLOB_TLS $GLOB_DB
   - cabal build
   - cp -r dist  ../dist
   - cd ..
