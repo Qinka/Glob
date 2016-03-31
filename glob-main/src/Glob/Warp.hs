@@ -12,7 +12,7 @@ module Glob.Warp
     ( warpTls
     , warp
     , warpStd
-    , runStderrLoggingT
+    , runStdoutLoggingT
     ) where
 
       import Yesod.Core
