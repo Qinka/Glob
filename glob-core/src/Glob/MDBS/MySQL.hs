@@ -65,7 +65,7 @@ module Glob.MDBS.MySQL
               Just x -> x
             , connectSSL = case dbSSL of
                 Nothing -> Nothing
-                Just SSLI{..} -> SSLInfo
+                Just SSLI{..} -> Just $ SSLInfo
                   { sslKey = dsKey
                   , sslCert = dsCert
                   , sslCA = dsCA
@@ -122,7 +122,7 @@ module Glob.MDBS.MySQL
         , dbUser :: String
         , dbPsk :: String
         , dbName :: String
-        , dbConThd :: String
+        , dbConThd :: Int
         , dbPath :: Maybe FilePath
         , dbSSL :: Maybe SSLI
         }
