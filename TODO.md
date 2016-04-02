@@ -7,7 +7,7 @@ This document is about the todo list of Glob, which is including the fixings of 
 
 ## Unmarked
 
-* To support more kinds of database, including SQLite and MySQL.
+* To support more kinds of database, including SQLite and MySQL(supported in 0.0.8.40).
 * To support Microsoft SQL Server, Oracle.
 * To support some NoSQL databases.
 * Add the handler of searching blogs, and pages.
@@ -16,6 +16,10 @@ This document is about the todo list of Glob, which is including the fixings of 
 * Trying to make glob worked well with PostgreSQL-XC
 * Add more launchers.
 
+
+## [DONE] 0.0.8.40
+
+* Supported MySQL
 
 ## [DONE] SINCE 0.0.8.10
 

@@ -37,6 +37,7 @@ module Glob.MDBS.MySQL
       import Database.Persist.Sql
       import Data.String(fromString)
       import Import.Monad
+      import Database.MySQL.Simple
 
       type DBBackend = SqlBackend
 
