@@ -88,7 +88,7 @@ module Glob.MDBS.MySQL
         rawWays <- lookupPostParams "raw-way"
         case fileinfo' of
           Just fileinfo -> do
-            text <- sourceToList % fileSource fileinfo
+            text <- sourceToList $ fileSource fileinfo
             let cmd =  b2t $ B.concat text
             case rawWays of
               "raw-sql":_ -> do
