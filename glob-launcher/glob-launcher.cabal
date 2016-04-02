@@ -40,6 +40,7 @@ executable launch.docker
   other-modules:       Main.CmdArgs
                      , Main.CmdArgs.TH
                      , MDBS
+                     , Paths_glob_launcher
   -- other-extensions:
   build-depends:       base >=4.8 && <4.9
                      , yaml
@@ -54,7 +55,7 @@ executable launch.docker
   if flag(with-tls)
     cpp-options:     -DWithTls
   if flag(with-postgresql)
-    other-modules:   MDBS.Postgre
+    other-modules:   MDBS.Postgres
     cpp-options:     -DWithPostgres
   if flag(with-mongodb)
     other-modules:   MDBS.Mongo
