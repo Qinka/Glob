@@ -23,6 +23,32 @@ module Main.CmdArgs.TH
       import Glob.Foundation.Common
       import System.Console.CmdArgs.Default
 
+      mkVarNotStrictT :: String -- Type: mkName typ
+                      -> String -- name of variable
+                      -> VarStrictType
+      mkVarNotStrictT typ name = (mkName name,NotStrict,ConT (mkName typ))
+
+      mkFieldExp :: String -- groupname
+                 -> String -- var
+                 -> String -- help
+                 -> String -- def
+                 -> FieldExp
+      mkFieldExp gT vT hT dT =
+        (mkName vT, InfixE
+            (Just (InfixE
+              (Just (InfixE
+                  (Just (LitE (StringL dT)))
+                  (VarE (mkName "&="))
+                  (Just (AppE (VarE (mkName "help"))
+                              (LitE (StringL hT))))))
+              (VarE (mkName "&="))
+              (Just (AppE (VarE (mkName "name"))
+                          (LitE (StringL vT))))))
+            (VarE (mkName "&="))
+            (Just (AppE (VarE (mkName "groupname"))
+                        (LitE (StringL gT)))))
+      mkBindS ::
+
       baseCmdD :: [VarStrictType] -> [Dec]
       baseCmdD con =
         [ DataD
