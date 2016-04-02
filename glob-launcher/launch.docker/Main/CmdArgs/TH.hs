@@ -245,8 +245,8 @@ module Main.CmdArgs.TH
 
       tocfgTls :: [Stmt]
       tocfgTls =
-        [ BindS (VarP (mkName "certPath")) (InfixE (Just (VarE (mkName "getEnv"))) (VarE (mkName "$")) (Just (AppE (VarE (mkName "port")) (VarE (mkName "x")))))
-        , BindS (VarP (mkName "keyPath")) (InfixE (Just (VarE (mkName "getEnv"))) (VarE (mkName "$")) (Just (AppE (VarE (mkName "port")) (VarE (mkName "x")))))
+        [ BindS (VarP (mkName "certPath'")) (InfixE (Just (VarE (mkName "getEnv"))) (VarE (mkName "$")) (Just (AppE (VarE (mkName "certPath")) (VarE (mkName "x")))))
+        , BindS (VarP (mkName "keyPath'")) (InfixE (Just (VarE (mkName "getEnv"))) (VarE (mkName "$")) (Just (AppE (VarE (mkName "keyPath")) (VarE (mkName "x")))))
         ]
 
       tocfgTlsAppE :: Exp -> Exp
