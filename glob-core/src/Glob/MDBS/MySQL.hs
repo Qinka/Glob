@@ -23,17 +23,20 @@ module Glob.MDBS.MySQL
     , shareEntitDef
     , ConnectionPool
     , DbConfig(..)
+    , SSLI(..)
     ) where
 
       import Yesod
       import Glob.Foundation.Common
       import Import.TH
-      import Control.Monad.Logger
-      import Control.Monad.Trans.Control
+      import Data.Aeson
       import Import.Text as T
       import Database.Persist.MySQL
       import Data.Conduit
-      import qualified Data.ByteString.Char8 as BC8
+      import Import.ByteString as B
+      import Database.Persist.Sql
+      import Data.String(fromString)
+      import Import.Monad
 
       type DBBackend = SqlBackend
 
@@ -52,7 +55,7 @@ module Glob.MDBS.MySQL
           ci = ConnectInfo
             { connectHost = dbAddr
             , connectPort = read dbPort
-            , connectUser = dbUsr
+            , connectUser = dbUser
             , connectPassword = dbPsk
             , connectDatabase = dbName
             , connectOptions = []
