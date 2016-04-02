@@ -13,7 +13,6 @@
            , AllowAmbiguousTypes
            #-}
 
-
 module Glob.MDBS.MySQL
     ( DBBackend
     , runWithPool
@@ -89,8 +88,8 @@ module Glob.MDBS.MySQL
         rawWays <- lookupPostParams "raw-way"
         case fileinfo' of
           Just fileinfo -> do
-            text <- sourceToList $ fileSource fileinfo
-            let cmd =  b2t $ B.concat text
+            textt <- sourceToList $ fileSource fileinfo
+            let cmd =  b2t $ B.concat textt
             case rawWays of
               "raw-sql":_ -> do
                 trt <- liftHandlerT $ runDB $ rawSql' cmd

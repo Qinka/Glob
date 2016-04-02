@@ -29,7 +29,7 @@ module Glob.MDBS
 #define HasDB
 #endif
 
-#ifdef WithMySQY
+#ifdef WithMySQL
 #ifndef HasDB
       import Glob.MDBS.MySQL as X
 #else

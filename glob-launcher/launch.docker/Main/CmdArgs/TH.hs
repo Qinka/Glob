@@ -150,7 +150,7 @@ module Main.CmdArgs.TH
             (AppE (ConE (mkName "GlobConfig")) (AppE (mkVarE "read") (mkVarE "port'") ) ) {- 1 -} (mkVarE "dbS") ) {-2-} (mkVarE "siteTitle'") ){-3-} (mkVarE "token")){-4-} (mkVarE  "staticPath'")){-5-} (mkVarE "logfile'")
 
       tocfgTls :: [Stmt]
-      tocfgTls = map mkBindS ["certPath","keypath"]
+      tocfgTls = map mkBindS ["certPath","keyPath"]
 
       tocfgTlsAppE :: Exp -> Exp
       tocfgTlsAppE expr = AppE (AppE expr (mkVarE "certPath'")) (mkVarE "keyPath'")

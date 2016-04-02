@@ -8,7 +8,7 @@
 {-# LANGUAGE TemplateHaskell
            #-}
 
-module MDBS.Postgres
+module MDBS.Mongo
     ( dbCon
     , dbField
     , dbStmt
@@ -31,7 +31,7 @@ module MDBS.Postgres
         ]
 
       dbField :: [FieldExp]
-      dbField = map (mkFieldExp "PostgreSQL Connection Settings")
+      dbField = map (mkFieldExp "MongoDB Connection Settings")
         [ ("dbPort","DB_PORT","The environment variable's name of the database's port")
         , ("dbAddr","DB_ADDR","The environment variable's name of the database's address")
         , ("dbPsk","DB_PSK","The environment variable's name of the password of database")
