@@ -23,10 +23,21 @@ module MDBS
 #ifndef HADDB
       import MDBS.Mongo as X
 #else
-#warning "Used two kinds of database"
+  #warning "Used two kinds of database"
 #endif
 #define HADDB
 #endif
+
+#ifdef WithMySQL
+#ifndef HADDB
+      import MDBS.MySQL as X
+#else
+  #warning "Used two kinds of database"
+#endif
+#define HADDB
+#endif
+
+
 
 #ifndef HADDB
 #warning "Need db"

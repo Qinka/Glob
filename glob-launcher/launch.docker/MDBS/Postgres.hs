@@ -16,117 +16,47 @@ module MDBS.Postgres
 
       import Language.Haskell.TH
       import Language.Haskell.TH.Syntax
+      import Main.CmdArgs.TH
 
 
       dbCon :: [VarStrictType]
-      dbCon =
-        [ (mkName "dbPort",NotStrict, ConT (mkName "String"))
-        , (mkName "dbAddr",NotStrict, ConT (mkName "String"))
-        , (mkName "dbName",NotStrict, ConT (mkName "String"))
-        , (mkName "dbPsk",NotStrict, ConT (mkName "String"))
-        , (mkName "dbUsr",NotStrict, ConT (mkName "String"))
-        , (mkName "dbConThd",NotStrict, ConT (mkName "String"))
+      dbCon = map (mkVarNotStrictT "String")
+        [ "dbPort"
+        , "dbAddr"
+        , "dbName"
+        , "dbPsk"
+        , "dbUsr"
+        , "dbConThd"
         ]
 
       dbField :: [FieldExp]
-      dbField =
-        [ ((mkName "dbPort"), InfixE
-              (Just (InfixE
-                (Just (InfixE
-                    (Just (LitE (StringL "DB_PORT")))
-                    (VarE (mkName "&="))
-                    (Just (AppE (VarE (mkName "help"))
-                                (LitE (StringL "The environment variable's name of the database's port"))))))
-                (VarE (mkName "&="))
-                (Just (AppE (VarE (mkName "name"))
-                            (LitE (StringL "dbport"))))))
-              (VarE (mkName "&="))
-              (Just (AppE (VarE (mkName "groupname"))
-                          (LitE (StringL "Database Settings")))))
-        , ((mkName "dbAddr"), InfixE
-              (Just (InfixE
-                (Just (InfixE
-                    (Just (LitE (StringL "DB_ADDR")))
-                    (VarE (mkName "&="))
-                    (Just (AppE (VarE (mkName "help"))
-                                (LitE (StringL "The environment variable's name of the database's address"))))))
-                (VarE (mkName "&="))
-                (Just (AppE (VarE (mkName "name"))
-                            (LitE (StringL "dbaddr"))))))
-              (VarE (mkName "&="))
-              (Just (AppE (VarE (mkName "groupname"))
-                          (LitE (StringL "Database Settings")))))
-        , ((mkName "dbPsk"), InfixE
-              (Just (InfixE
-                (Just (InfixE
-                    (Just (LitE (StringL "DB_PSK")))
-                    (VarE (mkName "&="))
-                    (Just (AppE (VarE (mkName "help"))
-                                (LitE (StringL "The environment variable's name of the password of database"))))))
-                (VarE (mkName "&="))
-                (Just (AppE (VarE (mkName "name"))
-                            (LitE (StringL "dbpsk"))))))
-              (VarE (mkName "&="))
-              (Just (AppE (VarE (mkName "groupname"))
-                          (LitE (StringL "Database Settings")))))
-        , ((mkName "dbName"), InfixE
-              (Just (InfixE
-                (Just (InfixE
-                    (Just (LitE (StringL "DB_NAME")))
-                    (VarE (mkName "&="))
-                    (Just (AppE (VarE (mkName "help"))
-                                (LitE (StringL "The environment variable's name of the name of the database"))))))
-                (VarE (mkName "&="))
-                (Just (AppE (VarE (mkName "name"))
-                            (LitE (StringL "dbname"))))))
-              (VarE (mkName "&="))
-              (Just (AppE (VarE (mkName "groupname"))
-                          (LitE (StringL "Database Settings")))))
-        , ((mkName "dbUsr"), InfixE
-              (Just (InfixE
-                (Just (InfixE
-                    (Just (LitE (StringL "DB_USR")))
-                    (VarE (mkName "&="))
-                    (Just (AppE (VarE (mkName "help"))
-                                (LitE (StringL "The environment variable's name of the database's user name"))))))
-                (VarE (mkName "&="))
-                (Just (AppE (VarE (mkName "name"))
-                            (LitE (StringL "dbusr"))))))
-              (VarE (mkName "&="))
-              (Just (AppE (VarE (mkName "groupname"))
-                          (LitE (StringL "Database Settings")))))
-        , ((mkName "dbConThd"), InfixE
-              (Just (InfixE
-                (Just (InfixE
-                    (Just (LitE (StringL "DB_CONTHD")))
-                    (VarE (mkName "&="))
-                    (Just (AppE (VarE (mkName "help"))
-                                (LitE (StringL "The environment variable's name of the limitation of the connection with db"))))))
-                (VarE (mkName "&="))
-                (Just (AppE (VarE (mkName "name"))
-                            (LitE (StringL "dbdbconthd"))))))
-              (VarE (mkName "&="))
-              (Just (AppE (VarE (mkName "groupname"))
-                          (LitE (StringL "Database Settings")))))
+      dbField = map (mkFieldExp "PostgreSQL Connection Settings")
+        [ ("dbPort","DB_PORT","The environment variable's name of the database's port")
+        , ("dbAddr","DB_ADDR","The environment variable's name of the database's address")
+        , ("dbPsk","DB_PSK","The environment variable's name of the password of database")
+        , ("dbName","DB_NAME","The environment variable's name of the name of the database")
+        , ("dbUsr","DB_USR","The environment variable's name of the database's user name")
+        , ("dbConThd","DB_CONTHD","The environment variable's name of the limitation of the connection with db")
         ]
       dbStmt :: [Stmt]
-      dbStmt =
-        [ BindS (VarP (mkName "dbAddr'")) (InfixE (Just (VarE (mkName "getEnv"))) (VarE (mkName "$")) (Just (AppE (VarE (mkName "dbAddr")) (VarE (mkName "x")))))
-        , BindS (VarP (mkName "dbPort'")) (InfixE (Just (VarE (mkName "getEnv"))) (VarE (mkName "$")) (Just (AppE (VarE (mkName "dbPort")) (VarE (mkName "x")))))
-        , BindS (VarP (mkName "dbName'")) (InfixE (Just (VarE (mkName "getEnv"))) (VarE (mkName "$")) (Just (AppE (VarE (mkName "dbName")) (VarE (mkName "x")))))
-        , BindS (VarP (mkName "dbPsk'")) (InfixE (Just (VarE (mkName "getEnv"))) (VarE (mkName "$")) (Just (AppE (VarE (mkName "dbPsk")) (VarE (mkName "x")))))
-        , BindS (VarP (mkName "dbUsr'")) (InfixE (Just (VarE (mkName "getEnv"))) (VarE (mkName "$")) (Just (AppE (VarE (mkName "dbUsr")) (VarE (mkName "x")))))
-        , BindS (VarP (mkName "dbConThd'")) (InfixE (Just (VarE (mkName "getEnv"))) (VarE (mkName "$")) (Just (AppE (VarE (mkName "dbConThd")) (VarE (mkName "x")))))
-        , LetS [FunD (mkName "dbS") [Clause [] (NormalB (AppE
+      dbStmt = map mkBindS
+          [ "dbAddr"
+          , "dbPort"
+          , "dbName"
+          , "dbPsk"
+          , "dbUsr"
+          , "dbConThd"
+          ]
+        ++ [LetS [FunD (mkName "dbS") [Clause [] (NormalB (AppE
           {-5-}(AppE
             {-4-}(AppE
               {-3-}(AppE
                 {-2-}(AppE
                   {-1-}(AppE (ConE (mkName "DbConfig"))
-                             (VarE (mkName "dbAddr'"))){-1-}
-                       (VarE (mkName "dbPort'"))){-2-}
-                     (VarE (mkName "dbUsr'"))){-3-}
-                   (VarE (mkName "dbPsk'"))){-4-}
-                 (VarE (mkName "dbName'"))){-5-}
-                (AppE (VarE (mkName "read")) (VarE (mkName "dbConThd'"))) )   ) [] ]]
+                             (mkVarE "dbAddr'")){-1-}
+                       (mkVarE "dbPort'")){-2-}
+                     (mkVarE "dbUsr'")){-3-}
+                   (mkVarE "dbPsk'")){-4-}
+                 (mkVarE "dbName'")){-5-}
+                (AppE (mkVarE "read") (mkVarE "dbConThd'")) )   ) [] ]]
         ]

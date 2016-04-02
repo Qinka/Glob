@@ -2,7 +2,7 @@
 --  documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-launcher
-version:             0.0.8.30
+version:             0.0.8.40
 synopsis:            The launcher of Glob.
 description:         The launcher of Glob.
 license:             AgasaLicense
@@ -31,15 +31,20 @@ flag with-mongodb
   description:       Use MongoDB for database
   default:           False
 
+flag with-mysql
+  description:       USe MySQl for database
+  default:           False
 
 executable launch.docker
   main-is:             Main.hs
   other-modules:       Main.CmdArgs
+                     , Main.CmdArgs.TH
+                     , MDBS
   -- other-extensions:
   build-depends:       base >=4.8 && <4.9
                      , yaml
                      , cmdargs
-                     , glob-core >= 0.0.8.30
+                     , glob-core >= 0.0.8.40
                      , glob-main >= 0.0.8.30
                      , template-haskell
   hs-source-dirs:      launch.docker
@@ -49,6 +54,11 @@ executable launch.docker
   if flag(with-tls)
     cpp-options:     -DWithTls
   if flag(with-postgresql)
+    other-modules:   MDBS.Postgre
     cpp-options:     -DWithPostgres
   if flag(with-mongodb)
+    other-modules:   MDBS.Mongo
     cpp-options:     -DWithMongoDB
+  if flag(with-mysql)
+    other-modules:   MDBS.MySQL
+    cpp-options:     -DWithMySQL

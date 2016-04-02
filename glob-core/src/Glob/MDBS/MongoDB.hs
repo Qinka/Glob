@@ -51,7 +51,7 @@ module Glob.MDBS.MongoDB
                         => DbConfig -> (ConnectionPool -> m b) -> m b
       withConfigAndPool dbc = mdb
         where
-          mdb = withMongoDBPool dbN hn sport auth (dbConThd dbc) (dbConThd dbc) defaultConnectionIdleTime
+          mdb = withMongoDBPool dbN hn sport auth (dbPS dbc) (dbSC dbc) defaultConnectionIdleTime
           auth = Just $ MongoAuth (s2t $ dbUser dbc) $ s2t $ dbPsk dbc
           sport = Service $ dbPort dbc
           hn = dbAddr dbc
@@ -84,7 +84,8 @@ module Glob.MDBS.MongoDB
         , dbUser      :: String
         , dbPsk :: String
         , dbName   :: String
-        , dbConThd   :: Int
+        , dbPS  :: Int
+        , dbSC  :: Int
         }
 
       instance FromJSON DbConfig where
@@ -93,16 +94,18 @@ module Glob.MDBS.MongoDB
           <*> v .: "port"
           <*> v .: "usr"
           <*> v .: "psk"
-          <*> v .: "dbName"
-          <*> v .: "conThd"
+          <*> v .: "name"
+          <*> v .: "poolstripes"
+          <*> v .: "stripeconnections"
       instance ToJSON DbConfig where
         toJSON DbConfig{..} = object
           [ "host"   .= dbAddr
           , "port"   .= dbPort
           , "usr"    .= dbUser
           , "psk"    .= dbPsk
-          , "dbName" .= dbName
-          , "conThd" .= dbConThd
+          , "name" .= dbName
+          , "poolstripes" .= dbPS
+          , "stripeconnections" .= dbSC
           ]
 
 

@@ -5,8 +5,7 @@
 
 -- src/Glob/MDBS/Postgre.hs
 
-{-# LANGUAGE CPP
-           , TemplateHaskell
+{-# LANGUAGE TemplateHaskell
            , RecordWildCards
            , FlexibleContexts
            , OverloadedStrings
@@ -15,7 +14,6 @@
            #-}
 
 module Glob.MDBS.Postgres
-#ifdef WithPostgres
     ( DBBackend
     , runWithPool
     , withConfigAndPool
@@ -25,11 +23,6 @@ module Glob.MDBS.Postgres
     , ConnectionPool
     , DbConfig(..)
     ) where
-#else
-      where
-#endif
-
-#ifdef WithPostgres
 
       import Yesod
       import Glob.Foundation.Common
@@ -110,7 +103,7 @@ module Glob.MDBS.Postgres
           <*> v .: "port"
           <*> v .: "usr"
           <*> v .: "psk"
-          <*> v .: "dbName"
+          <*> v .: "name"
           <*> v .: "conThd"
       instance ToJSON DbConfig where
         toJSON DbConfig{..} = object
@@ -118,10 +111,6 @@ module Glob.MDBS.Postgres
           , "port"   .= dbPort
           , "usr"    .= dbUser
           , "psk"    .= dbPsk
-          , "dbName" .= dbName
+          , "name" .= dbName
           , "conThd" .= dbConThd
           ]
-
-#else
-      import Prelude
-#endif

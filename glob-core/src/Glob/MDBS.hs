@@ -29,7 +29,17 @@ module Glob.MDBS
 #define HasDB
 #endif
 
+#ifdef WithMySQY
+#ifndef HasDB
+      import Glob.MDBS.MySQL as X
+#else
+  #warning You had used other db.
+#endif
+#define HasDB
+#endif
+
+
 #ifndef HasDB
 #warning "You need one and only one db."
-      import Prelude as X 
+      import Prelude as X
 #endif

@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-core
-version:             0.0.8.30
+version:             0.0.8.40
 synopsis:            A framework of blog, used by myself.
 description:         A framework of blog, used by myself.
 license:             AgasaLicense
@@ -36,6 +36,10 @@ flag with-mongodb
   description:       Use MongoDB for database
   default:           False
 
+flag with-mysql
+  description:       Use MySQL for databsae
+  default:           False
+
 library
   exposed-modules:   Glob
                    , Glob.Auth
@@ -49,8 +53,6 @@ library
                    , Glob.Handler.Post
                    , Glob.Handler.Static
                    , Glob.MDBS
-                   , Glob.MDBS.MongoDB
-                   , Glob.MDBS.Postgres
                    , Glob.Sub.Background
                    , Glob.Sub.Background.Data
                    , Glob.Sub.Background.TH
@@ -96,20 +98,6 @@ library
     build-depends:   text
   else
     build-depends:   text >=1.2 && <1.4
-  if flag(with-postgresql)
-    if flag(unlimit-version)
-      build-depends: persistent-postgresql
-    else
-      build-depends: persistent-postgresql >= 2.1 && < 2.3
-  if flag(with-mongodb)
-    if flag(unlimit-version)
-      build-depends: persistent-mongoDB
-                   , network
-                   , mongoDB
-    else
-      build-depends: persistent-mongoDB >= 2.1 && < 2.4
-                   , mongoDB >= 2.0 && < 2.2
-                   , network >= 2.6 && < 2.8
   if flag(unlimit-version)
     build-depends:   persistent
   else
@@ -181,6 +169,29 @@ library
 
 
   if flag(with-mongodb)
+    other-modules:   Glob.MDBS.MongoDB
     cpp-options:     -DWithMongoDB
+    if flag(unlimit-version)
+      build-depends: persistent-mongoDB
+                   , network
+                   , mongoDB
+    else
+      build-depends: persistent-mongoDB >= 2.1 && < 2.4
+                   , mongoDB >= 2.0 && < 2.2
+                   , network >= 2.6 && < 2.8
+
   if flag(with-postgresql)
+    other-modules:   Glob.MDBS.Postgres
     cpp-options:     -DWithPostgres
+    if flag(unlimit-version)
+      build-depends: persistent-postgresql
+    else
+      build-depends: persistent-postgresql >= 2.1 && < 2.3
+
+  if flag(with-mysql)
+    other-modules:   Glob.MDBS.MySQL
+    cpp-options:     -DWithMySQL
+    if flag(unlimit-version)
+      build-depends: persistent-mysql
+    else
+      build-depends: persistent-mysql >= 0.1.1 && <= 0.2

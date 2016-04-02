@@ -1,5 +1,13 @@
 # The change log of Glob
 
+## [VERSION] 0.0.8.40
+
+1. 添加了 MySQL （未测试）
+
+## [VERSION] 0.0.8.35
+
+1. 优化 launcher 的代码，减少代码重复
+
 ## [VERSION] 0.0.8.30
 
 1. 重大更新，使用 TemplateHaskell 解决掉了 docker-launcher 对不同数据库支持上带来的障碍，同时解决了

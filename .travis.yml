@@ -5,6 +5,8 @@ env:
   - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-postgresql" GLOB_TLS="-fwith-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/PostgreSQL/Dockerfile" GLOB_DT="postgres-tls"
   - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-mongodb" GLOB_TLS="-f-with-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/MongoDB/Dockerfile" GLOB_DT="mongodb"
   - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-mongodb" GLOB_TLS="-fwith-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/MongoDB/Dockerfile" GLOB_DT="mongodb-tls"
+  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-mysql" GLOB_TLS="-f-with-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/MySQL/Dockerfile" GLOB_DT="mysql"
+  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-mysql" GLOB_TLS="-fwith-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/MySQL/Dockerfile" GLOB_DT="mysql-tls"
 services:
   - docker
 
