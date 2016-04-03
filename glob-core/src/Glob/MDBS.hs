@@ -45,5 +45,5 @@ module Glob.MDBS
 #warning "You need one and only one db."
       import Prelude as X
 #else
-      dbConfigMk = DbConfig
+      mkDbConfig = DbConfig
 #endif

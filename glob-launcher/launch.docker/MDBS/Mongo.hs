@@ -56,7 +56,7 @@ module MDBS.Mongo
               {-4-}(AppE
                 {-3-}(AppE
                   {-2-}(AppE
-                    {-1-}(AppE (mkVarE "DbConfig")
+                    {-1-}(AppE (mkVarE "mkDbConfig")
                                (mkVarE "dbAddr'")){-1-}
                          (mkVarE "dbPort'")){-2-}
                        (mkVarE "dbUsr'")){-3-}
