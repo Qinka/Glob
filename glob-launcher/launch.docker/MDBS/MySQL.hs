@@ -64,13 +64,13 @@ module MDBS.MySQL
           , "dbUsr"
           , "dbConThd"
           ]
-        ++ [ "dsKey"
-            , "dsCert"
-            , "dsCA"
-            , "dsCAPath"
-            , "dsCiphers"
-            , "dbPath"
-            ]
+        ++ map mkBindSMaybe [ "dsKey"
+           , "dsCert"
+           , "dsCA"
+           , "dsCAPath"
+           , "dsCiphers"
+           , "dbPath"
+           ]
         ++ [ LetS [FunD (mkName "ds") [Clause [] (NormalB  (AppE (ConE (mkName "Just")) (AppE {-4-}
               (AppE {-3-}(AppE {-2-}(AppE {-1-}
                 (AppE (mkVarE "mkSSLIJust") (mkVarE "dsKey'") ){-1-}
