@@ -32,6 +32,7 @@ module MDBS.MySQL
         , "dbPsk"
         , "dbUsr"
         , "dbConThd"
+        , "dbPath"
         , "dsKey"
         , "dsCert"
         , "dsCA"
