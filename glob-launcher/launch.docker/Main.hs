@@ -20,7 +20,7 @@ module Main
       import Data.Version
       import Paths_glob_launcher
       import Glob.Foundation.Config
-      import Glob.MDBS hiding (dbAddr,dbPort,dbUser,dbPsk,dbName,dbConThd)
+      import Glob.MDBS (dbConfigMk)
       import Glob.Default
       import Data.Yaml
       import System.IO

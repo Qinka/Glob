@@ -52,7 +52,7 @@ module MDBS.Postgres
             {-4-}(AppE
               {-3-}(AppE
                 {-2-}(AppE
-                  {-1-}(AppE (ConE (mkName "DbConfig"))
+                  {-1-}(AppE (mkVarE "dbConfigMk")
                              (mkVarE "dbAddr'")){-1-}
                        (mkVarE "dbPort'")){-2-}
                      (mkVarE "dbUsr'")){-3-}

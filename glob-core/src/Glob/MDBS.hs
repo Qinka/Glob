@@ -9,6 +9,7 @@
 
 module Glob.MDBS
     ( module X
+    , module Glob.MDBS
     ) where
 
 #ifdef WithPostgres
@@ -32,6 +33,7 @@ module Glob.MDBS
 #ifdef WithMySQL
 #ifndef HasDB
       import Glob.MDBS.MySQL as X
+      mkSSLI = SSLI
 #else
   #warning You had used other db.
 #endif
@@ -42,4 +44,6 @@ module Glob.MDBS
 #ifndef HasDB
 #warning "You need one and only one db."
       import Prelude as X
+#else
+      dbConfigMk = DbConfig
 #endif
