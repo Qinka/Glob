@@ -66,10 +66,10 @@ module MDBS.MySQL
           ]
         ++ [ LetS [FunD (mkName "ds") [Clause [] (NormalB  (AppE {-4-}
               (AppE {-3-}(AppE {-2-}(AppE {-1-}
-                (AppE (AppE (ConE (mkName "Just")) (ConE (mkName "SSLI"))) (mkVarE "dsKey'") ){-1-} 
+                (AppE (AppE (ConE (mkName "Just")) (ConE (mkName "SSLI"))) (mkVarE "dsKey'") ){-1-}
               (mkVarE "dsCert'")){-2-}(mkVarE "dsCA'")){-3-} (mkVarE "dsCAPath'")){-4-}
-             (mkVarE "dsCiphers'")) )       ] ]
-           , LetS [FunD (mkName "dbS") [Clause [] (NormalB
+             (mkVarE "dsCiphers'")) )    []   ] ]
+           , LetS [FunD (mkName "dbS") [Clause [] (NormalB (AppE
            {-6-}(AppE
             {-5-}(AppE
               {-4-}(AppE
@@ -82,5 +82,5 @@ module MDBS.MySQL
                      (mkVarE "dbPsk'")){-4-}
                    (mkVarE "dbName'")){-5-}
                   (AppE (mkVarE "read") (mkVarE "dbConThd'")) ){-6-}
-                 (mkVarE "ds")   ) [] ]]
+                 (mkVarE "ds")  ) ) [] ]]
         ]
