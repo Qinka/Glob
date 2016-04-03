@@ -78,12 +78,12 @@ module MDBS.MySQL
               {-4-}(AppE
                 {-3-}(AppE
                   {-2-}(AppE
-                    {-1-}(AppE (mkVarE "mkDbConfig"))
+                    {-1-}(AppE (mkVarE "mkDbConfig")
                                (mkVarE "dbAddr'")){-1-}
                          (mkVarE "dbPort'")){-2-}
                        (mkVarE "dbUsr'")){-3-}
                      (mkVarE "dbPsk'")){-4-}
                    (mkVarE "dbName'")){-5-}
                   (AppE (mkVarE "read") (mkVarE "dbConThd'")) ){-6-}
-                 (mkVarE "ds")  ) [] ]]
+                 (mkVarE "ds")  ）) [] ]]
         ]
