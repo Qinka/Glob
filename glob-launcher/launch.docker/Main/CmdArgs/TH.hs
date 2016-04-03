@@ -21,6 +21,7 @@ module Main.CmdArgs.TH
     , mkLitStrE
     , mkVarNotStrictT
     , mkBindS
+    , mkBindSMaybe
     ) where
 
       import Language.Haskell.TH
