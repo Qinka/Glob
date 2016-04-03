@@ -72,11 +72,11 @@ module MDBS.MySQL
            , "dsCiphers"
            , "dbPath"
            ]
-        ++ [ LetS [FunD (mkName "ds") [Clause [] (NormalB  (AppE (ConE (mkName "Just")) (AppE {-4-}
+        ++ [ LetS [FunD (mkName "ds") [Clause [] (NormalB (AppE {-4-}
               (AppE {-3-}(AppE {-2-}(AppE {-1-}
                 (AppE (mkVarE "mkSSLIJust") (mkVarE "dsKey'") ){-1-}
               (mkVarE "dsCert'")){-2-}(mkVarE "dsCA'")){-3-} (mkVarE "dsCAPath'")){-4-}
-             (mkVarE "dsCiphers'"))) )   []   ] ]
+             (mkVarE "dsCiphers'")) )   []   ] ]
            , LetS [FunD (mkName "dbS") [Clause [] (NormalB (AppE
            {-7-}(AppE
              {-6-}(AppE
