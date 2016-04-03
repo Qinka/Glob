@@ -85,5 +85,5 @@ module MDBS.MySQL
                      (mkVarE "dbPsk'")){-4-}
                    (mkVarE "dbName'")){-5-}
                   (AppE (mkVarE "read") (mkVarE "dbConThd'")) ){-6-}
-                 (mkVarE "ds")  ）) [] ]]
+                 (mkVarE "ds")  )) [] ]]
         ]
