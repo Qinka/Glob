@@ -68,7 +68,7 @@ module MDBS.MySQL
               (AppE {-3-}(AppE {-2-}(AppE {-1-}
                 (AppE (AppE (ConE (mkName "Just")) (ConE (mkName "SSLI"))) (mkVarE "dsKey'") ){-1-} 
               (mkVarE "dsCert'")){-2-}(mkVarE "dsCA'")){-3-} (mkVarE "dsCAPath'")){-4-}
-             (mkVarE "dsCiphers'")) )      ) ] ]
+             (mkVarE "dsCiphers'")) )       ] ]
            , LetS [FunD (mkName "dbS") [Clause [] (NormalB
            {-6-}(AppE
             {-5-}(AppE
