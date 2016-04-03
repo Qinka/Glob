@@ -12,11 +12,13 @@ module MDBS.Mongo
     ( dbCon
     , dbField
     , dbStmt
+    , mkDbConfig
     ) where
 
       import Language.Haskell.TH
       import Language.Haskell.TH.Syntax
       import Main.CmdArgs.TH
+      import Glob.MDBS
 
 
       dbCon :: [VarStrictType]

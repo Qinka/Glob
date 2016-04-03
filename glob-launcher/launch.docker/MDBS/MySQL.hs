@@ -13,12 +13,15 @@ module MDBS.MySQL
     ( dbCon
     , dbField
     , dbStmt
+    , mkDbConfig
+    , mkSSLI
     ) where
 
 
       import Language.Haskell.TH
       import Language.Haskell.TH.Syntax
       import Main.CmdArgs.TH
+      import Glob.MDBS
 
 
       dbCon :: [VarStrictType]
@@ -82,5 +85,5 @@ module MDBS.MySQL
                      (mkVarE "dbPsk'")){-4-}
                    (mkVarE "dbName'")){-5-}
                   (AppE (mkVarE "read") (mkVarE "dbConThd'")) ){-6-}
-                 (mkVarE "ds")  ) ) [] ]]
+                 (mkVarE "ds")  ) [] ]]
         ]
