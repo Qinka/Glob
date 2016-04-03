@@ -117,7 +117,7 @@ module Glob.MDBS.MySQL
         }
 
       mkSSLIJust a b c d e = case (a,b,c,d,e) of
-        (Just aa,Just bb,Just cc,Just dd,Just ee) -> SSLI aa bb cc dd ee
+        (Just aa,Just bb,Just cc,Just dd,Just ee) -> Just $ SSLI aa bb cc dd ee
         _ -> Nothing
 
       data DbConfig = DbConfig
