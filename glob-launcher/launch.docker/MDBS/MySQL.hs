@@ -15,6 +15,7 @@ module MDBS.MySQL
     , dbStmt
     , mkDbConfig
     , mkSSLI
+    , mkSSLIJust
     ) where
 
 
