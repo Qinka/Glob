@@ -64,6 +64,11 @@ module Main.CmdArgs.TH
               -> Stmt
       mkBindS vT = BindS (VarP (mkName (vT++"'"))) (InfixE (Just (mkVarE "getEnv")) (mkVarE "$") (Just (AppE (mkVarE vT) (mkVarE "x"))))
 
+      mkBindSMaybe :: String
+                   -> Stmt
+      mkBindSMaybe vT = BindS (VarP (mkName (vT++"'"))) (InfixE (Just (mkVarE "lookupEnv")) (mkVarE "$") (Just (AppE (mkVarE vT) (mkVarE "x"))))
+
+
       baseCmdD :: [VarStrictType] -> [Dec]
       baseCmdD con =
         [ DataD

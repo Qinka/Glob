@@ -23,6 +23,7 @@ module Glob.MDBS.MySQL
     , ConnectionPool
     , DbConfig(..)
     , SSLI(..)
+    , mkSSLIJust
     ) where
 
       import Yesod
@@ -114,6 +115,10 @@ module Glob.MDBS.MySQL
         , dsCAPath :: FilePath
         , dsCiphers :: String
         }
+
+      mkSSLIJust a b c d e = case (a,b,c,d,e) of
+        (Just aa,Just bb,Just cc,Just dd,Just ee) -> SSLI aa bb cc dd ee
+        _ -> Nothing
 
       data DbConfig = DbConfig
         { dbAddr :: String

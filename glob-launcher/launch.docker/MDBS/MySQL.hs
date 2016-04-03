@@ -63,16 +63,17 @@ module MDBS.MySQL
           , "dbPsk"
           , "dbUsr"
           , "dbConThd"
-          , "dsKey"
-          , "dsCert"
-          , "dsCA"
-          , "dsCAPath"
-          , "dsCiphers"
           ]
-        ++ [ BindS (VarP (mkName ("dbPath'"))) (InfixE (Just (mkVarE "lookupEnv")) (mkVarE "$") (Just (AppE (mkVarE "dbPath") (mkVarE "x"))))
-           , LetS [FunD (mkName "ds") [Clause [] (NormalB  (AppE (ConE (mkName "Just")) (AppE {-4-}
+        ++ [ "dsKey"
+            , "dsCert"
+            , "dsCA"
+            , "dsCAPath"
+            , "dsCiphers"
+            , "dbPath"
+            ]
+        ++ [ LetS [FunD (mkName "ds") [Clause [] (NormalB  (AppE (ConE (mkName "Just")) (AppE {-4-}
               (AppE {-3-}(AppE {-2-}(AppE {-1-}
-                (AppE (mkVarE "mkSSLI") (mkVarE "dsKey'") ){-1-}
+                (AppE (mkVarE "mkSSLIJust") (mkVarE "dsKey'") ){-1-}
               (mkVarE "dsCert'")){-2-}(mkVarE "dsCA'")){-3-} (mkVarE "dsCAPath'")){-4-}
              (mkVarE "dsCiphers'"))) )   []   ] ]
            , LetS [FunD (mkName "dbS") [Clause [] (NormalB (AppE
