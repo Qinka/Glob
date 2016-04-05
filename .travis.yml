@@ -33,9 +33,9 @@ after_script: |
   if [ $TRAVIS_TEST_RESULT -eq 0 ]; then
     echo "There should build a docker image."
     if [ -n "$TRAVIS_TAG" ]; then
-      export DOCKER_IMAGE_TAG=$GLOB_DT-$TRAVIS_TAG-$TRAVIS_BUILD_NUMBER
+      export DOCKER_IMAGE_TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_TAG-$GLOB_DT
     else
-      export DOCKER_IMAGE_TAG=$GLOB_DT-$TRAVIS_COMMIT-$TRAVIS_BUILD_NUMBER
+      export DOCKER_IMAGE_TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT-$GLOB_DT
     fi
     cp $GLOB_DF dist
     cd dist && docker build -f Dockerfile -t qinka/glob:$DOCKER_IMAGE_TAG . && cd ..
