@@ -11,7 +11,7 @@ RUN apt-get update && apt-get -y install postgresql-server-dev-9.4
 RUN cd /src && cabal update && cabal install -j9 directory process persistent-template yesod persistent-postgresql warp-tls cmdargs
 RUN cd /src && cabal install glob-core/ -fwith-postgresql
 RUN cd /src && cabal install glob-main/
-RUN cd /src && cabal install glob-launcher/ -flaunch-docker
+RUN cd /src && cabal install glob-launcher/ -flaunch-docker -fwith-postgresql
 RUN cp /src/.cabal-sandbox/bin/* /usr/bin
 RUN rm -r src
 EXPOSE 3000
