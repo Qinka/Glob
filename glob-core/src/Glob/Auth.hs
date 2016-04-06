@@ -18,7 +18,6 @@ module Glob.Auth
       import Prelude as P
       import Import as I
       import qualified Import.ByteString as B
-      import Data.Digest.Pure.SHA
       import Glob.MDBS
       import Yesod
       import Glob.Foundation.Config
