@@ -72,7 +72,7 @@ module Glob.Foundation.Base where
         (getter,_) <- clockDateCacher
         return $! Logger loggerSet' getter
         where
-          logfile = globLogFile $ globConfig $ gi
+          logfile = globLogFile $ globConfig gi
           newGlobLoggerSet "stdout" d = newStdoutLoggerSet d
           newGlobLoggerSet "stderr" d = newStderrLoggerSet d
           newGlobLoggerSet file     d = newFileLoggerSet d file

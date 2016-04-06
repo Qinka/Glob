@@ -3,7 +3,9 @@ flags:
     unlimit-version: true
 extra-package-dbs: []
 packages:
+- glob-auth/
 - glob-core/
+- glob-ih/
 - glob-launcher/
 - glob-main/
 extra-deps: []

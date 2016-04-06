@@ -5,9 +5,6 @@
 
 -- src/MDBS/Postgres.hs
 
-{-# LANGUAGE TemplateHaskell
-           #-}
-
 module MDBS.Postgres
     ( dbCon
     , dbField

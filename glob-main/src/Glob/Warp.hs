@@ -35,7 +35,7 @@ module Glob.Warp
             Warp.setPort port $
             Warp.setServerName serverValue$
             Warp.setOnException (\_ e ->
-              when (shouldLog' e) (mLS site logger e)) $
+              when (shouldLog' e) (mLS site logger e))
             Warp.defaultSettings)
 
 
@@ -59,7 +59,7 @@ module Glob.Warp
           Warp.setPort port $
           Warp.setServerName serverValue $
           Warp.setOnException (\_ e ->
-            when (shouldLog' e) (mLS site logger e)) $
+            when (shouldLog' e) (mLS site logger e))
           Warp.defaultSettings)
 
       mLS site logger e = messageLoggerSource

@@ -60,12 +60,10 @@ module Glob.MDBS.MySQL
             , connectPassword = dbPsk
             , connectDatabase = dbName
             , connectOptions = []
-            , connectPath = case dbPath of
-              Nothing -> connectPath defaultConnectInfo
-              Just x -> x
+            , connectPath = fromMaybe (connectPath defaultConnectInfo) dbPath
             , connectSSL = case dbSSL of
                 Nothing -> Nothing
-                Just SSLI{..} -> Just $ SSLInfo
+                Just SSLI{..} -> Just SSLInfo
                   { sslKey = dsKey
                   , sslCert = dsCert
                   , sslCA = dsCA

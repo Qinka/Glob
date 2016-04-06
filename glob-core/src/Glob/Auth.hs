@@ -23,6 +23,7 @@ module Glob.Auth
       import Yesod
       import Glob.Foundation.Config
       import Control.Concurrent(threadDelay)
+      import Glob.Auth.Token
 
       bgAuth ::( Yesod site
                , YesodPersist site
@@ -52,23 +53,3 @@ module Glob.Auth
           timeUD x = do
             ut <- getCurrentTime
             return (addUTCTime (-x) ut,addUTCTime x ut)
-
-      runToken :: [String] -> String -> String
-      runToken xs time = shaR $ fStBSL $ concat (loop xs ca) ++ timeS
-        where
-          fStBSL = B.fromStrictBS.s2b
-          stdToken = showDigest $ sha256 $ fStBSL $ head xs ++ timeS
-          ca' = foldr ((+).oct) 0 $ take (len `quot` 16 +1) stdToken
-          ca = ca' `mod` len
-          len = length xs
-          timeS = showDigest $ sha256 $ fStBSL time
-          shaR = take 56.case ca `mod` 4 of
-            0 -> showDigest.sha224
-            1 -> showDigest.sha256
-            2 -> showDigest.sha384
-            3 -> showDigest.sha512
-      oct :: Char -> Int
-      oct = fromMaybe 0.flip elemIndex "0123456789abcdef"
-      loop :: [a] -> Int -> [a]
-      loop xs i = let len = length xs in
-        take len $ drop i $ concat $ replicate 2 xs

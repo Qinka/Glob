@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-core
-version:             0.0.8.40
+version:             0.0.8.50
 synopsis:            A framework of blog, used by myself.
 description:         A framework of blog, used by myself.
 license:             AgasaLicense
@@ -70,6 +70,7 @@ library
                    , Paths_glob_core
   -- other-extensions:
   build-depends:     base >=4.8 && <4.9
+                   , glob-auth == 0.0.8.50
   if flag(unlimit-version)
     build-depends:   bytestring
   else
@@ -154,10 +155,6 @@ library
     build-depends:   conduit
   else
     build-depends:   conduit >=1.2 && <1.4
-  if flag(unlimit-version)
-    build-depends:    SHA
-  else
-    build-depends:    SHA >= 1.5 && < 2.3
   if flag(unlimit-version)
     build-depends:    transformers
   else

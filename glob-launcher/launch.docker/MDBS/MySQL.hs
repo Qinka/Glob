@@ -5,10 +5,6 @@
 
 -- src/MDBS/MySQL.hs
 
-{-# LANGUAGE TemplateHaskell
-           , CPP
-           #-}
-
 module MDBS.MySQL
     ( dbCon
     , dbField

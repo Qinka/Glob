@@ -20,7 +20,9 @@ before_install:
   - "cabal install -j9 directory process persistent-template yesod persistent-postgresql persistent-mongoDB warp-tls cmdargs SHA"
 script:
   - mkdir dist
-  - cd glob-core
+  - cd glob-auth
+  - cabal install
+  - cd ../glob-core
   - cabal install $GLOB_DB $GLOB_TLS
   - cd ../glob-main
   - cabal install $GLOB_TLS

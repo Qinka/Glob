@@ -1,11 +1,17 @@
 # The change logs of Glob AND Knowd bugs
-s
+
+## [VERSION] 0.0.8.50
+
+1. 添加了 glob 的 ih（辅助用于后台认证的）
+2. 拆分了出来了 glob-auth 用于 glob-ih
+
 ## [TAG] [KNOWD BUG] 0.0.8.40 & 0.1-rc2
 
 1. MySQL 与 MongoDB 在上传 大文件到数据库依然有问题。而 MySQL 是自动限制，MongoDB 则是认为限制。
   但是上传静态大文件不受影响。
 2. 未测试 MySQL 的 SSL 连接。
 3. 'database' 文件夹中的 SQL 文件并不适用于 MySQL， 需要自行修改。
+4. 缺少 ih，已在 0.0.8.50 中修复
 
 ## [VERSION] 0.0.8.40 （will be tag: v0.1-rc2）
 

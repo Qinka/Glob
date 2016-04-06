@@ -30,7 +30,7 @@ module Import.TH
       persistFileWithC :: PersistSettings
                        -> FilePath
                        -> Q Exp
-      persistFileWithC s = (persistFileWith s).("config/"++)
+      persistFileWithC s = persistFileWith s.("config/"++)
 
       parseRoutesFileC :: FilePath -> Q Exp
       parseRoutesFileC = parseRoutesFile.("config/"++)

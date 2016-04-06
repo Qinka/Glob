@@ -22,13 +22,12 @@ before_script:
 
 script:
   - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
-  - mkdir dist
-  - cd glob-core
+  - cd glob-auth
+  - cabal install
+  - cd ../glob-core
   - cabal install $GLOB_DB $GLOB_TLS
   - cd ../glob-main
   - cabal install $GLOB_TLS
   - cd ../glob-launcher
   - cabal configure $GLOB_LA $GLOB_TLS $GLOB_DB
   - cabal build
-  - cp -r dist  ../dist
-  - cd ..
