@@ -1,4 +1,4 @@
-dga# Glob
+# Glob
 
 env:
   - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-postgresql" GLOB_TLS="-f-with-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/PostgreSQL/Dockerfile" GLOB_DT="postgres"
