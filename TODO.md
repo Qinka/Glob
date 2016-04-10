@@ -15,6 +15,7 @@ This document is about the todo list of Glob, which is including the fixings of 
 * Trying to make glob worked well with Nginx.
 * Trying to make glob worked well with PostgreSQL-XC
 * Add more launchers.
+* Using llvm
 
 
 ## [DONE] 0.0.8.40
