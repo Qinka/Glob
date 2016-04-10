@@ -96,7 +96,7 @@ module Glob.Foundation.Common
       b2s :: ByteString -> String
       b2s = t2s.b2t
 
-      s2b :: String ->ByteString
+      s2b :: String -> ByteString
       s2b = t2b.s2t
 
       ws2s :: [Text] -> Text
