@@ -1,12 +1,13 @@
 # Glob
 
 env:
-  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-postgresql" GLOB_TLS="-f-with-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/PostgreSQL/Dockerfile" GLOB_DT="postgres"
-  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-postgresql" GLOB_TLS="-fwith-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/PostgreSQL/Dockerfile" GLOB_DT="postgres-tls"
-  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-mongodb" GLOB_TLS="-f-with-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/MongoDB/Dockerfile" GLOB_DT="mongodb"
-  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-mongodb" GLOB_TLS="-fwith-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/MongoDB/Dockerfile" GLOB_DT="mongodb-tls"
-  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-mysql" GLOB_TLS="-f-with-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/MySQL/Dockerfile" GLOB_DT="mysql"
-  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-mysql" GLOB_TLS="-fwith-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/MySQL/Dockerfile" GLOB_DT="mysql-tls"
+  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-postgresql" GLOB_TLS="-f-with-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/Nginx/Dockerfile" GLOB_DT="postgres" NGINX="true"
+  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-postgresql" GLOB_TLS="-f-with-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/PostgreSQL/Dockerfile" GLOB_DT="postgres" NGINX="false"
+  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-postgresql" GLOB_TLS="-fwith-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/PostgreSQL/Dockerfile" GLOB_DT="postgres-tls" NGINX="false"
+  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-mongodb" GLOB_TLS="-f-with-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/MongoDB/Dockerfile" GLOB_DT="mongodb" NGINX="false"
+  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-mongodb" GLOB_TLS="-fwith-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/MongoDB/Dockerfile" GLOB_DT="mongodb-tls" NGINX="false"
+  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-mysql" GLOB_TLS="-f-with-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/MySQL/Dockerfile" GLOB_DT="mysql" NGINX="false"
+  - CABALVER=1.22 GHCVER=7.10.3 GLOB_DB="-fwith-mysql" GLOB_TLS="-fwith-tls" GLOB_LA="-flaunch-docker" GLOB_DF="./dockerfiles/Travis-CI/MySQL/Dockerfile" GLOB_DT="mysql-tls" NGINX="false"
 services:
   - docker
 
@@ -33,13 +34,30 @@ script:
   - cd ..
 after_script: |
   if [ $TRAVIS_TEST_RESULT -eq 0 ]; then
-    echo "There should build a docker image."
-    if [ -n "$TRAVIS_TAG" ]; then
-      export DOCKER_IMAGE_TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_TAG-$GLOB_DT
+    if [ $NGINX -eq "false" ];then
+      echo "There should build a docker image."
+      if [ -n "$TRAVIS_TAG" ]; then
+        export DOCKER_IMAGE_TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_TAG-$GLOB_DT
+      else
+        export DOCKER_IMAGE_TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT-$GLOB_DT
+      fi
+      cp $GLOB_DF dist
+      cd dist && docker build -f Dockerfile -t qinka/glob:$DOCKER_IMAGE_TAG . && cd ..
+      docker push  qinka/glob
     else
-      export DOCKER_IMAGE_TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT-$GLOB_DT
+      echo "Build with nginx"
+      if [ -n "$TRAVIS_TAG" ]; then
+        export DOCKER_IMAGE_TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_TAG-$GLOB_DT
+      else
+        export DOCKER_IMAGE_TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT-$GLOB_DT
+      fi
+      cd dist && mkdir shell && cd ..
+      cp nginx/run.sh    dist/shell
+      cp nginx/create.sh dist/shell
+      chmod a+x dist/shell/run.sh
+      chmod a+x dist/shell/create.sh
+      cp $GLOB_DF dist
+      cd dist && docker build -f Dockerfile -t qinka/glob:$DOCKER_IMAGE_TAG . && cd ..
+      docker push  qinka/glob
     fi
-    cp $GLOB_DF dist
-    cd dist && docker build -f Dockerfile -t qinka/glob:$DOCKER_IMAGE_TAG . && cd ..
-    docker push  qinka/glob
   fi
