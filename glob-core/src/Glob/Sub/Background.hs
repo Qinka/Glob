@@ -149,7 +149,7 @@ module Glob.Sub.Background
               -> ReaderT (PersistEntityBackend val) m [()]
       insert' i = do
         insert i
-        return [()]
+        return []
 
       fileInfo :: (MonadResource a,MonadHandler a) => [FileInfo] -> a B.ByteString
       fileInfo [] = invalidArgs ["failed/less and less"]
