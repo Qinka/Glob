@@ -34,7 +34,7 @@ script:
   - cd ..
 after_script: |
   if [ $TRAVIS_TEST_RESULT -eq 0 ]; then
-    if [ $NGINX -eq "false" ];then
+    if [ $NGINX == "false" ];then
       echo "There should build a docker image."
       if [ -n "$TRAVIS_TAG" ]; then
         export DOCKER_IMAGE_TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_TAG-$GLOB_DT
