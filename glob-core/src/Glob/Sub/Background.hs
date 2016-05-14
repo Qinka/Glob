@@ -144,7 +144,7 @@ module Glob.Sub.Background
             return $ Just $ decodeUtf8 rt
 
 
-      insert' :: forall val (m :: * -> *).(MonadIO m, PersistStore (PersistEntityBackend val),PersistEntity val)
+      insert' :: forall val (m :: * -> *).(MonadIO m, PersistStore (PersistEntityBackend val),PersistEntity val,DBBackend~ PersistEntityBackend val)
               => val
               -> ReaderT (PersistEntityBackend val) m [()]
       insert' i = do
