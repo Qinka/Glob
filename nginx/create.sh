@@ -31,7 +31,7 @@ if [ $# -eq 6 ];then
   while [ $i -le $endp ]
   do
     echo "      server 127.0.0.1:"$i";"
-    export GLOB_PORT$i=$i
+    echo "export GLOB_PORT$i=$i"  >> $startsh
     echo "launch.docker --port=GLOB_PORT"$i" +RTS -N &" >> $startsh
     let i=i+1
   done
