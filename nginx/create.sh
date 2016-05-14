@@ -32,7 +32,7 @@ if [ $# -eq 6 ];then
   do
     echo "      server 127.0.0.1:"$i";"
     export GLOB_PORT$i=$i
-    echo "launch.docker --port=GLOB_PORT"$i" &" >> $startsh
+    echo "launch.docker --port=GLOB_PORT"$i" +RTS -N &" >> $startsh
     let i=i+1
   done
   echo "nginx" >> $startsh
