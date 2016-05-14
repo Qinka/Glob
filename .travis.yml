@@ -47,9 +47,9 @@ after_script: |
     else
       echo "Build with nginx"
       if [ -n "$TRAVIS_TAG" ]; then
-        export DOCKER_IMAGE_TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_TAG-$GLOB_DT
+        export DOCKER_IMAGE_TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_TAG-$GLOB_DT-nginx
       else
-        export DOCKER_IMAGE_TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT-$GLOB_DT
+        export DOCKER_IMAGE_TAG=$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT-$GLOB_DT-nginx
       fi
       cd dist && mkdir shell && cd ..
       cp nginx/run.sh    dist/shell
