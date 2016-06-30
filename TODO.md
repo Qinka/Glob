@@ -12,6 +12,7 @@ This document is about the todo list of Glob, which is including the fixings of 
 * Add the handler of searching blogs, and pages, tags, created date, updated date.
 * Simple Launch
 * Using llvm
+* Support Markdown (Markdown will be main or only one for Pages and Blogs)
 
 ## [DONE] 0.0.8.40
 
