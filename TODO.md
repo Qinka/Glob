@@ -5,18 +5,14 @@ This document is about the todo list of Glob, which is including the fixings of 
 
 # TODO list
 
-## Unmarked
+## A new plan ==>> (0.1.0.0)
 
-* To support more kinds of database, including SQLite and MySQL(supported in 0.0.8.40).
-* To support Microsoft SQL Server, Oracle.
-* To support some NoSQL databases.
-* Add the handler of searching blogs, and pages.
-  tags, created date, updated date.
-* Trying to make glob worked well with Nginx.
-* Trying to make glob worked well with PostgreSQL-XC
-* Add more launchers.
+* Using MongoDB (ONLY). NEVER supporting PostgreSQL MySQL, and saying Good-Bye to Other DB.
+* Worked with Nginx
+* Add the handler of searching blogs, and pages, tags, created date, updated date.
+* Simple Launch
 * Using llvm
-
+* Support Markdown (Markdown will be main or only one for Pages and Blogs)
 
 ## [DONE] 0.0.8.40
 
