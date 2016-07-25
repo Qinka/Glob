@@ -1,0 +1,59 @@
+% src/Glob/Auth.lhs
+
+\begin{codeinfo}
+  \CodePath{src/Glob/Auth.lhs}
+  \CodeInfo{Authentication of Glob}
+  \CodeProject{glob-core}
+  \CodeCreater{Qinka}
+  \CodeCreatedDate{2016-07-19}
+  %\CodeChangeLog{date}{text}
+\end{codeinfo}
+
+\begin{code}
+module Glob.Auth
+    ( bgAuth
+    ) where
+
+      import Control.Concurrent(threadDelay)
+      import Network.HTTP.Date
+      import System.Environment
+      import Yesod.Core
+      import Yesod.Core.Handler
+
+      import Glob.Auth.Token
+      import Glob.Model
+      import Glob.Common
+
+      import Import
+      import qualified Import.ByteStringUtf8 as B
+\end{code}
+
+用于后台验证的
+\begin{code}
+      bgAuth :: Yesod    site
+             => String
+             -> HandlerT site IO AuthResult
+      bgAuth pskKeyEnvVal = fetchToken checkToken
+        where
+          checkToken tokens time = do
+            let strTime = show time
+            (floorTime,upperTime) <- liftIO $ getTimeValidBound 6
+            if floorTime <= time && upperTime >= time
+              then (liftIO $ (transPsk2Token strTime).words <$> getEnv pskKeyEnvVal)
+                >>= (\s -> if s2bUtf8 s `elem` tokens
+                              then return Authorized
+                              else return $ Unauthorized ":( Who are you!"
+                              )
+              else return $ Unauthorized "Who are you! The thing did not answer."
+          getTimeValidBound delta = getCurrentTime >>=
+            (\utcNow -> return ( addUTCTime (-delta) utcNow
+                               , addUTCTime   delta  utcNow
+                               ))
+          fetchToken f = do
+            tokens <- lookupHeaders "Token"
+            time <- parseHTTPDateMaybe <$> lookupHeader "Date"
+            case time of
+              Just ti -> f tokens ti
+              _ -> invalidArgs ["Error Header","token","Date"]
+          parseHTTPDateMaybe = (fromHttpDate2UTC.b2sUtf8 <$>)
+\end{code}
