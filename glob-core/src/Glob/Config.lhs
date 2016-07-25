@@ -59,7 +59,7 @@ Default of getServerName
 Default of shutdown
 \begin{code}
       defSigINTHandle :: ToConfig a => a -> IO () -> IO ()
-      defSigINTHandle _ f =  installHandler sigINT $ \sig -> do
+      defSigINTHandle _ f =  installHandler sigINT $ \sig ->
           if sig ==sigINT
             then f >> putStrLn "\nGoing to turn down"
             else putStrLn $ "catch: " ++ show sig

@@ -117,7 +117,7 @@ query
       getQueryR :: [T.Text] -> Handler T.Text
       getQueryR idx = do
         case idx of
-          "version":_ -> return $globCoreVersionQutoe
+          "version":_ -> return $globCoreVersionQuote
           "name":_ -> return "Glob"
           "servertime":_ -> liftIO $ s2t.show <$> getCurrentTime
           _ -> getQ

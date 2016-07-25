@@ -38,6 +38,7 @@ resolver: nightly-2016-07-15
 packages:
 - glob-auth/
 - glob-core/
+- glob-launch/
 
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)

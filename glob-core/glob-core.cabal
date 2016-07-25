@@ -15,18 +15,11 @@ build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
 
-flag with-O2
-  default: True
-  description: Enable the -O2 flag for ghc
-flag with-llvm
-  default: True
-  description: Enable the -fllvm flag for ghc
-
 library
-  exposed-modules:   Glob.Core
+  exposed-modules:   Glob.Common
+                   , Glob.Core
                    , Glob.Model
   other-modules:     Glob.Auth
-                   , Glob.Common
                    , Glob.Config
                    , Glob.Foundation
                    , Glob.Handler
@@ -40,6 +33,7 @@ library
                    , Import.Text
                    , Import.TH
                    , Import.Wai
+                   , Paths_glob_core
   default-extensions:  OverloadedStrings
                      , QuasiQuotes
                      , RecordWildCards
@@ -75,8 +69,3 @@ library
   hs-source-dirs:      src
                      , import
   default-language:    Haskell2010
-  if flag(with-O2)
-    ghc-options:       -O2
-  if flag(with-llvm)
-    ghc-options:       -fllvm
-  ghc-options:         -Wall

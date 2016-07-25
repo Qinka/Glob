@@ -16,7 +16,7 @@ module Glob.Common
     , s2bUtf8, b2sUtf8
     , globCoreVersion
     , globCoreVersionStr
-    , globCoreVersionQutoe
+    , globCoreVersionQuote
     , tryH, catchH, handlerH
     , fromHttpDate2UTC
     , fromUTC2HttpDate
@@ -67,7 +67,7 @@ the version of glob-core
 \begin{code}
       globCoreVersion = version
       globCoreVersionStr = showVersion version
-      globCoreVersionQutoe = stringE $ showVersion version
+      globCoreVersionQuote = stringE $ showVersion version
 \end{code}
 
 Throw, catch, handler the exceptions.
