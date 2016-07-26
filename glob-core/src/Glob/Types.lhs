@@ -84,18 +84,18 @@ transform between HtmlRow and  Document
       doc2HR :: Document -> Maybe HtmlRow
       doc2HR doc = case typ of
         "frame" -> HtmlFrame
-          <$> doc !? "_id"
+          <$> doc !? "index"
           <*> doc !? "html"
           <*> doc !? "update-time"
         "page" -> HtmlPage
-          <$> doc !? "_id"
+          <$> doc !? "index"
           <*> doc !? "html"
           <*> doc !? "title"
           <*> doc !? "summary"
           <*> doc !? "update-time"
           <*> doc !? "create-time"
         "blog" -> HtmlBlog
-          <$> doc !? "_id"
+          <$> doc !? "index"
           <*> doc !? "html"
           <*> doc !? "title"
           <*> doc !? "summary"
@@ -104,16 +104,16 @@ transform between HtmlRow and  Document
           <*> doc !? "tags"
         _ -> Nothing
         where
-          Just typ = MG.lookup ("type") doc :: Maybe T.Text
+          Just typ = MG.lookup "type" doc :: Maybe T.Text
       hr2Doc :: HtmlRow -> Document
       hr2Doc HtmlFrame{..} =
-        [ "_id"         =: hrfIndex
+        [ "index"       =: hrfIndex
         , "html"        =: hrfHtml
         , "update-time" =: hrfUpdateTime
         , "type"        =: ("frame"::T.Text)
         ]
       hr2Doc HtmlPage{..} =
-        [ "_id"         =: hrpIndex
+        [ "index"       =: hrpIndex
         , "html"        =: hrpHtml
         , "title"       =: hrpTitle
         , "summary"     =: hrpSummary
@@ -122,7 +122,7 @@ transform between HtmlRow and  Document
         , "type"        =: ("page"::T.Text)
         ]
       hr2Doc HtmlBlog{..} =
-        [ "_id"         =: hrbIndex
+        [ "index"       =: hrbIndex
         , "html"        =: hrbHtml
         , "title"       =: hrbTitle
         , "summary"     =: hrbSummary
@@ -166,13 +166,13 @@ transform between Rc and Document
 \begin{code}
       rc2Doc :: Rc -> Document
       rc2Doc RcTxt{..} =
-        [ "_id" =: rctIndex
+        [ "index" =: rctIndex
         , "content" =: rctTxt
         , "MIME" =: rctMIME
         , "type" =: ("txt" ::T.Text)
         ]
       rc2Doc RcBin{..} =
-        [ "_id" =: rcbIndex
+        [ "index" =: rcbIndex
         , "content" =: Binary rcbBinary
         , "MIME" =: rcbMIME
         , "type" =: ("binary" :: T.Text)
@@ -180,11 +180,11 @@ transform between Rc and Document
       doc2Rc :: Document -> Maybe Rc
       doc2Rc doc = case typ of
         "txt" -> RcTxt
-          <$> doc !? "_id"
+          <$> doc !? "index"
           <*> doc !? "content"
           <*> doc !? "MIME"
         "binary" -> RcBin
-          <$> doc !? "_id"
+          <$> doc !? "index"
           <*> (fromBinary <$> (doc !? "content"))
           <*> doc !? "MIME"
         _ -> Nothing
@@ -205,14 +205,14 @@ transform bewteen Nav and Document
 \begin{code}
       nav2Doc :: Nav -> Document
       nav2Doc Nav{..} =
-        [ "_id"   =: navLabel
+        [ "index"   =: navLabel
         , "url"   =: navUrl
         , "order" =: navOrder
         ]
       doc2Nav :: Document -> Maybe Nav
       doc2Nav doc = Nav
         <$> doc !? "url"
-        <*> doc !? "_id"
+        <*> doc !? "index"
         <*> doc !? "order"
 \end{code}
 instance ToJSON

@@ -20,6 +20,7 @@ module Glob.Common
     , tryH, catchH, handlerH
     , fromHttpDate2UTC
     , fromUTC2HttpDate
+    , lookupPostUTCTime
     ) where
 
       import Control.Monad
@@ -98,4 +99,11 @@ transform between UTCTime and HTTP date
       fromUTC2HttpDate = formatTime defaultTimeLocale "%a, %d %b %G %T GMT"
       fromHttpDate2UTC :: String -> UTCTime
       fromHttpDate2UTC = readTime defaultTimeLocale "%a, %d %b %G %T GMT"
+\end{code}
+
+lookup time from param
+\begin{code}
+      lookupPostUTCTime :: Yesod site
+                        => T.Text -> HandlerT site IO (Maybe UTCTime)
+      lookupPostUTCTime = ((T.readT <$>) <$>).lookupPostParam
 \end{code}

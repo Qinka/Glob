@@ -99,9 +99,10 @@ Glob's Layout
       globLayout w = do
         Glob{..} <- getYesod
         pc <- widgetToPageContent w
-        topHtml    <- runDB' $ findOne (select ["_id" =: (["frame","top"] ::[T.Text])]    "html")
-        bottomHtml <- runDB' $ findOne (select ["_id" =: (["frame","bottom"]::[T.Text])] "html")
-        navHtml    <- runDB' $ findOne (select ["_id" =: (["frame","nav"]::[T.Text])]    "html")
+        topHtml    <- runDB' $ findOne (select ["index" =: (["frame","top"] ::[T.Text])]    "html")
+        bottomHtml <- runDB' $ findOne (select ["index" =: (["frame","bottom"]::[T.Text])] "html")
+        navHtml    <- runDB' $ findOne (select ["index" =: (["frame","nav"]::[T.Text])]    "html")
+        liftIO $ print [topHtml,bottomHtml,navHtml]
         case (trans topHtml,trans bottomHtml, trans navHtml) of
           (Just tH,Just bH,Just nH) -> withUrlRenderer [hamlet|
             $newline never
@@ -120,9 +121,9 @@ Glob's Layout
                 #{bH}
                 <link rel=stylesheet href=@{ResourceR ["css","frame.css"]}>
             |]
+          _ -> withUrlRenderer [hamlet|all lost !|]
         where
-          trans (Just x) = preEscapedToHtml.hrfHtml <$> doc2HR x
-          trans Nothing = Nothing
+          trans = (preEscapedToHtml.hrfHtml <$>).(doc2HR =<<)
 \end{code}
 
 instance Mongoble

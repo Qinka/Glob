@@ -13,7 +13,7 @@ test.config
 .stack-work
 .cabal-sandbox.bak
 
-
+test
 # For VS Code
 
 .vscode

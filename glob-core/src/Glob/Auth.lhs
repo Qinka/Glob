@@ -39,12 +39,13 @@ module Glob.Auth
             let strTime = show time
             (floorTime,upperTime) <- liftIO $ getTimeValidBound 6
             if floorTime <= time && upperTime >= time
-              then (liftIO $ (transPsk2Token strTime).words <$> getEnv pskKeyEnvVal)
-                >>= (\s -> if s2bUtf8 s `elem` tokens
-                              then return Authorized
-                              else return $ Unauthorized ":( Who are you!"
-                              )
+              then fetchItem strTime >>= checkItem tokens
               else return $ Unauthorized "Who are you! The thing did not answer."
+          fetchItem strTime = liftIO $!
+            transPsk2Token strTime.words <$> getEnv pskKeyEnvVal
+          checkItem tokens st = if s2bUtf8 st `elem` tokens
+            then return Authorized
+            else return $ Unauthorized ":( Who are you!"
           getTimeValidBound delta = getCurrentTime >>=
             (\utcNow -> return ( addUTCTime (-delta) utcNow
                                , addUTCTime   delta  utcNow

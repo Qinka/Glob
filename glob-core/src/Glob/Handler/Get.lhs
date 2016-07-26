@@ -40,7 +40,7 @@ Home
 \begin{code}
       getHomeR :: Handler Html
       getHomeR = do
-        Just home <- runDB' $ (doc2HR=<<) <$> findOne (select ["_id"=:["frame",("home"::T.Text)],"type"=:("page"::T.Text)] "html")
+        Just home <- runDB' $  (doc2HR =<<) <$> findOne (select ["index"=:["frame",("home"::String)]] "html")
         let homeH = preEscapedToHtml $ hrpHtml home
         let sumH  = preEscapedToHtml $ hrpSummary home
         defaultLayout $ do
@@ -74,7 +74,7 @@ pages
 \begin{code}
       getPageR :: [T.Text] -> Handler Html
       getPageR idx = do
-        page <- runDB' $ (doc2HR=<<) <$> findOne (select ["_id"=:idx,"type"=:("page"::T.Text)] "html")
+        page <- runDB' $ (doc2HR=<<) <$> findOne (select ["index"=:idx,"type"=:("page"::T.Text)] "html")
         case page of
           Just HtmlPage{..} -> do
             let pH = preEscapedToHtml hrpHtml
@@ -92,7 +92,7 @@ blogs
 \begin{code}
       getBlogR :: [T.Text] -> Handler Html
       getBlogR idx = do
-        blog <- runDB' $ (doc2HR =<<) <$> findOne (select ["_id"=:idx,"type"=: ("blog" ::T.Text)] "html")
+        blog <- runDB' $ (doc2HR =<<) <$> findOne (select ["index"=:idx,"type"=: ("blog" ::T.Text)] "html")
         case blog of
           Just HtmlBlog{..} -> do
             let pH = preEscapedToHtml hrbHtml
@@ -123,7 +123,7 @@ query
           _ -> getQ
         where
           getQ = do
-            x <- runDB' $ findOne (select ["_id"=:idx] "query")
+            x <- runDB' $ findOne (select ["index"=:idx] "query")
             case sigTypeFunc x of
               Just vs ->
                 return $ T.unwords vs
@@ -142,7 +142,7 @@ resource
 \begin{code}
       getResourceR :: [T.Text] -> Handler TypedContent
       getResourceR idx = do
-        rc <- runDB' $ (doc2Rc =<<) <$> findOne (select ["_id" =: idx] "resource")
+        rc <- runDB' $ (doc2Rc =<<) <$> findOne (select ["index" =: idx] "resource")
         selectRep $ case rc of
           Just RcTxt{..} -> provideRepType (t2bUtf8 rctMIME) $ return rctTxt
           Just RcBin{..} -> provideRepType (t2bUtf8 rcbMIME) $ return rcbBinary

@@ -67,10 +67,10 @@ update pages
         html    <- getFilesBS =<< lookupFiles "html"
         title   <- lookupPostParam            "title"
         summary <- lookupPostParam            "summary"
-        uTime   <- lookupPostParam            "update-time"
-        cTime   <- lookupPostParam            "create-time"
-        returnRT.tryH.runDB'.upsert (select ["_id" =: idx,"type"=:("page"::T.Text)] "html") $ catMaybes
-          [ "_id"         =@       Just idx
+        uTime   <- lookupPostUTCTime          "update-time"
+        cTime   <- lookupPostUTCTime          "create-time"
+        returnRT.tryH.runDB'.upsert (select ["index" =: idx,"type"=:("page"::T.Text)] "html") $ catMaybes
+          [ "index"       =@       Just idx
           , "title"       =@            title
           , "html"        =@ b2tUtf8<$> html
           , "summary"     =@            summary
@@ -87,10 +87,10 @@ update blog
         html    <- getFilesBS =<< lookupFiles "html"
         title   <- lookupPostParam            "title"
         summary <- lookupPostParam            "summary"
-        uTime   <- lookupPostParam            "update-time"
-        cTime   <- lookupPostParam            "create-time"
-        returnRT.tryH.runDB'.upsert (select ["_id" =: idx,"type"=:("blog"::T.Text)] "html") $ catMaybes
-          [ "_id"         =@       Just idx
+        uTime   <- lookupPostUTCTime          "update-time"
+        cTime   <- lookupPostUTCTime          "create-time"
+        returnRT.tryH.runDB'.upsert (select ["index" =: idx,"type"=:("blog"::T.Text)] "html") $ catMaybes
+          [ "index"       =@       Just idx
           , "title"       =@            title
           , "html"        =@ b2tUtf8<$> html
           , "summary"     =@            summary
@@ -107,17 +107,17 @@ update frame
         html    <- getFilesBS =<< lookupFiles "html"
         title   <- lookupPostParam            "title"
         summary <- lookupPostParam            "summary"
-        uTime   <- lookupPostParam            "update-time"
-        cTime   <- lookupPostParam            "create-time"
+        uTime   <- lookupPostUTCTime          "update-time"
+        cTime   <- lookupPostUTCTime          "create-time"
         typ     <- lookupPostParam            "type"
-        returnRT.tryH.runDB'.upsert (select ["_id" =: idx] "html") $ catMaybes
-          [ "_id"         =@       Just idx
-          , "title"       =@            title
-          , "html"        =@ b2tUtf8<$> html
-          , "summary"     =@            summary
-          , "update-time" =@            uTime
-          , "create-time" =@            cTime
-          , "type"        =@            typ
+        returnRT.tryH.runDB'.upsert (select ["index" =: idx] "html") $ catMaybes
+          [ "index"       =@        Just idx
+          , "title"       =@             title
+          , "html"        =@  b2tUtf8<$> html
+          , "summary"     =@             summary
+          , "update-time" =@             uTime
+          , "create-time" =@             cTime
+          , "type"        =@             typ
           ]
 \end{code}
 
@@ -126,9 +126,9 @@ Update query
       putQueryR :: [T.Text] -> Handler TypedContent
       putQueryR idx = do
         var <- lookupPostParam "var"
-        returnRT.tryH.runDB'.upsert (select ["_id" =: idx] "query") $ catMaybes
-          [ "_id" =@ Just idx
-          , "var" =@      var
+        returnRT.tryH.runDB'.upsert (select ["index" =: idx] "query") $ catMaybes
+          [ "index" =@ Just idx
+          , "var"   =@      var
           ]
 \end{code}
 
@@ -147,16 +147,16 @@ resource update
         returnRT $ case typ of
           "txt" -> do
             text <- getFilesBS =<< lookupFiles "text"
-            tryH.runDB'.upsert (select ["_id" =: idx,"type" =: ("txt"::T.Text)] "resource") $ catMaybes
-              [ "_id"  =@       Just idx
-              , "mime" =@            mime
-              , "txt"  =@ b2tUtf8<$> text
-              , "type" =@       Just typ
+            tryH.runDB'.upsert (select ["index" =: idx,"type" =: ("txt"::T.Text)] "resource") $ catMaybes
+              [ "index"  =@       Just idx
+              , "mime"   =@            mime
+              , "txt"    =@ b2tUtf8<$> text
+              , "type"   =@       Just typ
               ]
           "binary" -> do
             bin <- getFilesBS =<< lookupFiles "binary"
-            tryH.runDB'.upsert (select ["_id" =: idx,"type" =: ("binary"::T.Text)] "resource") $ catMaybes
-              [ "_id"    =@      Just idx
+            tryH.runDB'.upsert (select ["index" =: idx,"type" =: ("binary"::T.Text)] "resource") $ catMaybes
+              [ "index"  =@      Just idx
               , "mime"   =@           mime
               , "binary" =@ Binary<$> bin
               , "type"   =@      Just typ
@@ -172,7 +172,7 @@ update nav
         url      <- lookupPostParam "url"
         order    <- lookupPostParam "order"
         returnRT.tryH.runDB'.upsert (select ["label" =: idx] "nav") $ catMaybes
-          [ "_id"   =@ Just idx
+          [ "index" =@ Just idx
           , "url"   =@      url
           , "order" =@      order
           ]
@@ -182,28 +182,28 @@ delete page
 \begin{code}
       deletePageR :: [T.Text] -> Handler TypedContent
       deletePageR idx =
-        returnRT.tryH.runDB'.delete$ select ["_id" =: idx, "type" =: ("page"::T.Text)] "html"
+        returnRT.tryH.runDB'.delete$ select ["index" =: idx, "type" =: ("page"::T.Text)] "html"
 \end{code}
 
 delete blog
 \begin{code}
       deleteBlogR :: [T.Text] -> Handler TypedContent
       deleteBlogR idx =
-        returnRT.tryH.runDB'.delete$ select ["_id" =: idx, "type" =: ("blog"::T.Text)] "html"
+        returnRT.tryH.runDB'.delete$ select ["index" =: idx, "type" =: ("blog"::T.Text)] "html"
 \end{code}
 
 delete frame
 \begin{code}
       deleteFrameR :: [T.Text] -> Handler TypedContent
       deleteFrameR idx =
-        returnRT.tryH.runDB'.delete$ select ["_id" =: idx] "html"
+        returnRT.tryH.runDB'.delete$ select ["index" =: idx] "html"
 \end{code}
 
 delete query
 \begin{code}
       deleteQueryR :: [T.Text] -> Handler TypedContent
       deleteQueryR idx =
-        returnRT.tryH.runDB'.delete$ select ["_id" =: idx] "query"
+        returnRT.tryH.runDB'.delete$ select ["index" =: idx] "query"
 \end{code}
 
 
@@ -217,7 +217,7 @@ delete resource
 \begin{code}
       deleteResourceR :: [T.Text] -> Handler TypedContent
       deleteResourceR idx =
-        returnRT.tryH.runDB'.delete$ select ["_id" =: idx] "resource"
+        returnRT.tryH.runDB'.delete$ select ["index" =: idx] "resource"
 \end{code}
 
 delete nav
@@ -225,7 +225,7 @@ delete nav
       deleteNavR :: Handler TypedContent
       deleteNavR = do
         Just idx <- lookupPostParam "label"
-        returnRT.tryH.runDB'.delete$ select ["_id" =: idx] "nav"
+        returnRT.tryH.runDB'.delete$ select ["index" =: idx] "nav"
 \end{code}
 
 
