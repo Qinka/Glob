@@ -46,6 +46,7 @@ data Glob
         , globDb          :: T.Text
         , globAM          :: AccessMode
         , globStaticUrl   :: T.Text
+        , globDBUP        :: (T.Text,T.Text)
         , globCP          :: ConnectionPool
         , globLogger      :: Logger
         }
@@ -132,6 +133,7 @@ instance Mongoble
         getDBCPool = globCP
         getDefaultAM = globAM
         getDefaultDB = globDb
+        getDBUP = globDBUP
 \end{code}
 
 the configure of Glob
@@ -166,7 +168,7 @@ the instance of ToConfig
         getLogPath = cfgLogPath
         getTimeout _ = 30
         getListenType = cfgListenType
-        toCfgD GlobCfg{..} = Glob cfgPskEnvToken cfgTitle dbDatabase am cfgStaticUrl
+        toCfgD GlobCfg{..} = Glob cfgPskEnvToken cfgTitle dbDatabase am cfgStaticUrl (dbUserName,dbPassword)
           <$> cpIO
           <*> logIO
           where
@@ -187,7 +189,6 @@ the instance of ToConfig
               dbPoolStrp
               (fromRational $ toRational dbPoolKpTm)
               (fromIntegral dbPoolStpM)
-
 \end{code}
 
 the configure of database (Mongo)
@@ -196,8 +197,8 @@ the configure of database (Mongo)
         { dbHostAddr :: String
         , dbDatabase :: T.Text
         , dbAccessMd :: T.Text
-        , dbUserName :: String
-        , dbPassword :: String
+        , dbUserName :: T.Text
+        , dbPassword :: T.Text
         , dbPoolStrp :: Int
         , dbPoolKpTm :: Double
         , dbPoolStpM :: Int

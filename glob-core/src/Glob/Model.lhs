@@ -24,6 +24,7 @@ module Glob.Model
       import Yesod.Core
 
       import Database.MongoDB as X
+      import qualified Import.Text as T
 \end{code}
 
 to operate DB
@@ -34,6 +35,7 @@ to operate DB
         getDefaultAM = defaultAM
         getDefaultDB :: a -> Database
         getDefaultDB = defaultDB
+        getDBUP :: a -> (T.Text,T.Text)
 
       defaultAM _ = master
       defaultDB _ = "master"
@@ -64,7 +66,10 @@ runDB function
             -> Action (HandlerT site IO) a
             -> HandlerT site IO a
       runDB am db f = getDBCPoolM >>= \pool ->
-        withResource pool $ \p -> access p am db f
+        withResource pool $ \p -> getYesod >>= (\site ->
+        access p am db (toAuth site >> f))
+        where
+          toAuth site = uncurry auth $ getDBUP site
 \end{code}
 
 
