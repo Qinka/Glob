@@ -1,0 +1,57 @@
+# The config of Travis
+
+#to use ubuntu 14.04
+sudo: required
+dist: trusty
+
+# setting cache
+cache:
+  - $HOME/.stack
+# the matrix of settings
+matrix:
+  include:
+    - env: GHC_VER=8.0.1 THREADED=t STACKSOLVER=stack.yaml LLVM=3.7
+      addons:
+        apt:
+          sources:
+            - hvr-ghc
+          packages:
+            - ghc-8.0.1
+    - env: GHC_VER=8.0.1 THREADED=t STACKSOLVER=stack.yaml
+      addons:
+        apt:
+          sources:
+            - hvr-ghc
+          packages:
+            - ghc-8.0.1
+    - env: GHC_VER=8.0.1 STACKSOLVER=stack.yaml
+      addons:
+        apt:
+          sources:
+            - hvr-ghc
+          packages:
+            - ghc-8.0.1
+    - env: GHC_VER=7.10.3 THREADED=t STACKSOLVER=stack.yaml
+      addons:
+        apt:
+          sources:
+            - hvr-ghc
+          packages:
+            - ghc-8.0.1
+
+# using docker
+services:
+  - docker
+
+# pre-install
+before_install:
+  - source $TRAVIS_BUILD_DIR/integration/TravisScript/before.sh
+
+
+# build
+script:
+  - source $TRAVIS_BUILD_DIR/integration/TravisScript/build.sh
+
+# update docker image
+after_success:
+  - source $TRAVIS_BUILD_DIR/integration/TravisScript/update.sh

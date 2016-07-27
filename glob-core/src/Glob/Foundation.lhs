@@ -120,7 +120,6 @@ Glob's Layout
                 #{nH}
                 ^{pageBody pc}
                 #{bH}
-                <link rel=stylesheet href=@{ResourceR ["css","frame.css"]}>
             |]
           _ -> withUrlRenderer [hamlet|all lost !|]
         where

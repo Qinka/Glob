@@ -148,18 +148,18 @@ resource update
           "txt" -> do
             text <- getFilesBS =<< lookupFiles "text"
             tryH.runDB'.upsert (select ["index" =: idx,"type" =: ("txt"::T.Text)] "resource") $ catMaybes
-              [ "index"  =@       Just idx
-              , "mime"   =@            mime
-              , "txt"    =@ b2tUtf8<$> text
-              , "type"   =@       Just typ
+              [ "index"   =@       Just idx
+              , "MIME"    =@            mime
+              , "content" =@ b2tUtf8<$> text
+              , "type"    =@       Just typ
               ]
           "binary" -> do
             bin <- getFilesBS =<< lookupFiles "binary"
             tryH.runDB'.upsert (select ["index" =: idx,"type" =: ("binary"::T.Text)] "resource") $ catMaybes
-              [ "index"  =@      Just idx
-              , "mime"   =@           mime
-              , "binary" =@ Binary<$> bin
-              , "type"   =@      Just typ
+              [ "index"   =@      Just idx
+              , "MIME"    =@           mime
+              , "content" =@ Binary<$> bin
+              , "type"    =@      Just typ
               ]
           _ ->notFound
 \end{code}
@@ -172,9 +172,9 @@ update nav
         url      <- lookupPostParam "url"
         order    <- lookupPostParam "order"
         returnRT.tryH.runDB'.upsert (select ["label" =: idx] "nav") $ catMaybes
-          [ "index" =@ Just idx
-          , "url"   =@      url
-          , "order" =@      order
+          [ "index" =@        Just idx
+          , "url"   =@             url
+          , "order" =@ (T.readT<$> order :: Maybe Int)
           ]
 \end{code}
 

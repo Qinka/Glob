@@ -22,6 +22,7 @@ module Glob.Handler.Get
     ) where
 
       import Control.Exception (throw)
+      import Control.Monad(mapM)
       import Glob.Common
       import Glob.Foundation
       import Glob.Model
@@ -154,6 +155,12 @@ nav
 \begin{code}
       getNavR :: Handler T.Text
       getNavR = do
-        rt <- runDB' $ (doc2Nav =<<) <$> findOne (select [] "nav")
-        return.b2tUtf8.toStrictBS.encode $ fromMaybe (error "how!") rt
+        rt <- runDB' $ (doc2Nav <$>) <$> dbAction
+        return.b2tUtf8.toStrictBS.encode $ catMaybes rt
+        where
+          dbAction = do
+            cr <- find (select [] "nav")
+            rtval <- rest cr
+            closeCursor cr
+            return rtval
 \end{code}
