@@ -7,7 +7,7 @@ sudo apt install wget
 ######
 echo fetch the system\' name
 export OS_CORENAME=$(lsb_release -a | grep Codename | awk '{print $2}')
-export OS_DISTRIBUTOR=$(lsb_release -a | grep Descriptino | awk '{print $2}')
+export OS_DISTRIBUTOR=$(lsb_release -a | grep Description | awk '{print $2}')
 echo using $OS_DISTRIBUTOR  $OS_CORENAME
 ######
 if [ -n "$LLVM" ]; then

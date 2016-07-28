@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ -n "$STACKSOLVER" ]; then
-  export STACKFILE=" --stack-yaml $STACKSOLVER "
+  export STACKFILE=" --stack-yaml $TRAVIS_BUILD_DIR/integration/StackSolver/$STACKSOLVER "
 fi
 if [ -n "$LLVM" ]; then
   export LLVMFLAG=" --ghc-options -fllvm --ghc-options -pgmlo --ghc-options opt-$LLVM --ghc-options -pgmlc --ghc-options llc-$LLVM "
