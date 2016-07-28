@@ -18,10 +18,9 @@ echo copy files
 cd $TRAVIS_BUILD_DIR
 mkdir docker.tmp
 mkdir docker.tmp/bin
-cp ~/.local/bin/glob-launch docker.tmp
+cp ~/.local/bin/glob-launch docker.tmp/bin
 cp $TRAVIS_BUILD_DIR/integration/Dockerfiles/hub/Dockerfile dockrt.tmp
 cp $TRAVIS_BUILD_DIR/integration/ShellScript/start.sh docker.tmp/bin
 echo build docker
-cp ~/.local/bin/$INSTALLTAGGER docker.tmp/bin
 cd docker.tmp && docker build -f Dockerfile -t qinka/glob:$DOCKER_IMAGE_TAG . && cd ..
 docker push  qinka/glob
