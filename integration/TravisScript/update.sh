@@ -22,5 +22,8 @@ cp ~/.local/bin/glob-launch docker.tmp/bin
 cp $TRAVIS_BUILD_DIR/integration/Dockerfiles/hub/Dockerfile dockrt.tmp
 cp $TRAVIS_BUILD_DIR/integration/ShellScript/start.sh docker.tmp/bin
 echo build docker
-cd docker.tmp && docker build -t qinka/glob:$DOCKER_IMAGE_TAG . && cd ..
+cd docker.tmp
+pwd
+ls
+docker build -t qinka/glob:$DOCKER_IMAGE_TAG . && cd ..
 docker push  qinka/glob
