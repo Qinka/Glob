@@ -19,7 +19,7 @@ cd $TRAVIS_BUILD_DIR
 mkdir docker.tmp
 mkdir docker.tmp/bin
 sudo cp $HOME/.local/bin/glob-launch docker.tmp/bin
-sudo cp $TRAVIS_BUILD_DIR/integration/Dockerfiles/hub/Dockerfile dockrt.tmp
+sudo cp $TRAVIS_BUILD_DIR/integration/Dockerfiles/hub/Dockerfile docker.tmp
 sudo cp $TRAVIS_BUILD_DIR/integration/ShellScript/start.sh docker.tmp/bin
 echo build docker
 cd docker.tmp
