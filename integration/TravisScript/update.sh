@@ -15,10 +15,11 @@ if [ -n "$THREADED" ]; then
   export DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG-threaded
 fi
 echo copy files
+cd $TRAVIS_BUILD_DIR
 mkdir docker.tmp
 mkdir docker.tmp/bin
 cp ~/.local/bin/glob-launch docker.tmp
-cp $TRAVIS_BUILD_DIR/integration/Dockerfiles/hub/Dockerfile dockrt.tmp/Dockerfile
+cp $TRAVIS_BUILD_DIR/integration/Dockerfiles/hub/Dockerfile dockrt.tmp
 cp $TRAVIS_BUILD_DIR/integration/ShellScript/start.sh docker.tmp/bin
 echo build docker
 cp ~/.local/bin/$INSTALLTAGGER docker.tmp/bin
