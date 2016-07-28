@@ -8,4 +8,4 @@ fi
 if [ -n "$THREADED" ]; then
   export THREADFLAG=" --ghc-options -threaded "
 fi
-stack install --flag $STACKFILE  --ghc-options -O2 $THREADFLAG $LLVMFLAG
+stack install  $STACKFILE  --ghc-options -O2 $THREADFLAG $LLVMFLAG
