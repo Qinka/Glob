@@ -30,7 +30,7 @@ matrix:
           sources:
             - hvr-ghc
           packages:
-            - ghc-8.0.1
+            - ghc-7.10.3
 
 # using docker
 services:
