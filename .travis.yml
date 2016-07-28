@@ -10,28 +10,21 @@ cache:
 # the matrix of settings
 matrix:
   include:
-    - env: GHC_VER=8.0.1 THREADED=t STACKSOLVER=stack.yaml LLVM=3.7
+    - env: GHC_VER=8.0.1 THREADED=t LLVM=3.7
       addons:
         apt:
           sources:
             - hvr-ghc
           packages:
             - ghc-8.0.1
-    - env: GHC_VER=8.0.1 THREADED=t STACKSOLVER=stack.yaml
+    - env: GHC_VER=8.0.1 THREADED=t
       addons:
         apt:
           sources:
             - hvr-ghc
           packages:
             - ghc-8.0.1
-    - env: GHC_VER=8.0.1 STACKSOLVER=stack.yaml
-      addons:
-        apt:
-          sources:
-            - hvr-ghc
-          packages:
-            - ghc-8.0.1
-    - env: GHC_VER=7.10.3 THREADED=t STACKSOLVER=stack.yaml
+    - env: GHC_VER=7.10.3 THREADED=t STACKSOLVER=stack7103.yaml
       addons:
         apt:
           sources:
