@@ -13,6 +13,7 @@
 \begin{code}
 module Glob.Handler.Static
     ( getStaticR
+    , getToStaticR
     ) where
 
       import Glob.Foundation
@@ -28,4 +29,10 @@ static used 301
       getStaticR idx = do
         Glob{..} <- getYesod
         redirectWith status301.T.concat $ globStaticUrl:(T.cons '/' <$> idx)
+\end{code}
+
+tostatic used 301
+\begin{code}
+      getToStaticR :: [T.Text] -> Handler ()
+      getToStaticR = getStaticR
 \end{code}

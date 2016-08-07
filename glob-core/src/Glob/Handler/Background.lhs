@@ -66,14 +66,14 @@ update pages
       putPageR idx = do
         html    <- getFilesBS =<< lookupFiles "html"
         title   <- lookupPostParam            "title"
-        summary <- lookupPostParam            "summary"
+        summary <- getFilesBS =<< lookupFiles "summary"
         uTime   <- lookupPostUTCTime          "update-time"
         cTime   <- lookupPostUTCTime          "create-time"
         returnRT.tryH.runDB'.upsert (select ["index" =: idx,"type"=:("page"::T.Text)] "html") $ catMaybes
           [ "index"       =@       Just idx
           , "title"       =@            title
           , "html"        =@ b2tUtf8<$> html
-          , "summary"     =@            summary
+          , "summary"     =@ b2tUtf8<$> summary
           , "update-time" =@            uTime
           , "create-time" =@            cTime
           , "type"        =@       Just ("page"::T.Text)
@@ -86,17 +86,18 @@ update blog
       putBlogR idx = do
         html    <- getFilesBS =<< lookupFiles "html"
         title   <- lookupPostParam            "title"
-        summary <- lookupPostParam            "summary"
+        summary <- getFilesBS =<< lookupFiles "summary"
         uTime   <- lookupPostUTCTime          "update-time"
         cTime   <- lookupPostUTCTime          "create-time"
         returnRT.tryH.runDB'.upsert (select ["index" =: idx,"type"=:("blog"::T.Text)] "html") $ catMaybes
           [ "index"       =@       Just idx
           , "title"       =@            title
           , "html"        =@ b2tUtf8<$> html
-          , "summary"     =@            summary
+          , "summary"     =@ b2tUtf8<$> summary
           , "update-time" =@            uTime
           , "create-time" =@            cTime
           , "type"        =@       Just ("blog" ::T.Text)
+          , "tags"        =@       Just (["blog"] :: [T.Text])
           ]
 \end{code}
 
@@ -106,18 +107,18 @@ update frame
       putFrameR idx = do
         html    <- getFilesBS =<< lookupFiles "html"
         title   <- lookupPostParam            "title"
-        summary <- lookupPostParam            "summary"
+        summary <- getFilesBS =<< lookupFiles "summary"
         uTime   <- lookupPostUTCTime          "update-time"
         cTime   <- lookupPostUTCTime          "create-time"
         typ     <- lookupPostParam            "type"
         returnRT.tryH.runDB'.upsert (select ["index" =: idx] "html") $ catMaybes
-          [ "index"       =@        Just idx
-          , "title"       =@             title
-          , "html"        =@  b2tUtf8<$> html
-          , "summary"     =@             summary
-          , "update-time" =@             uTime
-          , "create-time" =@             cTime
-          , "type"        =@             typ
+          [ "index"       =@       Just idx
+          , "title"       =@            title
+          , "html"        =@ b2tUtf8<$> html
+          , "summary"     =@ b2tUtf8<$> summary
+          , "update-time" =@            uTime
+          , "create-time" =@            cTime
+          , "type"        =@            typ
           ]
 \end{code}
 
@@ -224,8 +225,11 @@ delete nav
 \begin{code}
       deleteNavR :: Handler TypedContent
       deleteNavR = do
-        Just idx <- lookupPostParam "label"
-        returnRT.tryH.runDB'.delete$ select ["index" =: idx] "nav"
+        idx <- lookupPostParam "label"
+        let sel = case idx of
+              Just idx -> select ["index" =: idx] "nav"
+              _ -> select [] "nav"
+        returnRT.tryH.runDB' $ delete sel
 \end{code}
 
 

@@ -69,6 +69,8 @@ the route of Glob
 
         /bg/frame/*Texts FrameR PUT      DELETE
         /bg/raw          RawR       POST
+
+        !*Texts ToStaticR GET
         |]
 \end{code}
 
@@ -111,9 +113,9 @@ Glob's Layout
             <html>
               <head>
                 <title>
-                  #{globTitle} - #{pageTitle pc}
+                  #{pageTitle pc} - #{globTitle}
                 <meta charset=utf-8>
-                <meta name=viewport content=witdh=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no>
+                <meta name=viewport content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
                 ^{pageHead pc}
               <body>
                 #{tH}

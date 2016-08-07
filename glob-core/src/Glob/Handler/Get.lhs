@@ -41,16 +41,18 @@ Home
 \begin{code}
       getHomeR :: Handler Html
       getHomeR = do
-        Just home <- runDB' $  (doc2HR =<<) <$> findOne (select ["index"=:["frame",("home"::String)]] "html")
-        let homeH = preEscapedToHtml $ hrpHtml home
-        let sumH  = preEscapedToHtml $ hrpSummary home
-        defaultLayout $ do
-          setTitle $ toHtml $ hrpTitle home
-          [whamlet|
-            <summary>
-              #{sumH}
-            #{homeH}
-            |]
+        home' <- runDB' $  (doc2HR =<<) <$> findOne (select ["index"=:["frame",("home"::String)]] "html")
+        case home' of
+          Just home -> do
+            let homeH = preEscapedToHtml $ hrpHtml home
+            let sumH  = preEscapedToHtml <$> hrpSummary home
+            defaultLayout $ do
+              setTitle $ toHtml $ hrpTitle home
+              case sumH of
+                Just sH -> [whamlet|#{sH}|]
+                _ -> return ()
+              [whamlet|#{homeH}|]
+          _ -> notFound
 \end{code}
 
 the list of blog
@@ -78,15 +80,14 @@ pages
         page <- runDB' $ (doc2HR=<<) <$> findOne (select ["index"=:idx,"type"=:("page"::T.Text)] "html")
         case page of
           Just HtmlPage{..} -> do
-            let pH = preEscapedToHtml hrpHtml
-            let sH = preEscapedToHtml hrpSummary
+            let pH = preEscapedToHtml     hrpHtml
+            let sH = preEscapedToHtml <$> hrpSummary
             defaultLayout $ do
               setTitle $ toHtml hrpTitle
-              [whamlet|
-                <summary>
-                  #{sH}
-                #{pH}
-                |]
+              case sH of
+                Just sH' -> [whamlet|<summary>#{sH'}|]
+                _ -> return ()
+              [whamlet|#{pH}|]
           _ -> notFound
 \end{code}
 blogs
@@ -96,17 +97,16 @@ blogs
         blog <- runDB' $ (doc2HR =<<) <$> findOne (select ["index"=:idx,"type"=: ("blog" ::T.Text)] "html")
         case blog of
           Just HtmlBlog{..} -> do
-            let pH = preEscapedToHtml hrbHtml
-            let sH = preEscapedToHtml hrbSummary
+            let pH = preEscapedToHtml     hrbHtml
+            let sH = preEscapedToHtml <$> hrbSummary
             defaultLayout $ do
               setTitle $ toHtml hrbTitle
-              [whamlet|
-                <summary>
-                  #{sH}
-                #{pH}
-                |]
+              case sH of
+                Just sH' -> [whamlet|<summary>#{sH'}|]
+                _ -> return ()
+              [whamlet|#{pH}|]
               toWidget [julius|
-                tags=$(#{showJS hrbTags})
+                tags=#{showJS hrbTags}
                 |]
           _ -> notFound
         where

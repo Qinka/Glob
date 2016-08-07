@@ -65,7 +65,7 @@ data for storied html
           { hrpIndex      :: [T.Text]
           , hrpHtml       :: T.Text
           , hrpTitle      :: T.Text
-          , hrpSummary    :: T.Text
+          , hrpSummary    :: Maybe T.Text
           , hrpUpdateTime :: UTCTime
           , hrpCreateTime :: UTCTime
           }
@@ -73,9 +73,9 @@ data for storied html
           { hrbIndex      :: [T.Text]
           , hrbHtml       :: T.Text
           , hrbTitle      :: T.Text
-          , hrbSummary    :: T.Text
-          , hrbUpdateTime :: T.Text
-          , hrbCreateTime :: T.Text
+          , hrbSummary    :: Maybe T.Text
+          , hrbUpdateTime :: UTCTime
+          , hrbCreateTime :: UTCTime
           , hrbTags       :: [T.Text]
           }
 \end{code}
@@ -91,14 +91,14 @@ transform between HtmlRow and  Document
           <$> doc !? "index"
           <*> doc !? "html"
           <*> doc !? "title"
-          <*> doc !? "summary"
+          <*> Just (doc !? "summary")
           <*> doc !? "update-time"
           <*> doc !? "create-time"
         "blog" -> HtmlBlog
           <$> doc !? "index"
           <*> doc !? "html"
           <*> doc !? "title"
-          <*> doc !? "summary"
+          <*> Just (doc !? "summary")
           <*> doc !? "update-time"
           <*> doc !? "create-time"
           <*> doc !? "tags"
@@ -129,6 +129,7 @@ transform between HtmlRow and  Document
         , "update-time" =: hrbUpdateTime
         , "create-time" =: hrbCreateTime
         , "type"        =: ("blog" ::T.Text)
+        , "tags"        =: hrbTags
         ]
 \end{code}
 

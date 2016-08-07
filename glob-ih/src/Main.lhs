@@ -19,11 +19,17 @@ module Main
       import Glob.Auth.Token
       import System.Environment
       import System.IO
+
+      import qualified GHC.IO.Encoding as E
 \end{code}
 
 \begin{code}
       main :: IO ()
       main = do
+#ifdef WithUTF8
+        E.setLocaleEncoding E.utf8
+        hSetEncoding stdout utf8
+#endif
         r:tokens <- getArgs
         now <- getCurrentTime
         let dt       = addUTCTime (fromIntegral $ read r) now
