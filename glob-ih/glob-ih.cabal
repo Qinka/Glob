@@ -2,15 +2,14 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-ih
-version:             0.0.9.10
--- synopsis:
--- description:
+version:             0.0.9.25
+synopsis:            a tool to help 'login'
+description:         the tool transform tokens and other things to curl's options
 license:             AllRightsReserved
 -- license-file:        LICENSE
 author:              Qinka
 maintainer:          qinka@live.com
--- copyright:
--- category:
+copyright:           2016 Qinka <qinka@live.com>
 build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
@@ -21,7 +20,7 @@ flag with-utf8
 
 executable glob-ih
   main-is:             Main.lhs
-  -- other-modules:
+  other-modules:       Paths_glob_ih
   default-extensions:  CPP
   build-depends:       base >=4.7 && <4.10
                      , glob-auth >= 0.0.9
