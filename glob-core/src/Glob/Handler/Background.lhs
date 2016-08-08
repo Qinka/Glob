@@ -6,7 +6,7 @@
   \CodeProject{glob-core}
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-07-22}
-  %\CodeChangeLog{date}{text}
+  \CodeChangeLog{0.0.9.25}{2016.08.08}{Add the author to blogs and pages.}
 \end{codeinfo}
 
 \begin{code}
@@ -64,11 +64,12 @@ update pages
 \begin{code}
       putPageR :: [T.Text] -> Handler TypedContent
       putPageR idx = do
-        html    <- getFilesBS =<< lookupFiles "html"
         title   <- lookupPostParam            "title"
-        summary <- getFilesBS =<< lookupFiles "summary"
+        html    <- getFilesBS =<< lookupFiles "html"
         uTime   <- lookupPostUTCTime          "update-time"
+        summary <- getFilesBS =<< lookupFiles "summary"
         cTime   <- lookupPostUTCTime          "create-time"
+        author  <- lookupPostParam            "author"
         returnRT.tryH.runDB'.upsert (select ["index" =: idx,"type"=:("page"::T.Text)] "html") $ catMaybes
           [ "index"       =@       Just idx
           , "title"       =@            title
@@ -76,6 +77,7 @@ update pages
           , "summary"     =@ b2tUtf8<$> summary
           , "update-time" =@            uTime
           , "create-time" =@            cTime
+          , "author"      =@            author
           , "type"        =@       Just ("page"::T.Text)
           ]
 \end{code}
@@ -84,11 +86,12 @@ update blog
 \begin{code}
       putBlogR :: [T.Text] -> Handler TypedContent
       putBlogR idx = do
+        cTime   <- lookupPostUTCTime          "create-time"
         html    <- getFilesBS =<< lookupFiles "html"
         title   <- lookupPostParam            "title"
         summary <- getFilesBS =<< lookupFiles "summary"
         uTime   <- lookupPostUTCTime          "update-time"
-        cTime   <- lookupPostUTCTime          "create-time"
+        author  <- lookupPostParam            "author"
         returnRT.tryH.runDB'.upsert (select ["index" =: idx,"type"=:("blog"::T.Text)] "html") $ catMaybes
           [ "index"       =@       Just idx
           , "title"       =@            title
@@ -96,6 +99,7 @@ update blog
           , "summary"     =@ b2tUtf8<$> summary
           , "update-time" =@            uTime
           , "create-time" =@            cTime
+          , "author"      =@            author
           , "type"        =@       Just ("blog" ::T.Text)
           , "tags"        =@       Just (["blog"] :: [T.Text])
           ]
@@ -111,6 +115,7 @@ update frame
         uTime   <- lookupPostUTCTime          "update-time"
         cTime   <- lookupPostUTCTime          "create-time"
         typ     <- lookupPostParam            "type"
+        author  <- lookupPostParam            "author"
         returnRT.tryH.runDB'.upsert (select ["index" =: idx] "html") $ catMaybes
           [ "index"       =@       Just idx
           , "title"       =@            title
@@ -118,6 +123,7 @@ update frame
           , "summary"     =@ b2tUtf8<$> summary
           , "update-time" =@            uTime
           , "create-time" =@            cTime
+          , "author"      =@            author
           , "type"        =@            typ
           ]
 \end{code}

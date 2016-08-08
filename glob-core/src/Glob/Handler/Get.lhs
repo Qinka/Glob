@@ -6,7 +6,7 @@
   \CodeProject{glob-core}
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-07-20}
-  %\CodeChangeLog{date}{text}
+  \CodeChangeLog{0.0.9.25}{2016.08.08}{Add the author to blogs and pages.}
 \end{codeinfo}
 
 \begin{code}
@@ -28,7 +28,6 @@ module Glob.Handler.Get
       import Glob.Model
       import Glob.Types
       import Text.Blaze.Html (preEscapedToHtml)
-      import Text.Julius (rawJS)
       import Yesod.Core
       import Yesod.Core.Types
 
@@ -52,6 +51,12 @@ Home
                 Just sH -> [whamlet|#{sH}|]
                 _ -> return ()
               [whamlet|#{homeH}|]
+              let au = case hrpAuthor home of
+                    Just a -> showJS a
+                    _ -> rawJS ("null" ::T.Text)
+              toWidget [julius|
+                  author=#{au}
+                  |]
           _ -> notFound
 \end{code}
 
@@ -64,13 +69,15 @@ the list of blog
           rtval <- rest cr
           closeCursor cr
           return rtval
-        let blogs = map (\b -> (hrbIndex b,hrbTitle b,hrbCreateTime b,hrbUpdateTime b,hrbSummary b,hrbTags b)).catMaybes $ doc2HR <$> blog'
+        let blogs = map (\b -> (hrbIndex b,hrbTitle b,hrbCreateTime b,hrbUpdateTime b,hrbSummary b,hrbTags b,hrbAuthor b)).catMaybes $ doc2HR <$> blog'
         return.b2tUtf8.toStrictBS.encode$ toValue <$> blogs
         where
-          toValue (i,t,c,u,s, ts) = object
+          toValue (i,t,c,u,s,ts,a) = object
             [ "index".=i , "title".=t
             , "create-time".=show c , "update-time".=show u
-            , "summary" .= s, "tags" .= ts]
+            , "summary" .= s, "tags" .= ts
+            , "author"  .= a
+            ]
 \end{code}
 
 pages
@@ -85,9 +92,15 @@ pages
             defaultLayout $ do
               setTitle $ toHtml hrpTitle
               case sH of
-                Just sH' -> [whamlet|<summary>#{sH'}|]
+                Just sH' -> [whamlet|<summary id=sum>#{sH'}|]
                 _ -> return ()
               [whamlet|#{pH}|]
+              let au = case hrpAuthor of
+                    Just a -> showJS a
+                    _ -> rawJS ("null" ::T.Text)
+              toWidget [julius|
+                  author=#{au}
+                  |]
           _ -> notFound
 \end{code}
 blogs
@@ -102,15 +115,17 @@ blogs
             defaultLayout $ do
               setTitle $ toHtml hrbTitle
               case sH of
-                Just sH' -> [whamlet|<summary>#{sH'}|]
+                Just sH' -> [whamlet|<summary id=sum>#{sH'}|]
                 _ -> return ()
               [whamlet|#{pH}|]
+              let au = case hrbAuthor of
+                    Just a -> showJS a
+                    _ -> rawJS ("null" ::T.Text)
               toWidget [julius|
                 tags=#{showJS hrbTags}
+                author=#{au}
                 |]
           _ -> notFound
-        where
-          showJS = rawJS.T.showT
 \end{code}
 
 query

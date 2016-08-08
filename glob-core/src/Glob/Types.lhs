@@ -6,7 +6,10 @@
   \CodeProject{glob-core}
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-07-20}
-  %\CodeChangeLog{date}{text}
+  \CodeChangeLog{0.0.9.25}{2016.08.08}{
+    Add the author to blogs and pages.
+    And moved a subfunction to Glob.Common
+    }
 \end{codeinfo}
 
 \begin{code}
@@ -60,6 +63,7 @@ data for storied html
           { hrfIndex      :: [T.Text]
           , hrfHtml       :: T.Text
           , hrfUpdateTime :: UTCTime
+          , hrfAuthor     :: Maybe T.Text
           }
         | HtmlPage
           { hrpIndex      :: [T.Text]
@@ -68,6 +72,7 @@ data for storied html
           , hrpSummary    :: Maybe T.Text
           , hrpUpdateTime :: UTCTime
           , hrpCreateTime :: UTCTime
+          , hrpAuthor     :: Maybe T.Text
           }
         | HtmlBlog
           { hrbIndex      :: [T.Text]
@@ -77,6 +82,7 @@ data for storied html
           , hrbUpdateTime :: UTCTime
           , hrbCreateTime :: UTCTime
           , hrbTags       :: [T.Text]
+          , hrbAuthor     :: Maybe T.Text
           }
 \end{code}
 transform between HtmlRow and  Document
@@ -84,24 +90,27 @@ transform between HtmlRow and  Document
       doc2HR :: Document -> Maybe HtmlRow
       doc2HR doc = case typ of
         "frame" -> HtmlFrame
-          <$> doc !? "index"
-          <*> doc !? "html"
-          <*> doc !? "update-time"
+          <$>       doc !? "index"
+          <*>       doc !? "html"
+          <*>       doc !? "update-time"
+          <*> Just (doc !? "author")
         "page" -> HtmlPage
-          <$> doc !? "index"
-          <*> doc !? "html"
-          <*> doc !? "title"
+          <$>       doc !? "index"
+          <*>       doc !? "html"
+          <*>       doc !? "title"
           <*> Just (doc !? "summary")
-          <*> doc !? "update-time"
-          <*> doc !? "create-time"
+          <*>       doc !? "update-time"
+          <*>       doc !? "create-time"
+          <*> Just (doc !? "author")
         "blog" -> HtmlBlog
-          <$> doc !? "index"
-          <*> doc !? "html"
-          <*> doc !? "title"
+          <$>       doc !? "index"
+          <*>       doc !? "html"
+          <*>       doc !? "title"
           <*> Just (doc !? "summary")
-          <*> doc !? "update-time"
-          <*> doc !? "create-time"
-          <*> doc !? "tags"
+          <*>       doc !? "update-time"
+          <*>       doc !? "create-time"
+          <*>       doc !? "tags"
+          <*> Just (doc !? "author")
         _ -> Nothing
         where
           Just typ = MG.lookup "type" doc :: Maybe T.Text
@@ -110,6 +119,7 @@ transform between HtmlRow and  Document
         [ "index"       =: hrfIndex
         , "html"        =: hrfHtml
         , "update-time" =: hrfUpdateTime
+        , "author"      =: hrfAuthor
         , "type"        =: ("frame"::T.Text)
         ]
       hr2Doc HtmlPage{..} =
@@ -119,6 +129,7 @@ transform between HtmlRow and  Document
         , "summary"     =: hrpSummary
         , "update-time" =: hrpUpdateTime
         , "create-time" =: hrpCreateTime
+        , "author"      =: hrpAuthor
         , "type"        =: ("page"::T.Text)
         ]
       hr2Doc HtmlBlog{..} =
@@ -128,8 +139,9 @@ transform between HtmlRow and  Document
         , "summary"     =: hrbSummary
         , "update-time" =: hrbUpdateTime
         , "create-time" =: hrbCreateTime
-        , "type"        =: ("blog" ::T.Text)
+        , "author"      =: hrbAuthor
         , "tags"        =: hrbTags
+        , "type"        =: ("blog" ::T.Text)
         ]
 \end{code}
 

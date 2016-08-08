@@ -6,7 +6,10 @@
   \CodeProject{glob-core}
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-07-15}
-  %\CodeChangeLog{date}{text}
+  \CodeChangeLog{0.0.9.25}{2016.08.08}{
+    Add a function named showJS, trans between Text and JS.
+    It was a subfunction in Glob.Handler.Get.
+    }
 \end{codeinfo}
 
 \begin{code}
@@ -21,6 +24,7 @@ module Glob.Common
     , fromHttpDate2UTC
     , fromUTC2HttpDate
     , lookupPostUTCTime
+    , showJS,rawJS
     ) where
 
       import Control.Monad
@@ -28,6 +32,7 @@ module Glob.Common
       import Data.Aeson.Types
       import Data.Either
       import Data.Time.Format
+      import Text.Julius (rawJS,RawJavascript)
       import Yesod.Core
 
       import Import
@@ -106,4 +111,9 @@ lookup time from param
       lookupPostUTCTime :: Yesod site
                         => T.Text -> HandlerT site IO (Maybe UTCTime)
       lookupPostUTCTime = ((T.readT <$>) <$>).lookupPostParam
+\end{code}
+
+\begin{code}
+      showJS :: Show a => a -> RawJavascript
+      showJS = rawJS. T.showT
 \end{code}
