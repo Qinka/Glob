@@ -7,6 +7,7 @@
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-07-20}
   \CodeChangeLog{0.0.9.25}{2016.08.08}{Add the author to blogs and pages.}
+  \CodeChangeLog{0.0.9.26}{2016.08.09}{add  the version of auth}
 \end{codeinfo}
 
 \begin{code}
@@ -23,6 +24,7 @@ module Glob.Handler.Get
 
       import Control.Exception (throw)
       import Control.Monad(mapM)
+      import Glob.Auth(globAuthVersionQuote)
       import Glob.Common
       import Glob.Foundation
       import Glob.Model
@@ -107,7 +109,8 @@ blogs
 \begin{code}
       getBlogR :: [T.Text] -> Handler Html
       getBlogR idx = do
-        blog <- runDB' $ (doc2HR =<<) <$> findOne (select ["index"=:idx,"type"=: ("blog" ::T.Text)] "html")
+        blog <- runDB' $ (doc2HR =<<) <$> findOne
+          (select ["index"=:idx,"type"=: ("blog" ::T.Text)] "html")
         case blog of
           Just HtmlBlog{..} -> do
             let pH = preEscapedToHtml     hrbHtml
@@ -133,6 +136,7 @@ query
       getQueryR :: [T.Text] -> Handler T.Text
       getQueryR idx = do
         case idx of
+          "version":"glob-auth":_ -> return $globAuthVersionQuote
           "version":_ -> return $globCoreVersionQuote
           "name":_ -> return "Glob"
           "servertime":_ -> liftIO $ s2t.show <$> getCurrentTime

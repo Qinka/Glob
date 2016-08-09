@@ -6,11 +6,15 @@
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-07-15}
   \CodeChangeLog{2016-08-09}{0.0.9.1}{change sha224 -> sha1, for C\# uwp do not support sha224}
+  \CodeChangeLog{2016-08-09}{0.0.9.1}{add the version of auth}
 \end{codeinfo}
 
 \begin{code}
 module Glob.Auth.Token
     ( transPsk2Token
+    , globAuthVersion
+    , globAuthVersionStr
+    , globAuthVersionQuote
     ) where
 
       import Data.Char
@@ -22,17 +26,21 @@ module Glob.Auth.Token
       import qualified Data.ByteString.Lazy as BL
       import qualified Data.Text as T
       import qualified Data.Text.Encoding as TE
+
+      import Data.Version
+      import Language.Haskell.TH
+      import Paths_glob_auth
 \end{code}
 
       transform password to token
 \begin{code}
       transPsk2Token :: String -> [String] -> String
       transPsk2Token timestamp psks =
-        oneSHA $ fromStr2ByteStrL $ concat (chgeOrder varca psks) ++ timestampSHA
+        oneSHA . fromStr2ByteStrL $ concat (chgeOrder varca psks) ++ timestampSHA
         where
           fromStr2ByteStrL = BL.fromStrict . s2bUtf8
-          timestampSHA =showDigest $ sha1 $ fromStr2ByteStrL timestamp
-          refToken = showDigest $ sha256 $ fromStr2ByteStrL $ head psks ++ timestampSHA
+          timestampSHA =showDigest . sha1 $ fromStr2ByteStrL timestamp
+          refToken = showDigest . sha256 . fromStr2ByteStrL $ head psks ++ timestampSHA
           varca' = foldr ((+).chr2hex) 0 $ take (pskCount`quot`16 +1) refToken
           varca = varca' `mod` pskCount
           pskCount = length psks
@@ -54,11 +62,18 @@ module Glob.Auth.Token
 \begin{code}
       chgeOrder :: Int -> [a] -> [a]
       chgeOrder i xs = let len = length xs in
-        take len $ drop i $ concat $ replicate 2 xs
+        take len . drop i . concat $ replicate 2 xs
 \end{code}
 
       With UTF8 code
 \begin{code}
       s2bUtf8 :: String -> B.ByteString
       s2bUtf8 = TE.encodeUtf8 . T.pack
+\end{code}
+
+version
+\begin{code}
+      globAuthVersion = version
+      globAuthVersionStr = showVersion version
+      globAuthVersionQuote = stringE $ showVersion version
 \end{code}
