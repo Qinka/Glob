@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-auth
-version:             0.0.9.0
+version:             0.0.9.1
 synopsis:            A blog.
 description:         A blog framework.
 license:             AllRightsReserved

@@ -5,7 +5,7 @@
   \CodeProject{glob-auth}
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-07-15}
-  %\CodeChangeLog{date}{text}
+  \CodeChangeLog{2016-08-09}{0.0.9.1}{change sha224 -> sha1, for C\# uwp do not support sha224}
 \end{codeinfo}
 
 \begin{code}
@@ -39,9 +39,9 @@ module Glob.Auth.Token
           oneSHA = take 56 . case varca`mod`4 of
             0 -> showDigest.sha256
             1 -> showDigest.sha512
-            2 -> showDigest.sha224
+            2 -> showDigest.sha1
             3 -> showDigest.sha384
-            _ -> showDigest.sha1
+            _ -> showDigest.sha224
 \end{code}
 
       char to hex e.g. b -> 11
