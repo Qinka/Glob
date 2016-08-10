@@ -24,7 +24,7 @@ module Glob.Handler.Get
 
       import Control.Exception (throw)
       import Control.Monad(mapM)
-      import Glob.Auth(globAuthVersionQuote)
+      import Glob.Auth.Token(globAuthVersionQuote)
       import Glob.Common
       import Glob.Foundation
       import Glob.Model

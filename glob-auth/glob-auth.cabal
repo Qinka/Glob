@@ -18,7 +18,7 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:     Glob.Auth.Token
-  -- other-modules:
+  other-modules:       Paths_glob_auth
   default-extensions:  FlexibleContexts
                      , OverloadedStrings
                      , TypeFamilies
