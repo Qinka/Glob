@@ -50,8 +50,10 @@ the main of help
       helpMain :: Bool -> IO ()
       helpMain v = if v
         then putStr $ showVersion version
-        else putStrLn $ usageInfo "Glob-IH helps\nUsage: glob-ih [OPTIONs] [TOKENs]"
-          options
+        else do
+          putStrLn $ usageInfo "Glob-IH helps\nUsage: glob-ih [OPTIONs] [TOKENs]"
+            options
+          getArgs >>= print
 \end{code}
 
 the main of time print
@@ -76,7 +78,6 @@ the main of mix
         let ut       = readTime   defaultTimeLocale "%a, %d %b %G %T GMT" d :: UTCTime
         let s        = transPsk2Token (show ut) tokens
         cmds <- getContents
-        hPutStrLn stderr $ unwords tokens
         put.concat.lines $ cmds
                            ++ "-H \"Token:"
                            ++ s
