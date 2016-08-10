@@ -76,6 +76,7 @@ the main of mix
         let ut       = readTime   defaultTimeLocale "%a, %d %b %G %T GMT" d :: UTCTime
         let s        = transPsk2Token (show ut) tokens
         cmds <- getContents
+        hPutStrLn stderr $ unwords tokens
         put.concat.lines $ cmds
                            ++ "-H \"Token:"
                            ++ s

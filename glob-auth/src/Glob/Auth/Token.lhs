@@ -7,6 +7,7 @@
   \CodeCreatedDate{2016-07-15}
   \CodeChangeLog{2016-08-09}{0.0.9.1}{change sha224 -> sha1, for C\# uwp do not support sha224}
   \CodeChangeLog{2016-08-09}{0.0.9.1}{add the version of auth}
+  \CodeChangeLog{2016-08-10}{0.0.9.5}{changhow it work}
 \end{codeinfo}
 
 \begin{code}
@@ -44,12 +45,17 @@ module Glob.Auth.Token
           varca' = foldr ((+).chr2hex) 0 $ take (pskCount`quot`16 +1) refToken
           varca = varca' `mod` pskCount
           pskCount = length psks
-          oneSHA = take 56 . case varca`mod`4 of
-            0 -> showDigest.sha256
-            1 -> showDigest.sha512
-            2 -> showDigest.sha1
-            3 -> showDigest.sha384
-            _ -> showDigest.sha224
+          s1   = showDigest.sha1
+          s256 = showDigest.sha256
+          s384 = showDigest.sha384
+          s512 = showDigest.sha512
+          com f g l r x = take l (f x) ++ take r (g x)
+          oneSHA = case varca`mod`4 of
+            0 -> com s256 s512 30 50
+            1 -> com s384 s1   60 20
+            2 -> com s512 s512 35 55
+            3 -> com s256 s384 40 40
+            _ -> s1
 \end{code}
 
       char to hex e.g. b -> 11
