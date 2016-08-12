@@ -8,6 +8,7 @@
   \CodeCreatedDate{2016-07-20}
   \CodeChangeLog{0.0.9.25}{2016.08.08}{Add the author to blogs and pages.}
   \CodeChangeLog{0.0.9.26}{2016.08.09}{add  the version of auth}
+  \CodeChangeLog{0.0.9.30}{2016.08.12}{made bloglist more powerful}
 \end{codeinfo}
 
 \begin{code}
@@ -65,15 +66,44 @@ Home
 the list of blog
 \begin{code}
       getBlogListR :: Handler T.Text
-      getBlogListR = do
-        blog' <- runDB' $ do
-          cr <-find (select ["type"=:("blog"::T.Text)] "html")
-          rtval <- rest cr
-          closeCursor cr
-          return rtval
-        let blogs = map (\b -> (hrbIndex b,hrbTitle b,hrbCreateTime b,hrbUpdateTime b,hrbSummary b,hrbTags b,hrbAuthor b)).catMaybes $ doc2HR <$> blog'
-        return.b2tUtf8.toStrictBS.encode$ toValue <$> blogs
+      getBlogListR =
+        returnV.(query <*>) $ mapblogs <$> queryDB
         where
+          queryDB =runDB' $ do
+            cr <-find (select ["type"=:("blog"::T.Text)] "html")
+            rtval <- rest cr
+            closeCursor cr
+            return rtval
+          query = do
+            kind <- lookupGetParam "kind"
+            case kind of
+              Nothing          -> return id
+              Just "tag"       -> tagQuery
+              Just "time"      -> timeQuery
+              Just "takendrop" -> tdQuery
+          tdQuery = do
+            t' <- (T.readT <$>) <$> lookupGetParam "take"
+            d' <- (T.readT <$>) <$> lookupGetParam "drop"
+            case (t',d') of
+              (Just t,Just d) -> return (take t.drop d)
+          timeQuery = do
+            tk <- lookupGetParam "time-kind"
+            l  <- (T.readT <$>) <$> lookupGetParam "latest"
+            o  <- (T.readT <$>) <$> lookupGetParam "oldset"
+            case (tk,l,o) of
+              (Just "update",Just latest,Just oldest) ->
+                return (filter (updateTQ latest oldest))
+              (Just "create",Just latest,Just oldest) ->
+                return (filter (createTQ latest oldest))
+              _ -> invalidArgs ["need time kind, latest and oldest"]
+          updateTQ l o (_,_,_,u,_,_,_) = l >= u &&  o <= u
+          createTQ l o (_,_,c,_,_,_,_) = l >= c &&  o <= c
+          tagQuery = do
+            tags <- lookupGetParams "tag"
+            return (filter (tagQ tags))
+          tagQ tags (_,_,_,_,_,ts,_) = and $ map (`elem` ts) tags
+          mapblogs = map (\b -> (hrbIndex b,hrbTitle b,hrbCreateTime b,hrbUpdateTime b,hrbSummary b,hrbTags b,hrbAuthor b)).catMaybes.(doc2HR <$>)
+          returnV = (return.b2tUtf8.toStrictBS.encode.map toValue =<<)
           toValue (i,t,c,u,s,ts,a) = object
             [ "index".=i , "title".=t
             , "create-time".=show c , "update-time".=show u
