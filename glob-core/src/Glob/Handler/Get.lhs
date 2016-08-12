@@ -77,15 +77,16 @@ the list of blog
           query = do
             kind <- lookupGetParam "kind"
             case kind of
-              Nothing          -> return id
               Just "tag"       -> tagQuery
               Just "time"      -> timeQuery
               Just "takendrop" -> tdQuery
+              _                -> return id
           tdQuery = do
             t' <- (T.readT <$>) <$> lookupGetParam "take"
             d' <- (T.readT <$>) <$> lookupGetParam "drop"
             case (t',d') of
               (Just t,Just d) -> return (take t.drop d)
+              _ -> invalidArgs ["need take and drop"]
           timeQuery = do
             tk <- lookupGetParam "time-kind"
             l  <- (T.readT <$>) <$> lookupGetParam "latest"
