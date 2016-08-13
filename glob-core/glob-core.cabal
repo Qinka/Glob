@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-core
-version:             0.0.9.31
+version:             0.0.9.32
 synopsis:            A blog.
 description:         A blog framework.
 license:             AllRightsReserved

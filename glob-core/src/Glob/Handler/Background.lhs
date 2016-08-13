@@ -7,6 +7,7 @@
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-07-22}
   \CodeChangeLog{0.0.9.25}{2016.08.08}{Add the author to blogs and pages.}
+  \CodeChangeLog{0.0.9.32}{2016.08.13}{Enable the tags of blog}
 \end{codeinfo}
 
 \begin{code}
@@ -92,6 +93,7 @@ update blog
         summary <- getFilesBS =<< lookupFiles "summary"
         uTime   <- lookupPostUTCTime          "update-time"
         author  <- lookupPostParam            "author"
+        tags    <- lookupTags
         returnRT.tryH.runDB'.upsert (select ["index" =: idx,"type"=:("blog"::T.Text)] "html") $ catMaybes
           [ "index"       =@       Just idx
           , "title"       =@            title
@@ -103,6 +105,11 @@ update blog
           , "type"        =@       Just ("blog" ::T.Text)
           , "tags"        =@       Just (["blog"] :: [T.Text])
           ]
+        where
+          lookupTags = do
+            t <- T.words <#> lookupPostParam  "tags"
+            ts <-            lookupPostParams "tag"
+            return $ (++ts) <$> t
 \end{code}
 
 update frame
