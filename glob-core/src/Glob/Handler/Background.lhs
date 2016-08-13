@@ -103,7 +103,7 @@ update blog
           , "create-time" =@            cTime
           , "author"      =@            author
           , "type"        =@       Just ("blog" ::T.Text)
-          , "tags"        =@       Just (["blog"] :: [T.Text])
+          , "tags"        =@            tags
           ]
         where
           lookupTags = do
