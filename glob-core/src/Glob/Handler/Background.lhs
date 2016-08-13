@@ -109,7 +109,9 @@ update blog
           lookupTags = do
             t <- T.words <#> lookupPostParam  "tags"
             ts <-            lookupPostParams "tag"
-            return $ (++ts) <$> t
+            return.Just $ case t of
+              Just t' -> ts++t'
+              _ -> ts
 \end{code}
 
 update frame

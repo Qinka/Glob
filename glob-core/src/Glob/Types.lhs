@@ -103,16 +103,18 @@ transform between HtmlRow and  Document
           <*>       doc !? "create-time"
           <*> Just (doc !? "author")
         "blog" -> HtmlBlog
-          <$>       doc !? "index"
-          <*>       doc !? "html"
-          <*>       doc !? "title"
-          <*> Just (doc !? "summary")
-          <*>       doc !? "update-time"
-          <*>       doc !? "create-time"
-          <*>       doc !? "tags"
-          <*> Just (doc !? "author")
+          <$>            doc !? "index"
+          <*>            doc !? "html"
+          <*>            doc !? "title"
+          <*> Just      (doc !? "summary")
+          <*>            doc !? "update-time"
+          <*>            doc !? "create-time"
+          <*> Just (m2l (doc !? "tags"))
+          <*> Just      (doc !? "author")
         _ -> Nothing
         where
+          m2l (Just xs) = xs
+          m2l _         = []
           Just typ = MG.lookup "type" doc :: Maybe T.Text
       hr2Doc :: HtmlRow -> Document
       hr2Doc HtmlFrame{..} =
