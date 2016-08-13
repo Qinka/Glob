@@ -9,6 +9,7 @@
   \CodeChangeLog{0.0.9.25}{2016.08.08}{Add the author to blogs and pages.}
   \CodeChangeLog{0.0.9.26}{2016.08.09}{add  the version of auth}
   \CodeChangeLog{0.0.9.30}{2016.08.12}{made bloglist more powerful}
+  \CodeChangeLog{0.0.9.31}{2016.08.13}{\ref{func:bloglist} change to use  HTTP date}
 \end{codeinfo}
 
 \begin{code}
@@ -46,7 +47,7 @@ Home
         home' <- runDB' $  (doc2HR =<<) <$> findOne (select ["index"=:["frame",("home"::String)]] "html")
         case home' of
           Just home -> do
-            let homeH = preEscapedToHtml $ hrpHtml home
+            let homeH = preEscapedToHtml  $  hrpHtml home
             let sumH  = preEscapedToHtml <$> hrpSummary home
             defaultLayout $ do
               setTitle $ toHtml $ hrpTitle home
@@ -64,6 +65,7 @@ Home
 \end{code}
 
 the list of blog
+\label{func:bloglist}
 \begin{code}
       getBlogListR :: Handler T.Text
       getBlogListR =
@@ -82,15 +84,15 @@ the list of blog
               Just "takendrop" -> tdQuery
               _                -> return id
           tdQuery = do
-            t' <- (T.readT <$>) <$> lookupGetParam "take"
-            d' <- (T.readT <$>) <$> lookupGetParam "drop"
+            t' <- T.readT <#> lookupGetParam "take"
+            d' <- T.readT <#> lookupGetParam "drop"
             case (t',d') of
               (Just t,Just d) -> return (take t.drop d)
               _ -> invalidArgs ["need take and drop"]
           timeQuery = do
             tk <- lookupGetParam "time-kind"
-            l  <- (T.readT <$>) <$> lookupGetParam "latest"
-            o  <- (T.readT <$>) <$> lookupGetParam "oldset"
+            l  <- fromHttpDate2UTC.T.unpack <#> lookupGetParam "latest"
+            o  <- fromHttpDate2UTC.T.unpack <#> lookupGetParam "oldset"
             case (tk,l,o) of
               (Just "update",Just latest,Just oldest) ->
                 return (filter (updateTQ latest oldest))

@@ -10,6 +10,7 @@
     Add a function named showJS, trans between Text and JS.
     It was a subfunction in Glob.Handler.Get.
     }
+  \CodeChangeLog{0.0.9.31}{2016.08.13}{add <#> eq2 (f <\$>) <\$>}
 \end{codeinfo}
 
 \begin{code}
@@ -25,6 +26,7 @@ module Glob.Common
     , fromUTC2HttpDate
     , lookupPostUTCTime
     , showJS,rawJS
+    , (<#>)
     ) where
 
       import Control.Monad
@@ -105,6 +107,14 @@ transform between UTCTime and HTTP date
       fromHttpDate2UTC :: String -> UTCTime
       fromHttpDate2UTC = readTime defaultTimeLocale "%a, %d %b %G %T GMT"
 \end{code}
+
+a kind of <\$>
+\begin{code}
+      infixl 4 <#>
+      (<#>) :: (Functor f1,Functor f2) => (a -> b) -> f1 (f2 b) -> f1 (f2 b)
+      (<#>) f = (f <$>) <$>)
+\end{code}
+
 
 lookup time from param
 \begin{code}
