@@ -111,8 +111,8 @@ transform between UTCTime and HTTP date
 a kind of <\$>
 \begin{code}
       infixl 4 <#>
-      (<#>) :: (Functor f1,Functor f2) => (a -> b) -> f1 (f2 b) -> f1 (f2 b)
-      (<#>) f = (f <$>) <$>)
+      (<#>) :: (Functor f1,Functor f2) => (a -> b) -> f1 (f2 a) -> f1 (f2 b)
+      (<#>) f = ((f <$>) <$>)
 \end{code}
 
 
