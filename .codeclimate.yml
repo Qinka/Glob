@@ -1,0 +1,8 @@
+# using code climate
+engines:
+  # hlint for haskell
+  hlint:
+    enabled: true
+ratings:
+  paths: []
+exclude_paths: []
