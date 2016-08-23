@@ -8,6 +8,7 @@
   \CodeChangeLog{2016-08-09}{0.0.9.1}{change sha224 -> sha1, for C\# uwp do not support sha224}
   \CodeChangeLog{2016-08-09}{0.0.9.1}{add the version of auth}
   \CodeChangeLog{2016-08-10}{0.0.9.5}{changhow it work}
+  \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
 \end{codeinfo}
 
 \begin{code}
@@ -51,10 +52,10 @@ module Glob.Auth.Token
           s512 = showDigest.sha512
           com f g l r x = take l (f x) ++ take r (g x)
           oneSHA = case varca`mod`4 of
-            0 -> com s256 s512 30 50
-            1 -> com s384 s1   60 20
-            2 -> com s512 s512 35 55
-            3 -> com s256 s384 40 40
+            0 -> com s256 s512 36 44
+            1 -> com s384 s1   59 21
+            2 -> com s512 s512 33 58
+            3 -> com s256 s384 41 39
             _ -> s1
 \end{code}
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 echo update
 ############
-export DOCKER_IMAGE_TAG=docekr-
+export DOCKER_IMAGE_TAG=glob-0.0.10.x-docekr-
 if [ -n "$TRAVIS_TAG" ]; then
   export DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG-$TRAVIS_TAG
 else

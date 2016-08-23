@@ -10,6 +10,7 @@
     Add the author to blogs and pages.
     And moved a subfunction to Glob.Common
     }
+  \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
 \end{codeinfo}
 
 \begin{code}
@@ -21,6 +22,9 @@ module Glob.Types
     , rc2Doc , doc2Rc
     , Nav(..)
     , doc2Nav , nav2Doc
+    , Rest(..)
+    , doc2Rest, rest2Doc
+    , fromBinary
     ) where
 
       import Data.Char(toLower)
@@ -237,5 +241,68 @@ instance ToJSON
           [ "label" .= navLabel
           , "url" .= navUrl
           , "order" .= navOrder
+          ]
+\end{code}
+
+\begin{code}
+      data Rest = Rest
+          { rIndex   :: [T.Text]
+          , rRest    :: ObjectId
+          , rType    :: T.Text
+          , rCtime   :: UTCTime
+          , rUtime   :: UTCTime
+          , rTitle   :: T.Text
+          , rSummary :: Maybe T.Text
+          , rWhose   :: Maybe T.Text
+          , rMIME    :: Maybe T.Text
+          , rTags    :: [T.Text]
+          } deriving (Eq,Show)
+\end{code}
+transform bewteen Rest and Document
+\begin{code}
+      rest2Doc :: Rest -> Document
+      rest2Doc Rest{..} =
+        [ "index"       =: rIndex
+        , "rest"        =: rRest
+        , "type"        =: rType
+        , "create-time" =: rCtime
+        , "update-time" =: rUtime
+        , "title"       =: rTitle
+        , "summary"     =: rSummary
+        , "whose"       =: rWhose
+        , "mime"        =: rMIME
+        , "tags"        =: rTags
+        ]
+
+      doc2Rest :: Document -> Maybe Rest
+      doc2Rest doc = Rest
+        <$>       doc !? "index"
+        <*>       doc !? "rest"
+        <*>       doc !? "type"
+        <*>       doc !? "create-time"
+        <*>       doc !? "update-time"
+        <*>       doc !? "title"
+        <*> Just (doc !? "summary")
+        <*> Just (doc !? "whose")
+        <*> Just (doc !? "mime")
+        <*>  m2l (doc !? "tags")
+        where
+          m2l (Just xs) = Just xs
+          m2l _         = Just []
+\end{code}
+
+toJSON
+\begin{code}
+      instance ToJSON Rest where
+        toJSON Rest{..} = object
+          [ "index"       .= rIndex
+          , "type"        .= rType
+          , "create-time" .= rCtime
+          , "update-time" .= rUtime
+          , "title"       .= rTitle
+          , "summary"     .= rSummary
+          , "whose"       .= rWhose
+          , "mime"        .= rMIME
+          , "tags"        .= rTags
           ]
 \end{code}

@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-ih
-version:             0.0.9.26
+version:             0.0.10.0
 synopsis:            a tool to help 'login'
 description:         the tool transform tokens and other things to curl's options
 license:             AllRightsReserved

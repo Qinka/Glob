@@ -6,6 +6,7 @@
   \CodeProject{glob-core}
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-07-20}
+  \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
   %\CodeChangeLog{date}{text}
 \end{codeinfo}
 
@@ -45,7 +46,6 @@ data Glob
         , globTitle       :: T.Text
         , globDb          :: T.Text
         , globAM          :: AccessMode
-        , globStaticUrl   :: T.Text
         , globDBUP        :: (T.Text,T.Text)
         , globCP          :: ConnectionPool
         , globLogger      :: Logger
@@ -55,22 +55,7 @@ data Glob
 the route of Glob
 \begin{code}
       mkYesodData "Glob" [parseRoutes|
-        /   HomeR         GET
-        /bl BlogListR     GET
-        /s/*Texts StaticR GET
-
-        /p/*Texts PageR     GET PUT DELETE
-        /b/*Texts BlogR     GET PUT DELETE
-        /q/*Texts QueryR    GET PUT DELETE
-        /t/*Texts TagR      GET PUT DELETE
-        /r/*Texts ResourceR GET PUT DELETE
-        /n        NavR      GET PUT DELETE
-
-
-        /bg/frame/*Texts FrameR PUT      DELETE
-        /bg/raw          RawR       POST
-
-        !*Texts ToStaticR GET
+        /*Texts   UrlR      GET PUT POST DELETE
         |]
 \end{code}
 
@@ -84,13 +69,12 @@ instance Yesod class
             <h1> error
             <p> #{T.showT er}
             |]
-        isAuthorized HomeR _ = return Authorized
-        isAuthorized BlogListR _ = return Authorized
-        isAuthorized RawR _ = bgAuth =<< globPskEnvToken <$> getYesod
-        isAuthorized _ _ = do
-          method <- requestMethod <$> waiRequest
-          case method of
-            "GET" -> return Authorized
+        isAuthorized (UrlR _) _ = do
+          me <- requestMethod <$> waiRequest
+          how <- lookupHeader "HOW"
+          case (me,how) of
+            ("GET",_) -> return Authorized
+            ("POST",Just "get") -> return Authorized
             _ -> bgAuth =<< globPskEnvToken <$> getYesod
         makeLogger = return.globLogger
         defaultLayout =globLayout
@@ -102,12 +86,11 @@ Glob's Layout
       globLayout w = do
         Glob{..} <- getYesod
         pc <- widgetToPageContent w
-        topHtml    <- runDB' $ findOne (select ["index" =: (["frame","top"] ::[T.Text])]    "html")
-        bottomHtml <- runDB' $ findOne (select ["index" =: (["frame","bottom"]::[T.Text])] "html")
-        navHtml    <- runDB' $ findOne (select ["index" =: (["frame","nav"]::[T.Text])]    "html")
-        liftIO $ print [topHtml,bottomHtml,navHtml]
-        case (trans topHtml,trans bottomHtml, trans navHtml) of
-          (Just tH,Just bH,Just nH) -> withUrlRenderer [hamlet|
+        topHtml    <- runDB' $ fetchFrame' ["~@123top"]
+        bottomHtml <- runDB' $ fetchFrame' ["~@123bottom"]
+        navHtml    <- runDB' $ fetchFrame' ["~@123nav"]
+        case[topHtml,bottomHtml,navHtml] of
+          Just tH:Just bH:Just nH:_ -> withUrlRenderer [hamlet|
             $newline never
             $doctype 5
             <html>
@@ -123,9 +106,8 @@ Glob's Layout
                 ^{pageBody pc}
                 #{bH}
             |]
-          _ -> withUrlRenderer [hamlet|all lost !|]
+          _ -> notFound -- withUrlRenderer [hamlet|all lost !|]
         where
-          trans = (preEscapedToHtml.hrfHtml <$>).(doc2HR =<<)
 \end{code}
 
 instance Mongoble
@@ -169,7 +151,7 @@ the instance of ToConfig
         getLogPath = cfgLogPath
         getTimeout _ = 30
         getListenType = cfgListenType
-        toCfgD GlobCfg{..} = Glob cfgPskEnvToken cfgTitle dbDatabase am cfgStaticUrl (dbUserName,dbPassword)
+        toCfgD GlobCfg{..} = Glob cfgPskEnvToken cfgTitle dbDatabase am  (dbUserName,dbPassword)
           <$> cpIO
           <*> logIO
           where

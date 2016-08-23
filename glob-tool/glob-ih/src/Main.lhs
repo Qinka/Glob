@@ -7,6 +7,7 @@
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-07-20}
   \CodeChangeLog{2016-08-08}{0.0.9.25}{Add the console's options}
+  \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
 \end{codeinfo}
 
 \begin{code}

@@ -5,6 +5,7 @@
   \CodeProject{glob-auth}
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-08-09}
+  \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
 \end{codeinfo}
 
 \begin{code}

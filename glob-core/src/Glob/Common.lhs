@@ -11,6 +11,7 @@
     It was a subfunction in Glob.Handler.Get.
     }
   \CodeChangeLog{0.0.9.31}{2016.08.13}{add <#> eq2 (f <\$>) <\$>}
+  \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
 \end{codeinfo}
 
 \begin{code}
@@ -26,7 +27,8 @@ module Glob.Common
     , fromUTC2HttpDate
     , lookupPostUTCTime
     , showJS,rawJS
-    , (<#>)
+    , (<#>),(<%>), (=@)
+    , returnE,returnET,returnER
     ) where
 
       import Control.Monad
@@ -110,9 +112,11 @@ transform between UTCTime and HTTP date
 
 a kind of <\$>
 \begin{code}
-      infixl 4 <#>
+      infixl 4 <#>,<%>
       (<#>) :: (Functor f1,Functor f2) => (a -> b) -> f1 (f2 a) -> f1 (f2 b)
       (<#>) f = ((f <$>) <$>)
+      (<%>) :: (Monad m,Functor f) => (a -> m b) -> f (m a) -> f (m b)
+      (<%>) f = ((f =<<) <$>)
 \end{code}
 
 
@@ -126,4 +130,21 @@ lookup time from param
 \begin{code}
       showJS :: Show a => a -> RawJavascript
       showJS = rawJS. T.showT
+\end{code}
+
+
+update from Nothing
+\begin{code}
+      infix 0 =@
+      (=@) :: Val v => Label -> Maybe v -> Maybe Field
+      (=@) l = ((Just.(l =:)) =<<)
+\end{code}
+
+\begin{code}
+      returnE :: (Monad m,Exception e) => e -> m String
+      returnE = pure.(\x -> "{\"error\":\"exception\",\"content\":\""++x++"\"}").show
+      returnET :: (Monad m,Exception e) => e -> m T.Text
+      returnET = (T.pack <$>).returnE
+      retrunER :: (Monad m,Exception e) => e -> m TypeContent
+      returnER = respond "application/json" =<< returnE
 \end{code}

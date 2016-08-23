@@ -1,5 +1,9 @@
 # Revision history for glob-core
 
+## 0.0.10.0 -- 2016-08-19
+
+* with a new idear.
+
 ## 0.0.9.30 -- 2016.08.12
 
 * made blog list more powerful

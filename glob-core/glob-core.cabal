@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-core
-version:             0.0.9.32
+version:             0.0.10.0
 synopsis:            A blog.
 description:         A blog framework.
 license:             AllRightsReserved
@@ -23,9 +23,9 @@ library
                    , Glob.Config
                    , Glob.Foundation
                    , Glob.Handler
-                   , Glob.Handler.Background
-                   , Glob.Handler.Get
-                   , Glob.Handler.Static
+                   , Glob.Handler.Fetch
+                   , Glob.Handler.Query
+                   , Glob.Handler.Query.Parser
                    , Glob.Types
                    , Import
                    , Import.ByteStringUtf8
@@ -55,6 +55,7 @@ library
                      , monad-logger >= 0.3.19
                      , mongoDB >= 2.1
                      , network >= 2.6.2
+                     , parsec >= 3.1.10
                      , resource-pool >= 0.2.3
                      , shakespeare >= 2.0.9
                      , signal >=0.1.0.3
