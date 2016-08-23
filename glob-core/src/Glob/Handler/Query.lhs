@@ -6,6 +6,7 @@
   \CodeProject{glob-core}
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-08-19}
+  \CodeChangeLog{0.0.10.10}{2016.08.23}{change to use stream}
   %\CodeChangeLog{date}{text}
 \end{codeinfo}
 

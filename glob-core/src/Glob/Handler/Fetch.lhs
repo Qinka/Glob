@@ -9,7 +9,10 @@
   \CodeChangeLog{0.0.9.25}{2016.08.08}{Add the author to blogs and pages.}
   \CodeChangeLog{0.0.9.26}{2016.08.09}{add  the version of auth}
   \CodeChangeLog{0.0.9.30}{2016.08.12}{made bloglist more powerful}
-  \CodeChangeLog{0.0.9.31}{2016.08.13}{\ref{func:bloglist} change to use  HTTP date}
+  \CodeChangeLog{0.0.9.31}{2016.08.13}{ change to use  HTTP date}
+  \CodeChangeLog{0.0.10.0}{2016.08.13}
+    { change version to 0.0.10.0 and rewrote some things.}
+  \CodeChangeLog{0.0.10.10}{2016.08.23}{change to use stream}
 \end{codeinfo}
 
 \begin{code}
@@ -101,19 +104,26 @@ pages
       getPostR (Just rest@Rest{..}) = do
         html <- runDB' $ fetchPost rest
         case html of
-          Just pH -> do
-            let sH = preEscapedToHtml <$> rSummary
-            selectRep.provideRep.defaultLayout $ do
-              setTitle $ toHtml $ rTitle
-              case sH of
-                Just sH' -> [whamlet|<summary id=sum>#{sH'}|]
-                _ -> return ()
-              [whamlet|#{pH}|]
-              let au = case rWhose of
-                    Just a -> showJS a
-                    _ -> rawJS ("null" ::T.Text)
-              toWidget [julius|author=#{au};|]
+          Just pH -> respondHTML pH
           _ -> notFound
+        where
+          withSummary (Just sH) = [whamlet|<summary id=sum>#{sH}|]
+          withSummary _ = return ()
+          withWhose (Just au) = do
+            let whose = showJS au
+            toWidget [julius|author=#{au};|]
+          withWhose _  = return ()
+          withHTML pH sH = defaultLayout $ do
+            setTitle $ toHtml $ rTitle
+            withSummary sH
+            [whamlet|#{pH}|]
+            withWhose
+          respondHTML pH = do
+            let sH = preEscapedToHtml <$> rSummary
+            html <- withHTML pH sH
+            respondSource "text/html" $ do
+              sendChunkHtml html
+              sendFlush
       getPostR _ = notFound
 \end{code}
 
@@ -131,8 +141,12 @@ resource
       getResourceR t (Just rest@Rest{..}) = do
         ct <- runDB' $ fetchItem rest
         case ct of
-          Just (Left  text) -> selectRep $  provideRepType (gmime rMIME) $ return text
-          Just (Right binary) ->respondSource (gmime rMIME) $ sendChunkBS binary
+          Just (Left  text) -> respondSource (gmime rMIME) $ do
+            sendChunkText text
+            sendFlush
+          Just (Right binary) -> respondSource (gmime rMIME) $ do
+            sendChunkBS binary
+            sendFlush
           _ -> notFound
           where
             gmime = fromMaybe "".(t2bUtf8 <$>)
