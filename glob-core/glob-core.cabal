@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-core
-version:             0.0.10.10
+version:             0.0.10.10-并州
 synopsis:            A blog.
 description:         A blog framework.
 license:             AllRightsReserved
@@ -34,7 +34,8 @@ library
                    , Import.TH
                    , Import.Wai
                    , Paths_glob_core
-  default-extensions:  OverloadedStrings
+  default-extensions:  FlexibleContexts
+                     , OverloadedStrings
                      , QuasiQuotes
                      , RecordWildCards
                      , TypeFamilies

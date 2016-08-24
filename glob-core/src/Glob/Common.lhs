@@ -12,6 +12,7 @@
     }
   \CodeChangeLog{0.0.9.31}{2016.08.13}{add <#> eq2 (f <\$>) <\$>}
   \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
+  \CodeChangeLog{0.0.10.10}{2016.08.23}{add some functions to be helper of tryH}
 \end{codeinfo}
 
 \begin{code}
@@ -36,6 +37,7 @@ module Glob.Common
       import Data.Aeson.Types
       import Data.Either
       import Data.Time.Format
+      import Database.MongoDB ((=:))
       import Text.Julius (rawJS,RawJavascript)
       import Yesod.Core
 
@@ -45,6 +47,7 @@ module Glob.Common
       import Data.Version
       import Paths_glob_core
 
+      import qualified Database.MongoDB as MDB
       import qualified Import.ByteStringUtf8 as B
       import qualified Import.Text as T
 \end{code}
@@ -136,7 +139,7 @@ lookup time from param
 update from Nothing
 \begin{code}
       infix 0 =@
-      (=@) :: Val v => Label -> Maybe v -> Maybe Field
+      (=@) ::MDB.Val v => MDB.Label -> Maybe v -> Maybe MDB.Field
       (=@) l = ((Just.(l =:)) =<<)
 \end{code}
 
@@ -145,6 +148,9 @@ update from Nothing
       returnE = pure.(\x -> "{\"error\":\"exception\",\"content\":\""++x++"\"}").show
       returnET :: (Monad m,Exception e) => e -> m T.Text
       returnET = (T.pack <$>).returnE
-      retrunER :: (Monad m,Exception e) => e -> m TypeContent
-      returnER = respond "application/json" =<< returnE
+      returnER :: SomeException -> HandlerT site IO TypedContent
+      returnER e = returnE e >>= (\strE -> respondSource "application/json"  $ do
+        sendChunk strE
+        sendFlush
+        )
 \end{code}

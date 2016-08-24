@@ -12,6 +12,7 @@
   \CodeChangeLog{0.0.9.31}{2016.08.13}{ change to use  HTTP date}
   \CodeChangeLog{0.0.10.0}{2016.08.13}
     { change version to 0.0.10.0 and rewrote some things.}
+  \CodeChangeLog{0.0.10.10}{2016.08.23}{using tryH to catch exception}
   \CodeChangeLog{0.0.10.10}{2016.08.23}{change to use stream}
 \end{codeinfo}
 
@@ -90,12 +91,14 @@ Get file's text
 \begin{code}
       restItem :: Val a => Maybe Rest -> Maybe a
                           -> ( a -> Rest -> Action Handler ())
-                          -> Handler T.Text
+                          -> Handler TypedContent
       restItem unR item f = case (unR,item) of
         (Just r,Just i) -> do
-          runDB' $ f i r
-          return "success"
+          rt <- tryH.runDB' $ f i r
+          returnItem rt
         _ ->  invalidArgs [" args failed"]
+        where returnItem (Left e) = returnER e
+              returnItem (Right _) = respondSource "" $ sendChunkText "success"
 \end{code}
 
 pages
@@ -111,13 +114,13 @@ pages
           withSummary _ = return ()
           withWhose (Just au) = do
             let whose = showJS au
-            toWidget [julius|author=#{au};|]
+            toWidget [julius|author=#{whose};|]
           withWhose _  = return ()
           withHTML pH sH = defaultLayout $ do
             setTitle $ toHtml $ rTitle
             withSummary sH
             [whamlet|#{pH}|]
-            withWhose
+            withWhose rWhose
           respondHTML pH = do
             let sH = preEscapedToHtml <$> rSummary
             html <- withHTML pH sH
@@ -128,7 +131,7 @@ pages
 \end{code}
 
 \begin{code}
-      restPostR :: [T.Text] -> Handler T.Text
+      restPostR :: [T.Text] -> Handler TypedContent
       restPostR idx = do
         unR <- lookupPostUnRest idx
         html <- b2tUtf8 <#> getFile "html"
@@ -158,7 +161,7 @@ resource
 \end{code}
 
 \begin{code}
-      restResourceR :: Bool -> [T.Text] -> Handler T.Text
+      restResourceR :: Bool -> [T.Text] -> Handler TypedContent
       restResourceR t idx = do
         unR <- lookupPostUnRest idx
         text <- b2tUtf8 <#> getFile "text"
@@ -179,7 +182,7 @@ resource
 \end{code}
 
 \begin{code}
-      restStaticR :: [T.Text] -> Handler T.Text
+      restStaticR :: [T.Text] -> Handler TypedContent
       restStaticR idx = do
         unR <- lookupPostUnRest idx
         url <- lookupPostParam "url"
@@ -187,7 +190,7 @@ resource
 \end{code}
 
 \begin{code}
-      restFrame :: [T.Text] -> Handler T.Text
+      restFrame :: [T.Text] -> Handler TypedContent
       restFrame idx = do
         unR <- lookupPostUnRest idx
         html <- b2tUtf8 <#> getFile "html"

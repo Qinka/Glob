@@ -1,8 +1,13 @@
 # Revision history for glob-core
 
+## 0.0.10.10 -- 2016.08.19
+
+* using tryH to catch exception
+* using streaming to translate
+
 ## 0.0.10.0 -- 2016-08-19
 
-* with a new idear.
+* with a new idea.
 
 ## 0.0.9.30 -- 2016.08.12
 

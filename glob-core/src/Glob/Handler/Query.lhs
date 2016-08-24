@@ -7,6 +7,7 @@
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-08-19}
   \CodeChangeLog{0.0.10.10}{2016.08.23}{change to use stream}
+  \CodeChangeLog{0.0.10.10}{2016.08.23}{change to use stream}
   %\CodeChangeLog{date}{text}
 \end{codeinfo}
 
@@ -19,6 +20,7 @@ module Glob.Handler.Query
     , putNavR
     , delQueryR
     , delNavR
+    , returnSucc
     ) where
 
       import Glob.Auth.Token(globAuthVersionQuote)
@@ -39,25 +41,38 @@ module Glob.Handler.Query
 \end{code}
 
 
+\begin{code}
+      returnSucc :: Handler TypedContent
+      returnSucc = respondSource "text/plain" $ sendChunkText "success"
+\end{code}
 
 query
 \begin{code}
-      getQueryR :: [T.Text] -> Handler T.Text
+      getQueryR :: [T.Text] -> Handler TypedContent
       getQueryR idx =
         case idx of
-          "version":"glob-auth":_ -> return $globAuthVersionQuote
-          "version":_ -> return $globCoreVersionQuote
-          "name":_ -> return "Glob"
-          "servertime":_ -> liftIO $ s2t.show <$> getCurrentTime
-          [] -> return $ T.concat ["Glob",$globCoreVersionQuote]
+          "version":"glob-auth":_ -> respondSource "text/plain" $
+            sendChunkText $globAuthVersionQuote
+          "version":_ -> respondSource "text/plain" $
+            sendChunkText $globCoreVersionQuote
+          "name":_ -> respondSource "text/plain" $
+            sendChunkText "Glob"
+          "servertime":_ -> do
+            time <- liftIO $ s2t.show <$> getCurrentTime
+            respondSource "text/plain" $ sendChunkText time
+          [] -> respondSource "text/plain" $ do
+            sendChunkText "Glob-"
+            sendChunkText $globCoreVersionQuote
+            sendFlush
           "index":xs -> getIndexR xs
           _ -> getQ
         where
           getQ = do
             x <- runDB'.findOne $ select ["index"=:("query":idx)] "query"
             case sigTypeFunc x of
-              Just vs ->
-                return $ T.unwords vs
+              Just vs ->respondSource "text/plain" $ do
+                mapM_ sendChunkText vs
+                sendFlush
               _ -> notFound
           sigTypeFunc :: Maybe Document -> Maybe [T.Text]
           sigTypeFunc x = x >>= (!? "var")
@@ -65,47 +80,60 @@ query
 \end{code}
 
 \begin{code}
-      putQueryR :: [T.Text] -> Handler T.Text
+      putQueryR :: [T.Text] -> Handler TypedContent
       putQueryR idx = do
         var <- lookupPostParam "var"
-        runDB'.upsert (select ["index" =: idx] "query") $ catMaybes
+        rt <- tryH.runDB'.upsert (select ["index" =: idx] "query") $ catMaybes
           [ "index" =@ Just idx
           , "var"   =@      var
           ]
-        return "success"
+        case rt of
+          Left e -> returnER e
+          Right _ -> returnSucc
 \end{code}
 
 
 \begin{code}
-      delQueryR :: [T.Text] -> Handler T.Text
+      delQueryR :: [T.Text] -> Handler TypedContent
       delQueryR idx = do
-        runDB'.delete$ select ["index" =: idx] "query"
-        return "success"
+        rt <- tryH.runDB'.delete$ select ["index" =: idx] "query"
+        case rt of
+          Left e -> returnER e
+          Right _ -> returnSucc
 \end{code}
 
 \begin{code}
-      getIndexR :: [T.Text] -> Handler T.Text
+      getIndexR :: [T.Text] -> Handler TypedContent
       getIndexR qs  = case rp of
         Left e -> invalidArgs [T.showT e]
-        Right rs -> (b2tUtf8.toStrictBS.encode.rs) <$> rests
+        Right rs -> rests rs
         where
           qu = T.concat qs
           rp = runQP $ T.unpack qu
-          rests = runDB' $ do
-            cur <- find $ select [] "index"
-            rt <- rest cur
-            closeCursor cur
-            return $ catMaybes $ doc2Rest <$> rt
+          rests rs = do
+            rt <- tryH.runDB' $ do
+              cur <- find $ select [] "index"
+              rt <- rest cur
+              closeCursor cur
+              return.catMaybes $ doc2Rest <$> rt
+            case rt of
+               Left e -> returnER e
+               Right item -> respondSource "application/json" $ do
+                   sendChunkLBS.encode.rs $ item
+                   sendFlush
 \end{code}
 
 
 
 nav
 \begin{code}
-      getNavR :: Handler T.Text
+      getNavR :: Handler TypedContent
       getNavR = do
-        rt <- runDB' $ (doc2Nav <$>) <$> dbAction
-        return.b2tUtf8.toStrictBS.encode $ catMaybes rt
+        rt <- tryH.runDB' $ (doc2Nav <$>) <$> dbAction
+        case rt of
+          Left e -> returnER e
+          Right d -> respondSource "application/json".
+            sendChunkLBS.encode $ catMaybes d
         where
           dbAction = do
             cr <- find (select [] "nav")
@@ -116,27 +144,31 @@ nav
 
 update nav
 \begin{code}
-      putNavR :: Handler T.Text
+      putNavR :: Handler TypedContent
       putNavR = do
         Just idx <- lookupPostParam "label"
         url      <- lookupPostParam "url"
         order    <- lookupPostParam "order"
-        runDB'.upsert (select ["label" =: idx] "nav") $ catMaybes
+        rt <- tryH.runDB'.upsert (select ["label" =: idx] "nav") $ catMaybes
             [ "index" =@        Just idx
             , "url"   =@             url
             , "order" =@ (T.readT<$> order :: Maybe Int)
             ]
-        return "success"
+        case rt of
+          Left e -> returnER e
+          Right _ -> returnSucc
 \end{code}
 
 delete nav
 \begin{code}
-      delNavR :: Handler T.Text
+      delNavR :: Handler TypedContent
       delNavR = do
         idx <- lookupPostParam "label"
         let sel = case idx of
               Just idx -> select ["index" =: idx] "nav"
               _ -> select [] "nav"
-        runDB' $ delete sel
-        return "success"
+        rt <- tryH.runDB' $ delete sel
+        case rt of
+          Left e -> returnER e
+          Right _ -> returnSucc
 \end{code}

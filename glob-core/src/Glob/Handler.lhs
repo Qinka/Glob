@@ -7,6 +7,8 @@
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-07-20}
   \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
+  \CodeChangeLog{0.0.10.10}{2016.08.23}{using tryH to catch exception}
+  \CodeChangeLog{0.0.10.10}{2016.08.23}{change to use stream}
   %\CodeChangeLog{date}{text}
 \end{codeinfo}
 
@@ -37,8 +39,7 @@ module Glob.Handler
 \end{code}
 
 \begin{code}
-      getUrlR :: [T.Text] -> Handler TypedContent
-      putUrlR,deleteUrlR :: [T.Text] -> Handler T.Text
+      getUrlR,putUrlR,deleteUrlR :: [T.Text] -> Handler TypedContent
 \end{code}
 
 \begin{code}
@@ -72,12 +73,14 @@ module Glob.Handler
             Just "binary" -> return "resource"
             Just "static" -> return "static"
             _ -> notFound
-        runDB' $ deleteItem idx db
-        return $ "success"
+        rt <- tryH.runDB' $ deleteItem idx db
+        case rt of
+          Left e -> returnER e
+          Right _ -> returnSucc
 \end{code}
 
 \begin{code}
-      postUrlR :: [T.Text] -> Handler T.Text
+      postUrlR :: [T.Text] -> Handler TypedContent
 \end{code}
 
 \begin{code}
