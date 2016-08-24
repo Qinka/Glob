@@ -115,7 +115,7 @@ pages
           withWhose (Just au) = do
             let whose = showJS au
             toWidget [julius|author=#{whose};|]
-          withWhose _  = return ()
+          withWhose _  = toWidget [julius|author=null;|]
           withHTML pH sH = defaultLayout $ do
             setTitle $ toHtml $ rTitle
             withSummary sH

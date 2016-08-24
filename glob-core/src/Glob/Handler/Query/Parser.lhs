@@ -37,8 +37,8 @@ data of parse
                        | QPDrop Int
                        | QPBefor UTCTime Bool
                        | QPAfter UTCTime Bool
-                       | QPTag String
-                       | QPType String
+                       | QPTag Bool String
+                       | QPType Bool String
                        | QPOr  [QueryParser]
                        | QPAnd [QueryParser]
                        deriving (Show)
@@ -48,8 +48,9 @@ data of parse
         return []
       qpType :: Parsec String () [QueryParser]
       qpType = do
-        typ <- string "type＝" *> many letter <* char ';'
-        return [QPType typ]
+        t <- string "type=" *> oneOf ['t','f'] <* char '='
+        typ <- many letter <* char ';'
+        return [QPType (t=='t') typ]
       qpTake :: Parsec String () [QueryParser]
       qpTake = do
         len <- string "take=" *> many (oneOf ['0'..'9']) <* char ';'
@@ -74,8 +75,9 @@ data of parse
         return [QPAfter date b]
       qpTag :: Parsec String () [QueryParser]
       qpTag = do
-        tag <- string "tag=" *> many (noneOf ";") <* char ';'
-        return [QPTag tag]
+        t <- string "tag=" *> oneOf ['t','f'] <* char '='
+        tag <- many (noneOf ";") <* char ';'
+        return [QPTag (t=='t') tag]
       qpAnd :: Parsec String () [QueryParser]
       qpAnd = do
         sub <- char '[' *> many qps <* char ']'
@@ -86,7 +88,7 @@ data of parse
         return [QPOr $ concat sub]
       qp :: Parsec String () [QueryParser]
       qp =  concat <$> many qps
-      qps = foldl (<|>) qpEmpty
+      qps = foldl (<|>) qpEmpty $ try <$>
         [qpTake,qpDrop,qpBefor,qpAfter,qpTag,qpOr,qpAnd
         , qpType
         ]
@@ -98,8 +100,8 @@ data of parse
       toFunc (QPDrop i:xs) = drop i.toFunc xs
       toFunc (QPBefor i b:xs) = filter (timeFilter i (>) b).toFunc xs
       toFunc (QPAfter i b:xs) = filter (timeFilter i (<) b).toFunc xs
-      toFunc (QPTag i:xs) = filter (tagFilter i).toFunc xs
-      toFunc (QPType i:xs) = filter (typFilter i).toFunc xs
+      toFunc (QPTag t i:xs) = filter ((==t).tagFilter i).toFunc xs
+      toFunc (QPType t i:xs) = filter ((==t).typFilter i).toFunc xs
       toFunc (QPOr s:xs) =  concat.map sg.toFunc xs
         where
           funcs = (\y -> toFunc [y]) <$> s

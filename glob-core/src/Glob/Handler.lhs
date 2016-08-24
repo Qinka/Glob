@@ -45,7 +45,6 @@ module Glob.Handler
 \begin{code}
       getUrlR idx = do
         rest <- runDB' $ fetchRest idx
-        liftIO $ print rest
         case rType <$> rest of
           Just "post" -> getPostR rest
           Just "text" -> getResourceR True rest

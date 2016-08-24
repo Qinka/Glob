@@ -11,15 +11,12 @@
     And moved a subfunction to Glob.Common
     }
   \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
+  \CodeChangeLog{2016-08-19}{0.0.10.15}{delete some out-date things}
 \end{codeinfo}
 
 \begin{code}
 module Glob.Types
-    ( HtmlRow(..)
-    , doc2HR , hr2Doc
-    , LogPath(..)
-    , Rc(..)
-    , rc2Doc , doc2Rc
+    ( LogPath(..)
     , Nav(..)
     , doc2Nav , nav2Doc
     , Rest(..)
@@ -61,97 +58,6 @@ instance ErrorResponse JSON
                                       ]
 \end{code}
 
-data for storied html
-\begin{code}
-      data HtmlRow = HtmlFrame
-          { hrfIndex      :: [T.Text]
-          , hrfHtml       :: T.Text
-          , hrfUpdateTime :: UTCTime
-          , hrfAuthor     :: Maybe T.Text
-          }
-        | HtmlPage
-          { hrpIndex      :: [T.Text]
-          , hrpHtml       :: T.Text
-          , hrpTitle      :: T.Text
-          , hrpSummary    :: Maybe T.Text
-          , hrpUpdateTime :: UTCTime
-          , hrpCreateTime :: UTCTime
-          , hrpAuthor     :: Maybe T.Text
-          }
-        | HtmlBlog
-          { hrbIndex      :: [T.Text]
-          , hrbHtml       :: T.Text
-          , hrbTitle      :: T.Text
-          , hrbSummary    :: Maybe T.Text
-          , hrbUpdateTime :: UTCTime
-          , hrbCreateTime :: UTCTime
-          , hrbTags       :: [T.Text]
-          , hrbAuthor     :: Maybe T.Text
-          }
-\end{code}
-transform between HtmlRow and  Document
-\begin{code}
-      doc2HR :: Document -> Maybe HtmlRow
-      doc2HR doc = case typ of
-        "frame" -> HtmlFrame
-          <$>       doc !? "index"
-          <*>       doc !? "html"
-          <*>       doc !? "update-time"
-          <*> Just (doc !? "author")
-        "page" -> HtmlPage
-          <$>       doc !? "index"
-          <*>       doc !? "html"
-          <*>       doc !? "title"
-          <*> Just (doc !? "summary")
-          <*>       doc !? "update-time"
-          <*>       doc !? "create-time"
-          <*> Just (doc !? "author")
-        "blog" -> HtmlBlog
-          <$>            doc !? "index"
-          <*>            doc !? "html"
-          <*>            doc !? "title"
-          <*> Just      (doc !? "summary")
-          <*>            doc !? "update-time"
-          <*>            doc !? "create-time"
-          <*> Just (m2l (doc !? "tags"))
-          <*> Just      (doc !? "author")
-        _ -> Nothing
-        where
-          m2l (Just xs) = xs
-          m2l _         = []
-          Just typ = MG.lookup "type" doc :: Maybe T.Text
-      hr2Doc :: HtmlRow -> Document
-      hr2Doc HtmlFrame{..} =
-        [ "index"       =: hrfIndex
-        , "html"        =: hrfHtml
-        , "update-time" =: hrfUpdateTime
-        , "author"      =: hrfAuthor
-        , "type"        =: ("frame"::T.Text)
-        ]
-      hr2Doc HtmlPage{..} =
-        [ "index"       =: hrpIndex
-        , "html"        =: hrpHtml
-        , "title"       =: hrpTitle
-        , "summary"     =: hrpSummary
-        , "update-time" =: hrpUpdateTime
-        , "create-time" =: hrpCreateTime
-        , "author"      =: hrpAuthor
-        , "type"        =: ("page"::T.Text)
-        ]
-      hr2Doc HtmlBlog{..} =
-        [ "index"       =: hrbIndex
-        , "html"        =: hrbHtml
-        , "title"       =: hrbTitle
-        , "summary"     =: hrbSummary
-        , "update-time" =: hrbUpdateTime
-        , "create-time" =: hrbCreateTime
-        , "author"      =: hrbAuthor
-        , "tags"        =: hrbTags
-        , "type"        =: ("blog" ::T.Text)
-        ]
-\end{code}
-
-
 LogPath : The data of the logger's path
 \begin{code}
       data LogPath = LogFile FilePath
@@ -166,49 +72,6 @@ instance FromJSON
           "stdout" -> LogStdout
           "stderr" -> LogStderr
           _ -> LogFile $ T.unpack v
-\end{code}
-
-resource
-\begin{code}
-      data Rc = RcTxt
-          { rctIndex :: [T.Text]
-          , rctTxt   :: T.Text
-          , rctMIME  :: T.Text
-          }
-        | RcBin
-          { rcbIndex  :: [T.Text]
-          , rcbBinary :: B.ByteString
-          , rcbMIME   :: T.Text
-          }
-\end{code}
-transform between Rc and Document
-\begin{code}
-      rc2Doc :: Rc -> Document
-      rc2Doc RcTxt{..} =
-        [ "index" =: rctIndex
-        , "content" =: rctTxt
-        , "MIME" =: rctMIME
-        , "type" =: ("txt" ::T.Text)
-        ]
-      rc2Doc RcBin{..} =
-        [ "index" =: rcbIndex
-        , "content" =: Binary rcbBinary
-        , "MIME" =: rcbMIME
-        , "type" =: ("binary" :: T.Text)
-        ]
-      doc2Rc :: Document -> Maybe Rc
-      doc2Rc doc = case typ of
-        "txt" -> RcTxt
-          <$> doc !? "index"
-          <*> doc !? "content"
-          <*> doc !? "MIME"
-        "binary" -> RcBin
-          <$> doc !? "index"
-          <*> (fromBinary <$> (doc !? "content"))
-          <*> doc !? "MIME"
-        _ -> Nothing
-        where
-          Just typ = MG.lookup "type" doc :: Maybe T.Text
 \end{code}
 
 nav
