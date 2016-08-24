@@ -5,14 +5,14 @@
 # here we use glob-lauch one
 glob-core:
   # load image from docker hub
-  image: index.docker.io/qinka/glob
+  image: index.docker.io/qinka/glob:lastest-0.0.10.x
   # use start.sh from url config-server/config/glob.json
   # config-server is a hostname
   command: start.sh fromurl config-server/config/glob.json
   # set passwords
   # it is good to add space in it
   environment:
-    - "GLOB_PSK=1024"
+    - "GLOB_PSK=921 924"
   # export the port
   ports:
     - "3000:3000"

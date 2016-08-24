@@ -1,7 +1,9 @@
 #!/bin/bash
 echo update
 ############
-export DOCKER_IMAGE_TAG=glob-0.0.10.x-docekr-
+export $GLOB_VERSION=0.0.10
+export $LATEST=glob-$GLOB_VERSION-$(uname)-$OS_DISTRIBUTOR-$OS_CORENAME-GHC_$GHCVER-$(uname -m)
+export DOCKER_IMAGE_TAG=glob-$GLOB_VERSION-docekr-
 if [ -n "$TRAVIS_TAG" ]; then
   export DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG-$TRAVIS_TAG
 else
@@ -24,4 +26,5 @@ sudo cp $TRAVIS_BUILD_DIR/integration/ShellScript/start.sh docker.tmp/bin
 echo build docker
 cd docker.tmp
 docker build -t qinka/glob:$DOCKER_IMAGE_TAG .
+docker build -t qinka/glob:$LATEST .
 docker push  qinka/glob
