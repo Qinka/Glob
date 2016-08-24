@@ -138,7 +138,6 @@ the instance of FromJSON for Glob
           <*> v .: "database"
           <*> v .: "title"
           <*> v .: "password-enviroment-variable"
-          <*> v .: "static-url"
           <*> v .: "log-path"
           <*> v .: "listen-type"
 \end{code}
