@@ -48,7 +48,7 @@ data of parse
         return []
       qpType :: Parsec String () [QueryParser]
       qpType = do
-        typ <- string "type" *> many letter <* char ';'
+        typ <- string "type＝" *> many letter <* char ';'
         return [QPType typ]
       qpTake :: Parsec String () [QueryParser]
       qpTake = do
@@ -74,7 +74,7 @@ data of parse
         return [QPAfter date b]
       qpTag :: Parsec String () [QueryParser]
       qpTag = do
-        tag <- string "string=" *> many (noneOf ";") <* char ';'
+        tag <- string "tag=" *> many (noneOf ";") <* char ';'
         return [QPTag tag]
       qpAnd :: Parsec String () [QueryParser]
       qpAnd = do
