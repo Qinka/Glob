@@ -126,7 +126,6 @@ the configure of Glob
         , cfgDb           :: DbCfg
         , cfgTitle        :: T.Text
         , cfgPskEnvToken  :: String
-        , cfgStaticUrl    :: T.Text
         , cfgLogPath      :: LogPath
         , cfgListenType   :: String
         }
