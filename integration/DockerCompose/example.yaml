@@ -8,7 +8,7 @@ glob-core:
   image: index.docker.io/qinka/glob:lastest-0.0.10.x
   # use start.sh from url config-server/config/glob.json
   # config-server is a hostname
-  command: start.sh fromurl config-server/config/glob.json
+  command: start.sh fromurl config.server/config/glob.json
   # set passwords
   # it is good to add space in it
   environment:
@@ -21,7 +21,7 @@ glob-core:
   # extra_host
   extra_hosts:
     # for configure service
-    - "config-server:0.0.0.0" # should be repleace
+    - "config.server:0.0.0.0" # should be repleace
   # link db for we ues it
   links:
     - db
