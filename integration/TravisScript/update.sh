@@ -2,8 +2,8 @@
 echo update
 ############
 export GLOB_VERSION=0.0.10
-export $LATEST=glob-$GLOB_VERSION-$(uname)-$OS_DISTRIBUTOR-$OS_CORENAME-GHC_$GHCVER-$(uname -m)
-export DOCKER_IMAGE_TAG=glob-$GLOB_VERSION-docekr-
+export LATEST=glob-$GLOB_VERSION-$(uname)-$OS_DISTRIBUTOR-$OS_CORENAME-GHC_$GHCVER-$(uname -m)
+export DOCKER_IMAGE_TAG=glob-$GLOB_VERSION-docker-
 if [ -n "$TRAVIS_TAG" ]; then
   export DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG-$TRAVIS_TAG
 else
