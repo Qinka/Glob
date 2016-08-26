@@ -26,7 +26,7 @@ module Main
       import System.IO
 
       import Data.Version
-      import Paths_glob_ih
+      import Paths_glob_tool
 
       import qualified GHC.IO.Encoding as E
 \end{code}

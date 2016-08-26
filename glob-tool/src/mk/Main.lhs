@@ -20,7 +20,7 @@ module Main
       import System.IO
 
       import Data.Version
-      import Paths_glob_mk
+      import Paths_glob_tool
 \end{code}
 
 for cmd args
