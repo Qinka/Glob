@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-tool
-version:             0.0.10.0
+version:             0.0.10.10
 synopsis:            a serial tool of glob
 description:         the tool transform tokens and other things to curl's options
 license:             AllRightsReserved
@@ -29,6 +29,10 @@ flag glob-mk
 flag glob-timecheck
   default: True
   description: to build glob-timecheck or not
+
+flag glob-newpost
+  default: True
+  description: to upload new post
 
 executable glob-ih
   if flag(glob-ih)
@@ -72,3 +76,30 @@ executable glob-timecheck
                      , time >= 1.6
   hs-source-dirs:      src/timecheck
   default-language:    Haskell2010
+
+executable glob-newpost
+  if flag(glob-newpost)
+    buildable:         True
+  else
+    buildable:         False
+  main-is:             Main.lhs
+  build-depends:       aeson >= 0.10
+                     , base >= 4.9 && < 4.10
+                     , bytestring >= 0.10.8
+                     , cmdargs >= 0.10.10
+                     , directory >= 1.2.5
+                     , glob-auth == 0.0.10.*
+                     , http-client >= 0.4.30
+                     , http-types
+                     , process >= 1.4
+                     , time >= 1.6
+  hs-source-dirs:      src/newpost
+  default-extensions:  CPP
+                     , DeriveDataTypeable
+                     , OverloadedStrings
+                     , RecordWildCards
+  default-language:    Haskell2010
+  if os(windows)
+    CC-Options: "-DWIN32"
+  else
+    CC-Options: "-DNWIN32"

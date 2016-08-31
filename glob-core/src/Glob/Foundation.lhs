@@ -137,7 +137,7 @@ the instance of FromJSON for Glob
           <$> v .: "port"
           <*> v .: "database"
           <*> v .: "title"
-          <*> v .: "password-enviroment-variable"
+          <*> v .: "password-environment-variable"
           <*> v .: "log-path"
           <*> v .: "listen-type"
 \end{code}

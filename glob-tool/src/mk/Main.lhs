@@ -33,6 +33,7 @@ for cmd args
           , hfpHtmlFile   :: String
           , hfpUpdateTime :: Maybe String
           }
+        | MKP
         {-| MkHtmlFrameDel
           { hfdTagerName  :: String
           , hfdTargeUrl   :: String
