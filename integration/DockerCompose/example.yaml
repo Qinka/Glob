@@ -27,7 +27,7 @@ glob-core:
     - db
 
 # The database used by glob
-# use MongoåçDB
+# use MongoDB
 db:
   # load image
   image: mongo:latest

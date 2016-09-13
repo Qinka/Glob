@@ -100,6 +100,7 @@ fetch summary
           _ -> fetchOne
         where
           fetchOne = do
+            name <- ()
             sPath <- (++"/newpost.new.sum.html") <$> getAppUserDataDirectory "glob"
             (_,_,_,ph) <- createProcess.shell $ unwords [editor,sPath]
             x <- waitForProcess ph

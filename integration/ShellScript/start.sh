@@ -88,7 +88,7 @@ elif [ "$1" = "fromenv" ] && [ $# -eq 1 ]; then
   #
   glob-launch -f /etc/glob/config +RTS -N -RTS
 elif [ "$1" = "fromenv" ] && [ "$2" = "help"]; then
-  echo The list of
+  echo The list of environment.
 else
   echo err
   echo fromurl URL
