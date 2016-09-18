@@ -12,7 +12,7 @@ fi
 export DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG-$(uname)-$OS_DISTRIBUTOR-$OS_CORENAME-GHC_$GHC_VER-$(uname -m)
 if [ -n "$LLVM" ]; then
     export DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG-llvm-$LLVM
-    export LATEST=$LATEST-llvm-$llvm
+    export LATEST=$LATEST-llvm-$LLVM
 fi
 if [ -n "$THREADED" ]; then
     export DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG-threaded
