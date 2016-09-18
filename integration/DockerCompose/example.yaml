@@ -5,7 +5,7 @@
 # here we use glob-lauch one
 glob-core:
   # load image from docker hub
-  image: index.docker.io/qinka/glob:lastest-0.0.10.x
+  image: index.docker.io/qinka/glob:glob-0.0.10-Linux-Ubuntu-trusty-GHC_-x86_64
   # use start.sh from url config-server/config/glob.json
   # config-server is a hostname
   command: start.sh fromurl config.server/config/glob.json

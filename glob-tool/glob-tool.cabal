@@ -31,7 +31,7 @@ flag glob-timecheck
   description: to build glob-timecheck or not
 
 flag glob-newpost
-  default: True
+  default: False
   description: to upload new post
 
 executable glob-ih

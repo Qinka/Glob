@@ -9,95 +9,95 @@
 
 \begin{code}
 module Main
-    ( main
-    ) where
+       ( main
+       ) where
 
-      import Control.Monad
-      import Data.Aeson
-      import Data.Maybe
-      import Data.String (fromString)
-      import Data.Time
-      import Glob.Auth.Token
-      import Network.HTTP.Client
-      import Network.HTTP.Client.MultipartFormData
-      import System.Console.CmdArgs
-      import System.Console.CmdArgs.Verbosity
-      import System.Directory
-      import System.Exit
-      import System.IO
-      import System.Process
+import Control.Monad
+import Data.Aeson
+import Data.Maybe
+import Data.String (fromString)
+import Data.Time
+import Glob.Auth.Token
+import Network.HTTP.Client
+import Network.HTTP.Client.MultipartFormData
+import System.Console.CmdArgs
+import System.Console.CmdArgs.Verbosity
+import System.Directory
+import System.Exit
+import System.IO
+import System.Process
 
-      import qualified Data.ByteString as B
-      import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString as B
+import qualified Data.ByteString.Lazy as BL
 
-      import Data.Version(showVersion)
-      import Paths_glob_tool(version)
+import Data.Version(showVersion)
+import Paths_glob_tool(version)
 \end{code}
 
 main function
 \begin{code}
-      main :: IO ()
-      main = do
+main :: IO ()
+main = do
 \end{code}
 get options
 \begin{code}
-        p@Post{..} <- cmdArgs newpost
-        whenLoud $ print p
+  p@Post{..} <- cmdArgs newpost
+  whenLoud $ print p
 \end{code}
 read configures from  somewhere.
 get path
 \begin{code}
-        cfgpath <- getCfgPath
-        whenLoud.putStrLn $ "config path:" ++ cfgpath
+  cfgpath <- getCfgPath
+  whenLoud.putStrLn $ "config path:" ++ cfgpath
 \end{code}
 if file do not exist
 \begin{code}
-        (&& isNothing sitePsk).(&& isNothing siteUrl).not <$> doesFileExist cfgpath
-          >>= whenNotExist cfgpath
+  (&& isNothing sitePsk).(&& isNothing siteUrl).not <$> doesFileExist cfgpath
+     >>= whenNotExist cfgpath
 \end{code}
 
 fetch settings
 \begin{code}
-        settings <- decode <$> BL.readFile cfgpath
-        whenLoud $ print settings
-        case settings of
-          Nothing -> do
-            putStrLn "can not parse json file!"
-            exitFailure
-          Just s@Settings{..} -> do
-            htmlPath <- fetchHtml postH defEditor
-            sumPath <- fetchSum sumH defEditor
-            fetchContents htmlPath sumPath $ uploadPost s p
+  settings <- decode <$> BL.readFile cfgpath
+  whenLoud $ print settings
+  case settings of
+    Nothing -> do
+      putStrLn "can not parse json file!"
+      exitFailure
+    Just s@Settings{..} -> do
+      htmlPath <- fetchHtml postH defEditor
+      sumPath <- fetchSum sumH defEditor
+      fetchContents htmlPath sumPath $ uploadPost s p
 \end{code}
 
 fetchContents
 \begin{code}
-      fetchContents :: FilePath -> Maybe FilePath
-                    -> (Handle -> Maybe Handle -> IO ())
-                    -> IO ()
-      fetchContents fp mfp f = do
-        h <- openFile fp ReadMode
-        s <- case mfp of
-          Just mfp' -> Just <$> openFile mfp' ReadMode
-          _ -> return Nothing
-        f h s
-        case s of
-            Just s' -> hClose s'
-            _ -> return ()
-        hClose h
+fetchContents :: FilePath -> Maybe FilePath
+              -> (Handle -> Maybe Handle -> IO ())
+              -> IO ()
+fetchContents fp mfp f = do
+  h <- openFile fp ReadMode
+  s <- case mfp of
+         Just mfp' -> Just <$> openFile mfp' ReadMode
+         _ -> return Nothing
+  f h s
+  case s of
+    Just s' -> hClose s'
+    _ -> return ()
+  hClose h
 \end{code}
 
 fetch summary
 \begin{code}
-      fetchSum :: Maybe String -> String -> IO (Maybe FilePath)
-      fetchSum s editor = do
-        case s of
-          Just s' -> do
-            is <- doesFileExist s'
-            if is
-              then return $ Just s'
-              else fetchOne
-          _ -> fetchOne
+fetchSum :: Maybe String -> String -> IO (Maybe FilePath)
+fetchSum s editor = do
+  case s of
+    Just s' -> do
+      is <- doesFileExist s'
+      if is
+        then return $ Just s'
+        else fetchOne
+    _ -> fetchOne
         where
           fetchOne = do
             name <- ()
