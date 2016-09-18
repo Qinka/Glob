@@ -135,7 +135,7 @@ updateContext :: Val a => T.Text -> Maybe ObjectId
               -> T.Text -> a -> Action (Handler site) ObjectId
 updateContext db oid field v = case oid of
   Just o -> upsert (select ["_id"=:o] db) [field =: v] >> return o
-    _ -> (\(ObjId i) -> i) <$> insert db [field =: v]
+  _ -> (\(ObjId i) -> i) <$> insert db [field =: v]
 updateItem :: Val a => T.Text -> T.Text
            -> a -> Rest -> Action (Handler site) ()
 updateItem typ field d unR = do
