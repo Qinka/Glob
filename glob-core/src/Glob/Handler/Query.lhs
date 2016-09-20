@@ -72,7 +72,7 @@ getQueryR idx =
       case sigTypeFunc x of
         Just vs ->respondSource "text/plain" $ do
           mapM_ sendChunkText vs
-            sendFlush
+          sendFlush
         _ -> notFound
     sigTypeFunc :: Maybe Document -> Maybe [T.Text]
     sigTypeFunc x = x >>= (!? "var")
