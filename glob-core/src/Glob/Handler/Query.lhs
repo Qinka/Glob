@@ -71,6 +71,7 @@ getQueryR idx =
   where
     getQ = do
       x <- runDB'.findOne $ select ["index" =: idx] "query"
+      liftIO $ print x
       case sigTypeFunc x of
         Just vs ->respondSource "text/plain" $ do
           mapM_ sendChunkText vs
@@ -84,10 +85,10 @@ getQueryR _ = notFound
 \begin{code}
 putQueryR :: [T.Text] -> Handler TypedContent
 putQueryR idx = do
-  var <- lookupPostParam "var"
+  var <- lookupPostParams "var"
   rt <- tryH.runDB'.upsert (select ["index" =: idx] "query") $ catMaybes
     [ "index" =@ Just idx
-    , "var"   =@      var
+    , "var"   =@ Just var
     ]
   case rt of
     Left e -> returnER e
