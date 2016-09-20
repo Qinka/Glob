@@ -57,6 +57,8 @@ getQueryR idx =
       sendChunkText $globCoreVersionQuote
     "name":_ -> respondSource "text/plain" $
       sendChunkText "Glob"
+    "buildinfo":_ -> respondSource "text/plain" $
+      sendChunkText $globCoreBuildInfo
     "servertime":_ -> do
       time <- liftIO $ s2t.show <$> getCurrentTime
       respondSource "text/plain" $ sendChunkText time

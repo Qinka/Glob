@@ -12,14 +12,17 @@
 
 \begin{code}
 module Glob.Core
-    ( module X
-    ) where
+       ( module X
+       ) where
 
-      import Glob.Config     as X
-      import Glob.Foundation as X
-      import Glob.Handler    as X
 
-      import Yesod.Core.Dispatch
+       
+import Glob.Config     as X
+import Glob.Foundation as X
+import Glob.Handler    as X
 
-      mkYesodDispatch "Glob" resourcesGlob
+import Yesod.Core.Dispatch
+       
+mkYesodDispatch "Glob" resourcesGlob
 \end{code}
+
