@@ -7,7 +7,7 @@
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-08-19}
   \CodeChangeLog{0.0.10.10}{2016.08.23}{change to use stream}
-  \CodeChangeLog{0.0.10.10}{2016.08.23}{change to use stream}
+  \CodeChangeLog{2016-09-25}{0.0.10.16}{with lts-7.0}
   %\CodeChangeLog{date}{text}
 \end{codeinfo}
 
@@ -15,10 +15,9 @@
 \begin{code}
 module Glob.Handler.Query
        ( getQueryR
+       , restQuery
        , getNavR
-       , putQueryR
        , putNavR
-       , delQueryR
        , delNavR
        , returnSucc
        ) where
@@ -26,6 +25,7 @@ module Glob.Handler.Query
 import Glob.Auth.Token(globAuthVersionQuote)
 import Glob.Common
 import Glob.Foundation
+import Glob.Handler.Internal
 import Glob.Handler.Query.Parser
 import Glob.Model
 import Glob.Types
@@ -48,61 +48,44 @@ returnSucc = respondSource "text/plain" $ sendChunkText "success"
 
 query
 \begin{code}
-getQueryR :: [T.Text] -> Handler TypedContent
-getQueryR idx =
-  case idx of
-    "version":"glob-auth":_ -> respondSource "text/plain" $
+getQueryR :: [T.Text] -> Maybe Rest -> Handler TypedContent
+getQueryR idx r  =
+  case tail idx of
+    "~version":"glob-auth":_ -> respondSource "text/plain" $
       sendChunkText $globAuthVersionQuote
-    "version":_ -> respondSource "text/plain" $
+    "~version":_ -> respondSource "text/plain" $
       sendChunkText $globCoreVersionQuote
-    "name":_ -> respondSource "text/plain" $
+    "~name":_ -> respondSource "text/plain" $
       sendChunkText "Glob"
-    "buildinfo":_ -> respondSource "text/plain" $
+    "~buildinfo":_ -> respondSource "text/plain" $
       sendChunkText $globCoreBuildInfo
-    "servertime":_ -> do
+    "~servertime":_ -> do
       time <- liftIO $ s2t.show <$> getCurrentTime
       respondSource "text/plain" $ sendChunkText time
     [] -> respondSource "text/plain" $ do
       sendChunkText "Glob-"
       sendChunkText $globCoreVersionQuote
       sendFlush
-    "index":xs -> getIndexR xs
-    _ -> getQ
+    "@nav":_ -> getNavR
+    ".index":xs -> getIndexR xs
+    _ -> getQ r
   where
-    getQ = do
-      x <- runDB'.findOne $ select ["index" =: idx] "query"
-      liftIO $ print x
-      case sigTypeFunc x of
-        Just vs ->respondSource "text/plain" $ do
-          mapM_ sendChunkText vs
+    getQ (Just rest@Rest{..}) = do
+      var <- runDB' $ fetchQuery rest
+      case var of
+        Just v ->respondSource "text/plain" $ do
+          sendChunkText v
           sendFlush
         _ -> notFound
-    sigTypeFunc :: Maybe Document -> Maybe [T.Text]
-    sigTypeFunc x = x >>= (!? "var")
-getQueryR _ = notFound
+    getQ _ = notFound
 \end{code}
 
 \begin{code}
-putQueryR :: [T.Text] -> Handler TypedContent
-putQueryR idx = do
-  var <- lookupPostParams "var"
-  rt <- tryH.runDB'.upsert (select ["index" =: idx] "query") $ catMaybes
-    [ "index" =@ Just idx
-    , "var"   =@ Just var
-    ]
-  case rt of
-    Left e -> returnER e
-    Right _ -> returnSucc
-\end{code}
-
-
-\begin{code}
-delQueryR :: [T.Text] -> Handler TypedContent
-delQueryR idx = do
-  rt <- tryH.runDB'.delete$ select ["index" =: idx] "query"
-  case rt of
-    Left e -> returnER e
-    Right _ -> returnSucc
+restQuery :: [T.Text] -> Handler TypedContent
+restQuery idx = do
+  unR <- lookupPostUnRest idx
+  var <- lookupPostParam "var"
+  restItem unR var updateQuery
 \end{code}
 
 \begin{code}

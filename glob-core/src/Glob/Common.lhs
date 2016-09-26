@@ -13,6 +13,7 @@
   \CodeChangeLog{0.0.9.31}{2016.08.13}{add <#> eq2 (f <\$>) <\$>}
   \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
   \CodeChangeLog{0.0.10.10}{2016.08.23}{add some functions to be helper of tryH}
+  \CodeChangeLog{2016-09-25}{0.0.10.16}{with lts-7.0}
 \end{codeinfo}
 
 \begin{code}

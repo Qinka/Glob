@@ -1,5 +1,13 @@
 # Revision history for glob-core
 
+## 0.0.10.16 -- 2016.09.25
+
+with lts-7.0 and emacs
+
+## 0.0.10.15-并州 -- 2016.08
+
+a sts(short term support) version.
+
 ## 0.0.10.10 -- 2016.08.19
 
 * using tryH to catch exception

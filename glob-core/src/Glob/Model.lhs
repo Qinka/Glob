@@ -7,6 +7,8 @@
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-07-17}
   \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
+  \CodeChangeLog{2016-09-25}{0.0.10.16}{with lts-7.0}
+  \CodeChangeLog{2016-09-25}{0.0.10.25}{ add query for query }
   %\CodeChangeLog{date}{text}
 \end{codeinfo}
 
@@ -24,7 +26,7 @@ module Glob.Model
        , updateFrame, updatePost, updateStatic
        , updateResourceT,updateResourceB
        , deleteRest, deleteContext, deleteContextM
-       , deleteItem
+       , deleteItem, updateQuery,fetchQuery
        ) where
 
 import Control.Exception hiding (Handler)
@@ -124,6 +126,8 @@ fetchResourceB :: Rest -> Action (Handler site) (Maybe B.ByteString)
 fetchResourceB rest = fromBinary <#> fetchContext "binary" rest "resource"
 fetchStatic :: Rest -> Action (Handler site) (Maybe T.Text)
 fetchStatic rest = fetchContext "url" rest "static"
+fetchQuery :: Rest -> Action (Handler site) (Maybe T.Text)
+fetchQuery rest = fetchContext "var" rest "query"
 \end{code}
 
 \begin{code}
@@ -157,6 +161,8 @@ updateResourceB :: Binary -> Rest -> Action (Handler site) ()
 updateResourceB = updateItem "resource" "binary"
 updateStatic :: T.Text -> Rest -> Action (Handler site) ()
 updateStatic = updateItem "static" "url"
+updateQuery :: T.Text -> Rest -> Action (Handler site) ()
+updateQuery = updateItem "query" "var"
 \end{code}
 
 \begin{code}

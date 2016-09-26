@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-core
-version:             0.0.10.15-并州
+version:             0.0.10.20:q
 synopsis:            A blog.
 description:         A blog framework.
 license:             AllRightsReserved
@@ -24,6 +24,7 @@ library
                    , Glob.Foundation
                    , Glob.Handler
                    , Glob.Handler.Fetch
+                   , Glob.Handler.Internal
                    , Glob.Handler.Query
                    , Glob.Handler.Query.Parser
                    , Glob.Types
@@ -67,6 +68,7 @@ library
                      , wai >= 3.2
                      , wai-logger >= 2.3
                      , warp >= 3.2.7
+                     , xml-hamlet >= 0.4.0.10
                      , yesod-core >= 1.4.20
   hs-source-dirs:      src
                      , import

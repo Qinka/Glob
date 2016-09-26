@@ -7,6 +7,7 @@
   \CodeCreater{Qinka}
   \CodeCreatedDate{2016-07-25}
   \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
+  \CodeChangeLog{2016-09-25}{0.0.10.1}{with lts-7.0}
   %\CodeChangeLog{date}{text}
 \end{codeinfo}
 
