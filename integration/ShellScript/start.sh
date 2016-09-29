@@ -8,6 +8,7 @@ if [ "$1" = "fromurl" ] && [ $# -eq 2 ]; then
     echo -e "\a"
     echo "WARNING the environment variables where hold password is empty, of null. You might change the database without password or can not upload things to database."
   fi
+  cat /etc/glob/config
   glob-launch -f /etc/glob/config +RTS -N -RTS
 elif [ "$1" = "fromenv" ] && [ $# -eq 1 ]; then
   mkdir /etc/glob
@@ -86,6 +87,7 @@ elif [ "$1" = "fromenv" ] && [ $# -eq 1 ]; then
   echo ", \"listen-type\" : \"$GLOB_TYPE\" ">> /etc/glob/config
   echo "}" >> /etc/glob/config
   #
+  cat /etc/glob/config
   glob-launch -f /etc/glob/config +RTS -N -RTS
 elif [ "$1" = "fromenv" ] && [ "$2" = "help"]; then
   echo The list of environment.
