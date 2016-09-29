@@ -71,21 +71,12 @@ elif [ "$1" = "fromenv" ] && [ $# -eq 1 ]; then
     echo "WARNING the environment variables where hold password is empty, of null. You might change the database without password or can not upload things to database."
   fi
   # write to /etc/glob/config
-  echo "{ \"port\" : \"$GLOB_PORT\" ">/etc/glob/config
-  echo ", \"database\" :" >> /etc/glob/config
-  echo "\t{ \"hostaddr\" : \"$GLOB_DB_ADDR\" ">> /etc/glob/config
-  echo "\t, \"database\" : \"$GLOB_DB_NAME\" ">> /etc/glob/config
-  echo "\t, \"access-mode\": \"$GLOB_DB_AM\" ">> /etc/glob/config
-  echo "\t, \"username\" : \"$GLOB_DB_USR\" ">> /etc/glob/config
-  echo "\t, \"pool-stripes\" : \"$GLOB_DB_PS\" ">> /etc/glob/config
-  echo "\t, \"pool-kept-time\" : \"$GLOB_DB_PK\" ">> /etc/glob/config
-  echo "\t, \"pool-strp-max\" : \"$GLOB_DB_PSM\" ">> /etc/glob/config
-  echo "\t}" >> /etc/glob/config
-  echo ", \"title\" : \"$GLOB_TITLE\" ">> /etc/glob/config
-  echo ", \"password-environment-variable\" : \"$GLOB_PSK_ENV_VAR\" ">> /etc/glob/config
-  echo ", \"log-path\" : \"$GLOB_LOG_PATH\" ">> /etc/glob/config
-  echo ", \"listen-type\" : \"$GLOB_TYPE\" ">> /etc/glob/config
-  echo "}" >> /etc/glob/config
+  echo "{ \"port\" : \"$GLOB_PORT\" , \"database\" :{ \"hostaddr\" : \"$GLOB_DB_ADDR\" " \
+       ", \"database\" : \"$GLOB_DB_NAME\" , \"access-mode\": \"$GLOB_DB_AM\" " \
+       ", \"username\" : \"$GLOB_DB_USR\" , \"pool-stripes\" : \"$GLOB_DB_PS\" " \
+       ", \"pool-kept-time\" : \"$GLOB_DB_PK\" , \"pool-strp-max\" : \"$GLOB_DB_PSM\" }" \
+       ", \"title\" : \"$GLOB_TITLE\" , \"password-environment-variable\" : \"$GLOB_PSK_ENV_VAR\" " \
+       ", \"log-path\" : \"$GLOB_LOG_PATH\" , \"listen-type\" : \"$GLOB_TYPE\" }" > /etc/glob/config
   #
   cat /etc/glob/config
   glob-launch -f /etc/glob/config +RTS -N -RTS
