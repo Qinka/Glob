@@ -65,7 +65,7 @@ elif [ "$1" = "fromenv" ] && [ $# -eq 1 ]; then
     echo "using default of listen type (*,at both ipv4 and ipv6 of each ip)"
   fi
   # check password environment variables
-  if [ -z "$(printenv $GLOB_PSK_ENV_VAR)"]; then
+  if [ -z "$(printenv $GLOB_PSK_ENV_VAR)" ]; then
     echo -e "\a"
     echo "WARNING the environment variables where hold password is empty, of null. You might change the database without password or can not upload things to database."
   fi
