@@ -71,10 +71,10 @@ elif [ "$1" = "fromenv" ] && [ $# -eq 1 ]; then
     echo "WARNING the environment variables where hold password is empty, of null. You might change the database without password or can not upload things to database."
   fi
   # write to /etc/glob/config
-  echo "{ \"port\" : \"$GLOB_PORT\" , \"database\" :{ \"hostaddr\" : \"$GLOB_DB_ADDR\" " \
+  echo "{ \"port\" : $GLOB_PORT , \"database\" :{ \"hostaddr\" : \"$GLOB_DB_ADDR\" " \
        ", \"database\" : \"$GLOB_DB_NAME\" , \"access-mode\": \"$GLOB_DB_AM\" " \
-       ", \"username\" : \"$GLOB_DB_USR\" , \"pool-stripes\" : \"$GLOB_DB_PS\" " \
-       ", \"pool-kept-time\" : \"$GLOB_DB_PK\" , \"pool-strp-max\" : \"$GLOB_DB_PSM\" }" \
+       ", \"username\" : \"$GLOB_DB_USR\" , \"pool-stripes\" : $GLOB_DB_PS " \
+       ", \"pool-kept-time\" : $GLOB_DB_PK , \"pool-strp-max\" : $GLOB_DB_PSM }" \
        ", \"title\" : \"$GLOB_TITLE\" , \"password-environment-variable\" : \"$GLOB_PSK_ENV_VAR\" " \
        ", \"log-path\" : \"$GLOB_LOG_PATH\" , \"listen-type\" : \"$GLOB_TYPE\" }" > /etc/glob/config
   #
