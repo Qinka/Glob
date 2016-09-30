@@ -33,8 +33,8 @@ elif [ "$1" = "fromenv" ] && [ $# -eq 1 ]; then
     export GLOB_DB_USR=
     echo 'using nothing as the default of user'
   fi
-  if [ -z "$GLOB_DB_PK" ];then
-    export GLOB_DB_PK=
+  if [ -z "$GLOB_DB_PSK" ];then
+    export GLOB_DB_PSK=
     echo 'using nothing as the default of user password'
   fi
   if [ -z "$GLOB_DB_PS" ];then
@@ -73,7 +73,7 @@ elif [ "$1" = "fromenv" ] && [ $# -eq 1 ]; then
   # write to /etc/glob/config
   echo "{ \"port\" : $GLOB_PORT , \"database\" :{ \"hostaddr\" : \"$GLOB_DB_ADDR\" " \
        ", \"database\" : \"$GLOB_DB_NAME\" , \"access-mode\": \"$GLOB_DB_AM\" " \
-       ", \"username\" : \"$GLOB_DB_USR\" , \"pool-stripes\" : $GLOB_DB_PS " \
+       ", \"username\" : \"$GLOB_DB_USR\" , \"password\":\"$GLOB_DB_PSK\" , \"pool-stripes\" : $GLOB_DB_PS " \
        ", \"pool-kept-time\" : $GLOB_DB_PK , \"pool-strp-max\" : $GLOB_DB_PSM }" \
        ", \"title\" : \"$GLOB_TITLE\" , \"password-environment-variable\" : \"$GLOB_PSK_ENV_VAR\" " \
        ", \"log-path\" : \"$GLOB_LOG_PATH\" , \"listen-type\" : \"$GLOB_TYPE\" }" > /etc/glob/config
