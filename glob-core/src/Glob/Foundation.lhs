@@ -9,6 +9,7 @@
   \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
   \CodeChangeLog{2016-09-25}{0.0.10.16}{with lts-7.0}
   \CodeChangeLog{2016-09-25}{0.0.10.25}{a new way for query, and add rss}
+  \CodeChangeLog{2016-10-01}{0.0.10.22}{config has "default"}
   %\CodeChangeLog{date}{text}
 \end{codeinfo}
 
@@ -133,12 +134,12 @@ the instance of FromJSON for Glob
 \begin{code}
 instance FromJSON GlobCfg where
   parseJSON (Object v) = GlobCfg
-    <$> v .: "port"
-    <*> v .: "database"
-    <*> v .: "title"
-    <*> v .: "password-environment-variable"
-    <*> v .: "log-path"
-    <*> v .: "listen-type"
+    <$> v .:? "port"                          .!= 3000
+    <*> v .:  "database"
+    <*> v .:  "title"                         .!= "Glob"
+    <*> v .:  "password-environment-variable"  .!= "GLOB_PSK"
+    <*> v .:  "log-path"                       .!= LogStdout
+    <*> v .:  "listen-type"                    .!= "*"
 \end{code}
 the instance of ToConfig
 \begin{code}
@@ -188,12 +189,12 @@ the instance of FromJSON for DbCfg
 \begin{code}
 instance FromJSON DbCfg where
   parseJSON (Object v) = DbCfg
-    <$> v .: "hostaddr"
-    <*> v .: "database"
-    <*> v .: "access-mode"
-    <*> v .: "username"
-    <*> v .: "password"
-    <*> v .: "pool-stripes"
-    <*> v .: "pool-kept-time"
-    <*> v .: "pool-strp-max"
+    <$> v .:? "hostaddr"        .!= "localhost:271017"
+    <*> v .:? "database"        .!= "local"
+    <*> v .:? "access-mode"     .!= "master"
+    <*> v .:? "username"        .!= "root"
+    <*> v .:? "password"        .!= "admin"
+    <*> v .:? "pool-stripes"    .!= 6
+    <*> v .:? "pool-kept-time"  .!= 6
+    <*> v .:? "pool-strp-max"   .!= 6
 \end{code}
