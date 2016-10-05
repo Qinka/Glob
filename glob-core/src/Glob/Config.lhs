@@ -11,6 +11,11 @@
   %\CodeChangeLog{date}{text}
 \end{codeinfo}
 
+Haskell Extension
+\begin{code}
+{-# LANGUAGE CPP #-}
+\end{code}
+
 \begin{code}
 module Glob.Config
        ( LogPath(..)
@@ -18,6 +23,7 @@ module Glob.Config
        , defGetServerName
        , defSetSettings
        , defSigINTHandle
+       , defIsDebug
        ) where
 
 import Data.String(fromString)
@@ -50,6 +56,8 @@ class FromJSON a => ToConfig a where
   sigINTHandle = defSigINTHandle
   setSettings :: a -> Settings -> Settings
   setSettings = defSetSettings
+  isLoudIO :: a -> IO Bool
+  isNormalIO :: a -> IO Bool
 \end{code}
 
 Default of getServerName
@@ -75,4 +83,15 @@ defSetSettings l = setInstallShutdownHandler (sigINTHandle l)
   . setHost (fromString $ getListenType l)
   . setTimeout (getTimeout l)
   . setServerName (s2bUtf8 $ getServerName l)
+\end{code}
+
+the default of is debug
+\begin{code}
+defIsDebug :: IO Bool
+defIsDebug = 
+#ifdef DEBUG
+        return True
+#else
+        return False
+#endif
 \end{code}

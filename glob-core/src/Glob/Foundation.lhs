@@ -30,6 +30,7 @@ import Glob.Common
 import Glob.Config
 import Glob.Model
 import Glob.Types
+import System.Console.CmdArgs.Verbosity(isLoud,isNormal)
 import Text.Blaze.Html(preEscapedToHtml)
 import Yesod.Core
        
@@ -78,7 +79,8 @@ instance Yesod Glob where
       "GET" -> return Authorized
       _ -> bgAuth =<< globPskEnvToken <$> getYesod
   makeLogger = return.globLogger
-  defaultLayout =globLayout
+  defaultLayout = globLayout
+  shouldLogIO _ _ = sl
 \end{code}
 
 Glob's Layout
@@ -197,4 +199,15 @@ instance FromJSON DbCfg where
     <*> v .:? "pool-stripes"    .!= 6
     <*> v .:? "pool-kept-time"  .!= 6
     <*> v .:? "pool-strp-max"   .!= 6
+\end{code}
+
+
+\begin{code}
+
+sl :: LogLevel -> IO Bool
+sl LevelDebug = defIsDebug
+sl LevelInfo = isNormal
+sl LevelWarn = isLoud
+sl LevelError = return True
+sl _ = isLoud
 \end{code}

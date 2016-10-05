@@ -35,6 +35,7 @@ launch = Launch
     &= typ "[stdin|FILEPATH]"
     &= help "The configure file glob loaded."
   }
+  &= verbosity
   &= help "You can turn on '+RTS -N' to let glob run faster."
   &= summary ( " glob-core-"
                ++ $(globCoreVersionQuote)
