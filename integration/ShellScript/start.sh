@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# let it stop when there are an error
+set -e
+
 echo start of Glob
 # from url
 if [ "$1" = "fromurl" ] && [ $# -eq 2 ]; then

@@ -32,5 +32,13 @@ compiler, compiler version, compiler arch, enabled thread of not, and using llvm
 Because of MS-Windows, I, now, am hard to build Windows docker with CI. I will try my best to build image manually.
 
 ### Start
-You need a mongodb database, and then see the man page of glob-launch(1).
+
+You need a mongodb database, and then see the man page of **glob-launch(1)**.
+And then launch it, with docker, for more see the **glob-docker(7)**.
+
+### Upload
+
+If you want to upload thing, you need to write a Makefile. If you wnat to know how to write a Makefile to upload, see **glob-makefile(7)**.
+
+
 

@@ -24,7 +24,7 @@ mkdir docker.tmp
 mkdir docker.tmp/bin
 sudo cp $HOME/.local/bin/glob-launch docker.tmp/bin
 sudo cp $TRAVIS_BUILD_DIR/integration/Dockerfiles/hub/Dockerfile docker.tmp
-sudo cp $TRAVIS_BUILD_DIR/integration/ShellScript/start.sh docker.tmp/bin
+sudo cp $TRAVIS_BUILD_DIR/integration/ShellScript/entrypoint.sh docker.tmp
 echo build docker
 cd docker.tmp
 docker build -t qinka/glob:$DOCKER_IMAGE_TAG .

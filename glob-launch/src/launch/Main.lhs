@@ -34,6 +34,7 @@ launch = Launch
   { from = "stdin"
     &= typ "[stdin|FILEPATH]"
     &= help "The configure file glob loaded."
+    &= name "config" &= name "c" &= name "f"
   }
   &= verbosity
   &= help "You can turn on '+RTS -N' to let glob run faster."
