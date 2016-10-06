@@ -29,7 +29,7 @@ function fromenv
     echo From env >&2
     mkEtcGlob
     globPort=$(getEnv 3000 GLOB_PORT)
-    globDbAddr=$(getEnv "localhost:27017" GLOB_PORT)
+    globDbAddr=$(getEnv "localhost:27017" GLOB_DB_ADDR)
     globDbName=$(getEnv local GLOB_DB_NAME)
     globDbAm=$(getEnv master GLOB_DB_AM)
     globDbUsr=$(getEnv root GLOB_DB_USR)
@@ -102,7 +102,7 @@ function getEnv
 	if [ $count -gt 1 ] && [ "$flag1" = "env" ]; then
 	    echo "$(printenv $env)"
 	else
-	    echo "$2"
+	    echo "$(printenv $2)"
 	fi
 	exit 0
     else
