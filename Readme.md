@@ -40,5 +40,16 @@ And then launch it, with docker, for more see the **glob-docker(7)**.
 
 If you want to upload thing, you need to write a Makefile. If you wnat to know how to write a Makefile to upload, see **glob-makefile(7)**.
 
+## Other Docuemnts
 
+### Man Page
+
+document | infos
+--------|----------
+glob-launch(1) | For launcher.
+glob-ih(1) | For a  identification helper.
+glob-timecheck(1) | For the delay-checker.
+glob-docker(7) | About using Glob with Docker.
+glob-makefile(7) | About using make to upload.
+glob-inner-variables | About some inner variables.
 
