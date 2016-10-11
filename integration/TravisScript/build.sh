@@ -1,4 +1,6 @@
 #!/bin/bash
+
+O2FLAG=" --ghc-options -O2 "
 if [ -n "$STACKSOLVER" ]; then
   export STACKFILE=" --stack-yaml $TRAVIS_BUILD_DIR/integration/StackSolver/$STACKSOLVER "
 fi
@@ -8,4 +10,11 @@ fi
 if [ -n "$THREADED" ]; then
   export THREADFLAG=" --ghc-options -threaded "
 fi
-stack install glob-launch $STACKFILE  --ghc-options -O2 $THREADFLAG $LLVMFLAG
+if [ -n "$DEBUG" ]; then
+    export DEBUGFLAG=" --flag glob-core:debug-info "
+    if [ -z "$LLVM" ]; then
+	O2FLAG=" "
+    fi
+fi
+
+stack install glob-launch $STACKFILE $O2FLAG $THREADFLAG $LLVMFLAG $DEBUGFLAG
