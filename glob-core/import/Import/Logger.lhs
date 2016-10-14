@@ -15,9 +15,10 @@
 module Import.Logger
        ( module X
        , Logger(..)
+       , clockDateCacher
        ) where
 
 import System.Log.FastLogger as X
-import Network.Wai.Logger as X
+import Network.Wai.Logger 
 import Yesod.Core.Types
 \end{code}
