@@ -69,10 +69,17 @@ defGetServerName _ = "Glob-" ++ globCoreVersionStr
 Default of shutdown
 \begin{code}
 defSigINTHandle :: ToConfig a => a -> IO () -> IO ()
-defSigINTHandle _ f =  installHandler sigINT $ \sig ->
-  if sig ==sigINT
-  then f >> putStrLn "\nGoing to turn down"
-  else putStrLn $ "catch: " ++ show sig
+defSigINTHandle _ m =  installHandlers [ sigINT
+                                       , sigABRT
+                                       , sigTERM
+                                       ]
+  where
+    installHandlers sigs = mapM_ (flip installHandler goingDown) sigs
+    goingDown :: Handler
+    goingDown sig = do
+      m
+      putStrLn $ "\n Signal(" ++ show sig ++ ") was sent."
+      putStrLn "\n Glob is going to turn down!"
 \end{code}
 
 Default of setSettings
