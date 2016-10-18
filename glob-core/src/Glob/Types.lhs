@@ -170,29 +170,3 @@ instance ToJSON Rest where
     , "tags"        .= rTags
     ]
 \end{code}
-
-rest to RSS
-Title link description
-language default-author
-\begin{spec}
-rests2RSS :: T.Text -> T.Text -> T.Text
-          -> T.Text -> T.Text
-          -> [Rest] -> RSS
-rests2RSS title link des lang defA rs =
-  [xml|
-      <rssversion="2.0">
-      <channel>
-        <title>#{title}
-        <link>#{link}
-        <description>#{desc}
-        <language>#{lang}
-        $for r <- rs
-          <item>
-            <title> #{rTitle rs}
-            <link> #{T.concat (link:(map ("/" T.++) rIndex))]}
-            $maybe auth <- rWhose rs
-              <author> #{auth}
-            $nothing
-              <author>#{defA}
-      |]
-\end{spec}

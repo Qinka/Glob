@@ -10,7 +10,7 @@
   \CodeChangeLog{0.0.10.10}{2016.08.23}{using tryH to catch exception}
   \CodeChangeLog{0.0.10.10}{2016.08.23}{change to use stream}
   \CodeChangeLog{0.0.10.16}{2016.09.25}{with lts-7.0}
-  \CodeChangeLog{2016-09-25}{0.0.10.25}{a new way for query, and add rss}
+  \CodeChangeLog{2016-09-25}{0.0.10.25}{a new way for query}
   %\CodeChangeLog{date}{text}
 \end{codeinfo}
 
@@ -84,20 +84,3 @@ deleteUrlR idx = do
     Left e -> returnER e
     Right _ -> returnSucc
 \end{code}
-
-\begin{spec}
-postUrlR :: [T.Text] -> Handler TypedContent
-\end{spec}
-
-\begin{spec}
-postUrlR idx = do
-  meth <- lookupHeader "HOW"
-  case (meth,idx) of
-    (Just "put", "n":_) -> putNavR
-    (Just "get", "n":_) -> getNavR
-    (Just "del", "n":_) -> delNavR
-    (Just "put", "q":is) -> putQueryR is
-    (Just "get", "q":is) -> getQueryR is
-    (Just "del", "q":is) -> delQueryR is
-    _ -> notFound
-\end{spec}
