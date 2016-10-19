@@ -17,7 +17,7 @@ matrix:
             - hvr-ghc
           packages:
             - ghc-8.0.1
-    - env: GHC_VER=8.0.1 THREADED=t DEBUG=debug DOCKER=docker
+    - env: GHC_VER=8.0.1 THREADED=t DEBUG=debug IS_DOCKER=docker
       addons:
         apt:
           sources:
