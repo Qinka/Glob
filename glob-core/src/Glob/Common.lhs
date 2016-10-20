@@ -16,6 +16,11 @@
   \CodeChangeLog{2016-09-25}{0.0.10.16}{with lts-7.0}
 \end{codeinfo}
 
+Haskell Extension
+\begin{code}
+{-# LANGUAGE CPP #-}
+\end{code}
+
 \begin{code}
 module Glob.Common
        ( t2s, s2t
@@ -32,6 +37,7 @@ module Glob.Common
        , (<#>),(<%>), (=@)
        , returnE,returnET,returnER
        , globCoreBuildInfo
+       , isDebug
        ) where
 
 import Control.Monad
@@ -167,5 +173,19 @@ the build time of Glob
 globCoreBuildInfo :: Q Exp
 globCoreBuildInfo = do
   timeStr <- formatTime defaultTimeLocale "-%Y-%m-%d-%H-%M-%S" <$> runIO getCurrentTime
-  stringE $ os ++ "-" ++ arch ++ "-"  ++ map toUpper compilerName ++ "-" ++ showVersion compilerVersion++timeStr
+  stringE $ os ++ "-" ++ arch ++ "-"  ++ map toUpper compilerName ++ "-" ++ showVersion compilerVersion++timeStr++debugInfo
+  where
+    debugInfo = if isDebug then "-debug" else ""  
+\end{code}
+
+
+Debug? Or not
+\begin{code}
+isDebug :: Bool
+isDebug =
+#ifdef DEBUG
+  True
+#else
+  False
+#endif
 \end{code}

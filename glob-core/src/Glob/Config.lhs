@@ -12,11 +12,6 @@
   %\CodeChangeLog{date}{text}
 \end{codeinfo}
 
-Haskell Extension
-\begin{code}
-{-# LANGUAGE CPP #-}
-\end{code}
-
 \begin{code}
 module Glob.Config
        ( LogPath(..)
@@ -96,10 +91,5 @@ defSetSettings l = setInstallShutdownHandler (sigINTHandle l)
 the default of is debug
 \begin{code}
 defIsDebug :: IO Bool
-defIsDebug = 
-#ifdef DEBUG
-        return True
-#else
-        return False
-#endif
+defIsDebug = return isDebug
 \end{code}
