@@ -26,9 +26,6 @@ module Glob.Common
        ( t2s, s2t
        , b2tUtf8, t2bUtf8
        , s2bUtf8, b2sUtf8
-       , globCoreVersion
-       , globCoreVersionStr
-       , globCoreVersionQuote
        , tryH, catchH, handlerH
        , fromHttpDate2UTC
        , fromUTC2HttpDate
@@ -36,8 +33,7 @@ module Glob.Common
        , showJS,rawJS
        , (<#>),(<%>), (=@)
        , returnE,returnET,returnER
-       , globCoreBuildInfo
-       , isDebug
+       , module X
        ) where
 
 import Control.Monad
@@ -52,16 +48,15 @@ import Language.Haskell.TH
 import System.Info
 import Text.Julius (rawJS,RawJavascript)
 import Yesod.Core
-       
+
 import Import
-import Import.TH
-       
-import Data.Version
-import Paths_glob_core
+      
 
 import qualified Database.MongoDB as MDB
 import qualified Import.ByteStringUtf8 as B
 import qualified Import.Text as T
+
+import Glob.Common.Infos as X
 \end{code}
 
 transform between Text and String
@@ -86,13 +81,6 @@ s2bUtf8 :: String -> B.ByteString
 s2bUtf8 = t2bUtf8.s2t
 b2sUtf8 :: B.ByteString -> String
 b2sUtf8 = t2s.b2tUtf8
-\end{code}
-
-the version of glob-core
-\begin{code}
-globCoreVersion = version
-globCoreVersionStr = showVersion version
-globCoreVersionQuote = stringE $ showVersion version
 \end{code}
 
 Throw, catch, handler the exceptions.
@@ -167,25 +155,3 @@ returnER e = returnE e >>= (\strE -> respondSource "application/json"  $ do
                            )
 \end{code}
 
-
-the build time of Glob
-\begin{code}
-globCoreBuildInfo :: Q Exp
-globCoreBuildInfo = do
-  timeStr <- formatTime defaultTimeLocale "-%Y-%m-%d-%H-%M-%S" <$> runIO getCurrentTime
-  stringE $ os ++ "-" ++ arch ++ "-"  ++ map toUpper compilerName ++ "-" ++ showVersion compilerVersion++timeStr++debugInfo
-  where
-    debugInfo = if isDebug then "-debug" else ""  
-\end{code}
-
-
-Debug? Or not
-\begin{code}
-isDebug :: Bool
-isDebug =
-#ifdef DEBUG
-  True
-#else
-  False
-#endif
-\end{code}

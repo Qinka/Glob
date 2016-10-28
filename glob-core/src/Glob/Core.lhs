@@ -14,6 +14,7 @@
 \begin{code}
 module Glob.Core
        ( module X
+       , globCore
        ) where
 
 
@@ -22,8 +23,25 @@ import Glob.Config     as X
 import Glob.Foundation as X
 import Glob.Handler    as X
 
+import Glob.Common.Infos(isDebug)
+import Network.Wai.Middleware.RequestLogger
+import Network.Wai.Middleware.Gzip
+import Yesod.Core
 import Yesod.Core.Dispatch
        
 mkYesodDispatch "Glob" resourcesGlob
+
+globCore :: ( ToConfig a
+            , CfgD a ~ b
+            , Yesod b
+            , YesodDispatch b
+            )
+         => a -> IO Application
+globCore cfg =
+  toCfgD cfg >>= toWaiApp >>=  withMiddleware
+  where
+    withMiddleware = return
+      . (if isDebug then logStdoutDev else id)
+      . gzip def
 \end{code}
 

@@ -59,7 +59,7 @@ class FromJSON a => ToConfig a where
 Default of getServerName
 \begin{code}
 defGetServerName :: ToConfig a => a -> String
-defGetServerName _ = "Glob-" ++ globCoreVersionStr
+defGetServerName _ = "Glob-" ++ $globCoreVersionQuote
 \end{code}
 
 Default of shutdown
@@ -74,7 +74,7 @@ defSigINTHandle _ m =  installHandlers [ sigINT
     goingDown :: Handler
     goingDown sig = do
       m
-      putStrLn $ "\n Signal(" ++ show sig ++ ") was sent."
+      putStrLn $ "\n Signal(" ++ show sig ++ ") was received."
       putStrLn "\n Glob is going to turn down!"
 \end{code}
 

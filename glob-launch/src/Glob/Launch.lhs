@@ -94,7 +94,7 @@ runToConfig :: ( ToConfig a
                , YesodDispatch b
                )
             => a -> IO ()
-runToConfig cfg = toCfgD cfg >>= toWaiApp >>= runSettings (settings defaultSettings)
+runToConfig cfg = globCore cfg >>= runSettings (settings defaultSettings)
   where settings = setSettings cfg
 \end{code}
 

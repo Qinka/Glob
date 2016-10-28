@@ -21,14 +21,20 @@ if [ -n "$IS_DOCKER" ]; then
     fi
     if [ -n "$DEBUG" ]; then
 	export DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG-debug
+	export DEBUG_EXT=.debug
     fi
     echo copy files
     cd $TRAVIS_BUILD_DIR
     mkdir docker.tmp
     mkdir docker.tmp/bin
     sudo cp $HOME/.local/bin/glob-launch docker.tmp/bin
-    sudo cp $TRAVIS_BUILD_DIR/integration/Dockerfiles/hub/Dockerfile docker.tmp
-    sudo cp $TRAVIS_BUILD_DIR/integration/ShellScript/entrypoint.sh docker.tmp
+    if [ -n "$DEBUG" ]; then
+	sudo cp $TRAVIS_BUILD_DIR/integration/Dockerfiles/hub/Dockerfile.debug docker.tmp/Dockerfile
+	sudo cp $TRAVIS_BUILD_DIR/integration/ShellScript/entrypoint.py docker.tmp
+    else
+	sudo cp $TRAVIS_BUILD_DIR/integration/Dockerfiles/hub/Dockerfile docker.tmp
+	sudo cp $TRAVIS_BUILD_DIR/integration/ShellScript/entrypoint.sh docker.tmp
+    fi
     echo build docker
     cd docker.tmp
     docker build -t qinka/glob:$DOCKER_IMAGE_TAG .

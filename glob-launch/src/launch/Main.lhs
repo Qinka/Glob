@@ -42,6 +42,7 @@ launch = Launch
                ++ $(globCoreVersionQuote)
                ++ ";glob-launch-"
                ++ $(globLaunchVersionQuote)
+               ++ ";"
                ++ $(globCoreBuildInfo)
              )
 fromLaunch :: Launch -> String

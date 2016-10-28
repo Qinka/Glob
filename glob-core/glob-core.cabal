@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-core
-version:             0.0.10.27
+version:             0.0.10.30
 synopsis:            A blog.
 description:         A blog framework.
 license:             AllRightsReserved
@@ -22,6 +22,7 @@ flag debug-info
                      
 library
   exposed-modules:   Glob.Common
+                   , Glob.Common.Infos
                    , Glob.Core
                    , Glob.Model
   other-modules:     Glob.Auth
@@ -56,6 +57,7 @@ library
                      , conduit >= 1.2.6
                      , directory >= 1.2.6
                      , fast-logger >= 2.4
+                     , gitrev >= 1.2
                      , glob-auth >= 0.0.9.0
                      , http-date >= 0.0.6
                      , http-types >= 0.9.1
@@ -72,6 +74,7 @@ library
                      , template-haskell >= 2.11
                      , transformers >= 0.5.2
                      , wai >= 3.2
+                     , wai-extra >= 3.0.15
                      , wai-logger >= 2.3
                      , warp >= 3.2.7
                      , xml-hamlet >= 0.4.0.10

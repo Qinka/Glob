@@ -1,0 +1,9 @@
+# build
+FROM index.docker.io/library/debian:latest
+MAINTAINER qinka
+RUN apt update && apt install -y libgmp10 wget curl jq nano python3 python
+ENV GLOB_DEBUG true
+ADD bin /usr/bin
+COPY entrypoint.py entrypoint
+ENTRYPOINT ["/entrypoint"]
+#CMD start.sh fromenv
