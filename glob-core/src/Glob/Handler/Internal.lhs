@@ -39,6 +39,7 @@ import qualified Import.ByteStringUtf8 as B
 \begin{code}
 lookupPostUnRest :: [T.Text] -> Handler (Maybe Rest)
 lookupPostUnRest idx = do
+  $logDebugS "Un Rest" (T.concat idx)
   ty <- lookupPostParam "type"
   ct <- lookupPostParam "create-time"
   ut <- lookupPostParam "update-time"
@@ -58,11 +59,12 @@ lookupPostUnRest idx = do
 restItem :: Val a => Maybe Rest -> Maybe a
          -> ( a -> Rest -> Action Handler ())
          -> Handler TypedContent
-restItem unR item f = case (unR,item) of
-  (Just r,Just i) -> do
-    rt <- tryH.runDB' $ f i r
-    returnItem rt
-  _ ->  invalidArgs [" args failed"]
+restItem unR item f = do
+  case (unR,item) of
+    (Just r,Just i) -> do
+      rt <- tryH.runDB' $ f i r
+      returnItem rt
+    _ ->  invalidArgs [" args failed"]
   where
     returnItem (Left e) = returnER e
     returnItem (Right _) = respondSource "" $ sendChunkText "success"

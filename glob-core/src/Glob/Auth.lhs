@@ -28,14 +28,16 @@ import Glob.Common
        
 import Import
 import qualified Import.ByteStringUtf8 as B
+import qualified Import.Text as T
 \end{code}
 
 用于后台验证的
 \begin{code}
-bgAuth :: Yesod    site
+bgAuth :: Yesod site
        => String
        -> HandlerT site IO AuthResult
-bgAuth pskKeyEnvVal = fetchToken checkToken
+bgAuth pskKeyEnvVal = do 
+  fetchToken checkToken
   where
     checkToken tokens time = do
       let strTime = show time
@@ -43,11 +45,15 @@ bgAuth pskKeyEnvVal = fetchToken checkToken
       if floorTime <= time && upperTime >= time
         then fetchItem strTime >>= checkItem tokens
         else return $ Unauthorized "Who are you! The thing did not answer."
-    fetchItem strTime = liftIO $!
-      transPsk2Token strTime.words <$> getEnv pskKeyEnvVal
-    checkItem tokens st = if s2bUtf8 st `elem` tokens
-                          then return Authorized
-                          else return $ Unauthorized ":( Who are you!"
+    fetchItem strTime = do
+      psk <- liftIO $! transPsk2Token strTime.words <$> getEnv pskKeyEnvVal
+      $logDebugS "Auth" (T.showT (strTime ++ " ;; " ++ psk))
+      return psk
+    checkItem tokens st = do
+      $logDebugS "Auth Eq" (T.showT tokens)
+      if s2bUtf8 st `elem` tokens
+        then return Authorized
+        else return $ Unauthorized ":( Who are you!"
     getTimeValidBound delta = getCurrentTime >>=
       (\utcNow -> return ( addUTCTime (-delta) utcNow
                          , addUTCTime   delta  utcNow
@@ -55,6 +61,7 @@ bgAuth pskKeyEnvVal = fetchToken checkToken
     fetchToken f = do
       tokens <- lookupHeaders "Token"
       time <- parseHTTPDateMaybe <$> lookupHeader "Date"
+      $logDebugS "Auth Time" (T.showT time)
       case time of
         Just ti -> f tokens ti
         _ -> invalidArgs ["Error Header","token","Date"]

@@ -44,8 +44,11 @@ getUrlR,putUrlR,deleteUrlR :: [T.Text] -> Handler TypedContent
 \end{code}
 
 \begin{code}
-getUrlR idx@("@":_) = getQueryR idx =<< runDB' (fetchRest idx)
+getUrlR idx@("@":_) = do
+  $logDebugS "Router Recode" "the query one in GET"
+  getQueryR idx =<< runDB' (fetchRest idx)
 getUrlR idx = do
+  $logDebugS "Router Recode" "the normal one in GET"
   rest <- runDB' $ fetchRest idx
   case rType <$> rest of
     Just "post" -> getPostR rest
@@ -56,8 +59,11 @@ getUrlR idx = do
     _ -> notFound
 \end{code}
 \begin{code}
-putUrlR ("@":"@nav":_) = putNavR
+putUrlR ("@":"@nav":_) = do
+  $logDebugS "Route Recode" "the nav one in PUT"
+  putNavR
 putUrlR idx = do
+  $logDebugS "Route Recode" "the normal one in PUT"
   typ <- lookupPostParam "type"
   case typ of
     Just "post" -> restPostR idx
@@ -69,8 +75,11 @@ putUrlR idx = do
     _ -> notFound
 \end{code}
 \begin{code}
-deleteUrlR ("@":"@nav":_) = delNavR
+deleteUrlR ("@":"@nav":_) = do
+  $logDebugS "Route Recode" "the nav one in DELETE"
+  delNavR
 deleteUrlR idx = do
+  $logDebugS "Route Recode" "the normal one in DELETE"
   typ <- lookupPostParam "type"
   db <- case typ of
     Just "post" -> return "post"
