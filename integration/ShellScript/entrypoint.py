@@ -99,7 +99,7 @@ def execGlob(path='/etc/glob/config'):
 
 def printD(text):
     isDebug = os.getenv("GLOB_DEBUG")
-    if isDebug is None:
+    if not (isDebug is None):
         print text
     
 def writeToEtc(content):
