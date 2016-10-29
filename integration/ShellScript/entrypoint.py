@@ -95,7 +95,7 @@ def checkPassword():
 
 def execGlob(path='/etc/glob/config'):
     printD(open(path).read())
-    os.execl('/usr/bin/glob-launch','-c',path,'+RTS','-N','-RTS')
+    os.system('glob-launch -c '+path +' +RTS -N -RTS')
 
 def printD(text):
     isDebug = os.getenv("GLOB_DEBUG")
