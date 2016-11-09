@@ -15,6 +15,7 @@
   \CodeChangeLog{0.0.10.10}{2016.08.23}{using tryH to catch exception}
   \CodeChangeLog{0.0.10.10}{2016.08.23}{change to use stream}
   \CodeChangeLog{2016-09-25}{0.0.10.16}{with lts-7.0}
+  \CodeChangeLog{0.0.10.31}{2016.11.09}{add tag to the post}}
 \end{codeinfo}
 
 \begin{code}
@@ -58,6 +59,7 @@ getPostR (Just rest@Rest{..}) = do
     Just pH -> respondHTML pH
     _ -> notFound
   where
+    withTags xs = toWidget [julius|tags=#{xs};|]
     withSummary (Just sH) = [whamlet|<summary id=sum>#{sH}|]
     withSummary _ = return ()
     withWhose (Just au) = do
@@ -69,6 +71,7 @@ getPostR (Just rest@Rest{..}) = do
       withSummary sH
       [whamlet|#{pH}|]
       withWhose rWhose
+      withTags $ toJSON rTags
     respondHTML pH = do
       let sH = preEscapedToHtml <$> rSummary
       html <- withHTML pH sH
