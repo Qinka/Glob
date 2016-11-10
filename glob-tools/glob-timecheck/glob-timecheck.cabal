@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-timecheck
-version:             0.0.10.11
+version:             0.1.0.0
 synopsis:            a serial tool of glob
 description:         the tool transform tokens and other things to curl's options
 license:             AllRightsReserved

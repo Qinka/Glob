@@ -35,7 +35,7 @@ library
                      , base >=4.7 && <4.10
                      , bytestring >= 0.10.8
                      , gitrev >= 1.2
-                     , glob-core >= 0.0.9
+                     , glob-core >= 0.1
                      , template-haskell >= 2.11
                      , text >= 1.2
                      , wai >= 3.2
