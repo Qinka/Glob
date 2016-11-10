@@ -21,11 +21,14 @@ module Glob.Launch
        , readFromPath
        , runToConfig
        , globLaunchVersionQuote
-       , globLaunchVersionStr
        , globLaunchVersion
+       , globLaunchGitBranchQuote
+       , globLaunchGitCommitQuote
+       , glob_middleware
        ) where
 
-import Glob.Common
+--import Glob.Common
+import Glob.Common.Infos as CoreInfos
 import Glob.Core
 import Glob.Model
 import Paths_glob_launch
@@ -33,10 +36,15 @@ import Paths_glob_launch
 import Control.Applicative ((<|>))
 import Data.Char
 import Data.String
+import Development.GitRev
 import System.IO
+
 import Yesod.Core
 import Network.Wai.Handler.Warp
 
+import Network.Wai
+import Network.Wai.Middleware.RequestLogger
+import Network.Wai.Middleware.Gzip
 import Data.Version
 import Language.Haskell.TH
        
@@ -69,7 +77,7 @@ read Config from file
 \begin{code}
 parseCfgFileJSON :: ToConfig a => String -> Maybe a
 parseCfgFileJSON str = A.decode blStr
-  where blStr = BL.fromStrict $ s2bUtf8 str
+  where blStr = BL.fromStrict $ TE.encodeUtf8 $ T.pack str
 parseCfgFileYAML :: ToConfig a => String -> Maybe a
 parseCfgFileYAML str = Y.decode blStr
   where  blStr = TE.encodeUtf8 $ T.pack str
@@ -94,13 +102,34 @@ runToConfig :: ( ToConfig a
                , YesodDispatch b
                )
             => a -> IO ()
-runToConfig cfg = globCore cfg >>= runSettings (settings defaultSettings)
-  where settings = setSettings cfg
+runToConfig cfg = toCfgD cfg >>= toWaiApp >>= run
+  where
+    settings = setSettings cfg
+    run = runSettings (settings defaultSettings).glob_middleware
 \end{code}
 
 version
 \begin{code}
-globLaunchVersion      =                       version
-globLaunchVersionStr   =           showVersion version
+globLaunchVersion :: Version
+globLaunchVersion = version
+globLaunchVersionQuote :: Q Exp
 globLaunchVersionQuote = stringE $ showVersion version
+globLaunchGitBranchQuote :: Q Exp
+globLaunchGitBranchQuote = gitBranch
+globLaunchGitCommitQuote :: Q Exp
+globLaunchGitCommitQuote = gitHash
+\end{code}
+
+
+\begin{code}
+glob_middleware :: Middleware
+glob_middleware = debugItem.gzipItem
+  where
+    debugItem = if CoreInfos.isDebug then logStdoutDev else id
+    gzipItem =
+#ifdef WithMiddlewareGzip
+       gzip def
+#else
+       id
+#endif
 \end{code}
