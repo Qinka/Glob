@@ -51,5 +51,5 @@ glob-ih(1) | For a  identification helper.
 glob-timecheck(1) | For the delay-checker.
 glob-docker(7) | About using Glob with Docker.
 glob-makefile(7) | About using make to upload.
-glob-inner-variables | About some inner variables.
+glob-inner-variables(7) | About some inner variables.
 

@@ -40,9 +40,10 @@ packages:
 - glob-auth/
 - glob-core/
 - glob-launch/
-- glob-tools/glob-tool
-- glob-tools/glob-ih
-- glob-tools/glob-timecheck
+- glob-tools/glob-tool/
+- glob-tools/glob-ih/
+- glob-tools/glob-timecheck/
+- glob-tools/glob-update/
 #- glob-tools/glob-newpost
 
 # Dependency packages to be pulled from upstream that are not in the resolver
