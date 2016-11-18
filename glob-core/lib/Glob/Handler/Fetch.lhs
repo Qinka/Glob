@@ -55,8 +55,9 @@ pages
 getPostR :: Maybe Rest -> Handler TypedContent
 getPostR (Just rest@Rest{..}) = do
   html <- runDB' $ fetchPost rest
+  isRaw <- null <$> lookupHeaders "RAW123RAW"
   case html of
-    Just pH -> respondHTML pH
+    Just pH -> respondHTML isRaw pH
     _ -> notFound
   where
     withTags xs = toWidget [julius|tags=#{xs};|]
@@ -72,7 +73,10 @@ getPostR (Just rest@Rest{..}) = do
       [whamlet|#{pH}|]
       withWhose rWhose
       withTags $ toJSON rTags
-    respondHTML pH = do
+    respondHTML False pH = respondSource "text/html" $ do
+      sendChunkHtml pH
+      sendFlush
+    respondHTML True pH = do
       let sH = preEscapedToHtml <$> rSummary
       html <- withHTML pH sH
       respondSource "text/html" $ do
