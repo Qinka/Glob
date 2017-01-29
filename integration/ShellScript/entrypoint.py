@@ -3,10 +3,36 @@
 import subprocess,sys,os
 import json
 import urllib,urllib2
+import re
+
+
+
+
+
+
 
 
 
 ## Functions
+
+def evalEnv(str):
+  rePa = r'\$\(\w*\)'
+  subs = re.findall(rePa,str)
+  spls = re.split(rePa,str)
+  finstr = ""
+  for i in range(len(subs)):
+    finstr += spls[i]
+    finstr += evalEnv(getEnvStr(subs[i]))
+  finstr += spls[len(subs)];
+  return finstr
+
+def getEnvStr(envName):
+  rt = os.getenv(envName[2:len(envName)-1])
+  if rt is None:
+      rt = ""
+  return rt
+
+
 
 def fromurl(url):
     print "From url", url
@@ -78,7 +104,14 @@ def getEnv(d,env,k=False):
         return d
         
 def getEnvE(d,env):
-    return getEnv(d,env,True)
+    env = '$(' + env + ')'
+    rt = evalEnv(env)
+    if len(rt) == 0:
+        return d
+    else:
+        return rt
+
+
                                             
 def checkPassword():
     cfg = open("/etc/glob/config")
