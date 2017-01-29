@@ -10,20 +10,20 @@ cache:
 # the matrix of settings
 matrix:
   include:
-    - env: GHC_VER=8.0.1 THREADED=t LLVM=3.7 DEBUG=debug
+    - env: GHC_VER=8.0.2 THREADED=t LLVM=3.7 DEBUG=debug
       addons:
         apt:
           sources:
             - hvr-ghc
           packages:
-            - ghc-8.0.1
-    - env: GHC_VER=8.0.1 THREADED=t DEBUG=debug IS_DOCKER=docker
+            - ghc-8.0.2
+    - env: GHC_VER=8.0.2 THREADED=t DEBUG=debug IS_DOCKER=docker
       addons:
         apt:
           sources:
             - hvr-ghc
           packages:
-            - ghc-8.0.1
+            - ghc-8.0.2
 
 # using docker
 services:
