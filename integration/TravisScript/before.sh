@@ -28,6 +28,7 @@ docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 ######
 echo setting up ghc
 export PATH=/opt/ghc/$GHC_VER/bin:$PATH
+ghc -V
 echo install stack
 mkdir -p ~/.local/bin
 export PATH=$HOME/.local/bin:$PATH
