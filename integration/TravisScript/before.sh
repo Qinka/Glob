@@ -30,6 +30,12 @@ echo install stack
 mkdir -p ~/.local/bin
 export PATH=$HOME/.local/bin:$PATH
 travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+echo check ghc
+if `ghc --numberic-version` != "$GHC_VERSION"
+   stack setup
+   export PATH=`stack path --programs`/ghc-$GHC_VERSION/bin:$PATH
+fi
+
 echo setting up ghc
 export PATH=/opt/ghc/$GHC_VER/bin:$PATH
 ######
