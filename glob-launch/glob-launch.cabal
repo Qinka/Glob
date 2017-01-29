@@ -9,7 +9,7 @@ license:             AllRightsReserved
 license-file:        LICENSE
 author:              Qinka
 maintainer:          qinka@live.com
-copyright:           2016 Qinka <qinka@live.com>
+copyright:           2016-2017 Qinka <qinka@live.com>
 category:            Web
 build-type:          Simple
 extra-source-files:  ChangeLog.md
@@ -80,4 +80,4 @@ source-repository head
   type: git
   location: https://github.com/Qinka/Glob.git
   subdir: glob-core
-  branch: 0.0.10-dev
+  branch: 0.1.0-dev
