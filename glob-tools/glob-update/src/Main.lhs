@@ -174,9 +174,9 @@ makeHandleS (Make id Basic) = case id of
   where
     pTimeCheck = do
       putStrLn $ unlines [ "# time check #"
+                         , "check-delay:"
                          , (unlines.map ('\t':))
-                           [ "check-delay:"
-                           , "@$(ECHO)"
+                           [ "@$(ECHO)"
                            , "@$(ECHO) check time"
                            , "@$(ECHO) $(CURL_PATH) \' -X GET ' $(SITE_URL)/@/~servertime | $(SHELL) | $(TIMECHECK_PATH)"
                            , "@$(ECHO)"
@@ -204,7 +204,7 @@ makeHandleS (Make id Basic) = case id of
       putStrLn $ "IH_PATH=" ++ ih_path
       putStrLn "## The delay between server and glob-ih"
       ih_delay <- ihDelay <$> getGlobal
-      putStrLn $ "IH_DELAY" ++ ih_delay
+      putStrLn $ "IH_DELAY=" ++ ih_delay
       putStrLn "## Get the time of now via glob-ih"
       ih_now <- ihNow <$> getGlobal
       putStrLn $ "IH_NOW="++ih_now
@@ -218,7 +218,7 @@ makeHandleS (Make id Basic) = case id of
       putStrLn $ "SHELL=" ++ shell_kind
       putStrLn "## The echo or some things like that"
       echo_kind <- echoKind <$> getGlobal
-      putStrLn $ "$ECHO=" ++ echo_kind ++ "\n"
+      putStrLn $ "ECHO=" ++ echo_kind ++ "\n"
     pCURL = do
       putStrLn "# CURL #"
       putStrLn "## Path of CURL"
