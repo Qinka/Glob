@@ -61,10 +61,11 @@ restItem :: Val a => Maybe Rest -> Maybe a
          -> Handler TypedContent
 restItem unR item f = do
   case (unR,item) of
+    (Nothing,_) -> invalidArgs [" args failed"]
+    (_,Nothing) -> invalidArgs ["args failed "]
     (Just r,Just i) -> do
       rt <- tryH.runDB' $ f i r
       returnItem rt
-    _ ->  invalidArgs [" args failed"]
   where
     returnItem (Left e) = returnER e
     returnItem (Right _) = respondSource "" $ sendChunkText "success"

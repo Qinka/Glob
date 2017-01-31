@@ -19,6 +19,7 @@ module Import.Text
        ) where
 
 import Data.Text as X
+import Data.Text.IO as X
 import Data.Text.Lazy
 import Data.Text.Encoding as X
 \end{code}

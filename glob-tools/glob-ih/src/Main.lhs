@@ -16,6 +16,9 @@ module Main
        ) where
 
 import Control.Monad
+import Crypto.Hash.Algorithms
+import Crypto.PubKey.RSA
+import Crypto.PubKey.RSA.PSS
 import Data.Char
 import Data.Maybe
 import Data.Time
@@ -28,7 +31,11 @@ import System.IO
 import Data.Version
 import Paths_glob_ih
 
-import qualified GHC.IO.Encoding as E
+import qualified GHC.IO.Encoding        as E
+import qualified Data.Text              as T
+import qualified Data.Text.Encoding     as TE
+import qualified Data.ByteString        as B
+import qualified Data.ByteString.Base64 as B64
 \end{code}
 
 main
@@ -42,8 +49,8 @@ main = do
   (os,ns) <- getArgs >>= compilerOpts
   case os of
     OptHelp v    -> helpMain v
-    OptTime tf f -> timeMain tf f
-    OptMix   f v -> mixMain f ns v
+    OptTime tf f d   -> timeMain tf f  d
+    OptMix  f  v d p -> mixMain  f  ns v d p
 \end{code}
 
 the main of help
@@ -58,8 +65,8 @@ helpMain v = if v
 
 the main of time print
 \begin{code}
-timeMain :: OptTimeFormat -> Int -> IO ()
-timeMain otf f = putStr =<< trans <$> getCurrentTime
+timeMain :: OptTimeFormat -> Int -> Double -> IO ()
+timeMain otf f d = putStr =<< trans <$> getCurrentTime
   where
     trans' = case otf of
       OTFHaskell -> show
@@ -70,19 +77,23 @@ timeMain otf f = putStr =<< trans <$> getCurrentTime
 
 the main of mix
 \begin{code}
-mixMain :: Int -> [String] -> Bool ->  IO ()
-mixMain f tokens v = do
+mixMain :: Int -> [String] -> Bool -> Double -> FilePath -> IO ()
+mixMain f tokens v dl fp = do
   now <- getCurrentTime
-  let dt       = addUTCTime (fromIntegral f) now
-  let d        = formatTime defaultTimeLocale "%a, %d %b %G %T GMT" dt
-  let ut       = readTime   defaultTimeLocale "%a, %d %b %G %T GMT" d :: UTCTime
-  let s        = transPsk2Token (show ut) tokens
+  priKey <- read <$> readFile fp
+  let dt             = addUTCTime (fromIntegral f) now
+      str            = show dt ++ show dl
+      sByte          = TE.encodeUtf8 $ T.pack str
+      sha512pss      = defaultPSSParams SHA512 :: PSSParams SHA512 B.ByteString B.ByteString
+  signed    <- (T.unpack . TE.decodeUtf8 . B64.encode . (\(Right r) -> r)) <$> signSafer sha512pss priKey sByte
   cmds <- getContents
   put.concat.lines $ cmds
-    ++ "-H \"Token:"
-    ++ s
-    ++ "\" -H \"Date:"
-    ++ d
+    ++ "-F \"sha-text="
+    ++ signed
+    ++ "\" -F \"time="
+    ++ show dt
+    ++ "\" -F \"delta="
+    ++ (show dl)
     ++ "\" "
   where  put t = putStr t >> when v (hPutStrLn stderr t)
 \end{code}
@@ -97,10 +108,13 @@ data Options = OptHelp
              | OptTime
                { otTimeFormat :: OptTimeFormat
                , otTimeFix    :: Int
+               , otDelta      :: Double
                }
              | OptMix
                { omTimeFix    :: Int
                , omVerbose    :: Bool
+               , omDelta      :: Double
+               , oPriKey      :: FilePath
                }
 \end{code}
 
@@ -112,6 +126,8 @@ options =
   , Option ['t'] ["time-print"] (OptArg timeprint "format") "print the current time"
   , Option ['m'] ["mix"]        (NoArg  mix               ) "mix the things"
   , Option ['f'] ["fix"]        (ReqArg timefix "time fix") "fix the time-diff"
+  , Option ['d'] ["delta"]      (ReqArg delta "delta"     ) "delta "
+  , Option ['p'] ["private-key"](ReqArg pkfile "FilePath" ) "Private Key file"
   , Option ['v'] ["verbose"]    (NoArg  verbose           ) "show details"
   , Option ['V'] ["version"]    (NoArg  ver               ) "show version"
   ]
@@ -141,7 +157,7 @@ data OptTimeFormat = OTFHaskell
 default time format
 \begin{code}
 defOptTime :: Options
-defOptTime = OptTime OTFHaskell 0
+defOptTime = OptTime OTFHaskell 0 6
 \end{code}
 
 time print
@@ -154,14 +170,14 @@ timeprint' mf opt = opt {otTimeFormat = tf}
           Just "http"    -> OTFHttp
           Just _         -> OTFOther $ fromMaybe (error "how come?") mf
 timeprint mf     (OptHelp _ )  = timeprint' mf defOptTime
-timeprint mf opt@(OptTime _ _) = timeprint' mf opt
+timeprint mf opt@(OptTime _ _ _) = timeprint' mf opt
 timeprint _  opt               = opt
 \end{code}
 
 default of OptMix
 \begin{code}
 defOptMix :: Options
-defOptMix = OptMix 0 False
+defOptMix = OptMix 0 False 6 ""
 \end{code}
 
 for mix
@@ -174,16 +190,31 @@ mix opt     = opt
 to show details
 \begin{code}
 verbose :: Options -> Options
-verbose opt@(OptMix _ _) = opt {omVerbose = True}
+verbose opt@(OptMix _ _ _ _) = opt {omVerbose = True}
 \end{code}
 
 time fix use -f or --fix
 \begin{code}
-timefix ::String -> Options -> Options
-timefix f opt@(OptTime _ _) = opt {otTimeFix = read f}
-timefix f opt@(OptMix _ _)    = opt {omTimeFix = read f}
+timefix :: String -> Options -> Options
+timefix f opt@(OptTime _ _ _) = opt {otTimeFix = read f}
+timefix f opt@(OptMix _ _ _ _)    = opt {omTimeFix = read f}
 timefix _ opt               = opt
 \end{code}
+
+\begin{code}
+delta :: String -> Options -> Options
+delta f opt@(OptTime _ _ _) = opt {otDelta = read f}
+delta f opt@(OptMix _ _ _ _)  = opt {omDelta = read f}
+delta _ opt               = opt
+\end{code}
+
+\begin{code}
+pkfile :: String -> Options -> Options
+pkfile f opt@(OptMix _ _ _ _) = opt {oPriKey = f}
+pkfile _ opt                  = opt
+\end{code}
+
+
 
 to compiler opts
 \begin{code}

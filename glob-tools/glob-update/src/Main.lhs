@@ -7,9 +7,10 @@ module Main
 
 import Control.Monad
 import Data.Data
-
 import Data.IORef
 import System.IO.Unsafe
+
+import Glob.Update
 
 import Import
 import qualified Import.ByteString.Lazy as BL
@@ -123,7 +124,7 @@ makeHandleS (Make id Item) = do
   case item of
     Nothing -> do putStrLn "Sorry, the id is error"
                   whenLoud $ putStrLn $ ".infos/"++id++".json does not exist"
-    Just (Res i p ti ts s co ct w) -> do
+    Just (Res i su ti ts s co ct w) -> do
       let dpS = case s of
             Left i -> ' ':i
             Right _ -> ""
@@ -134,110 +135,148 @@ makeHandleS (Make id Item) = do
             TextFile t' -> ("text","text",' ':t')
             Static u' -> ("static","url","")
             Query v' -> ("query","var","")
-      putStrLn $ id++":"++dpF++dpS
-      let isPandocF = length dpF > 6 && take 5 (reverse dpF) /= ".lmth"
-          isPandocS = length dpS > 6 && take 5 (reverse dpS) /= ".lmth"
-      when isPandocF $ putStrLn $ "\t@pandoc -o .ignore/"++i++".html"++dpF
-      when isPandocS $ putStrLn $ "\t@pandoc -o .ignore/"++i++".sum.html"++dpS
-      putStrLn $ "\t@$(ECHO) $(CURL_PATH) $(CURL_DETAIL) \' -X PUT -F \"type=" ++ typ ++ "\" \' \\"
-      putStrLn $ "\t\t\' -F \"create-time=" ++ (show ct) ++ "\" ' \\"
-      putStrLn $ "\t\t\' -F \"update-time=$(IH_NOW)\" \' \\"
-      putStrLn $ "\t\t\' -F \"title=" ++ ti ++ "\" \' \\"
-      case s of
-        Left f' -> putStrLn $ "\t\t\' -F \"summary=@.ignore/"++i++".sum.html\" \' \\ "
-        Right "" -> return ()
-        Right t' -> putStrLn $ "\t\t\' -F \"summary="++t'++"\" \' \\"
-      putStrLn $ "\t\t\' -F \""++cn++"="++fetchContent co++"\" \' \\"
-      case w of
-        Just w' -> putStrLn $ "\t\t\' -F \"whose="++w'++"\" \' \\"
-        Nothing -> return ()
-      let putTag = \tag -> putStrLn $ "\t\t\' -F \"tag="++tag++"\" \' \\"
-      mapM_ putTag ts
-      putStrLn $ "\t\t$(SITE_URL)"++p++" \' \' | $(IH_PATH) -m -f$(IH_DELAY) -v $(PSK) | $(SHELL)"
-      putStrLn $ id++".del:"
-      putStrLn $ "\t@$(ECHO) $(CURL_PATH) $(CURL_DETAIL) ' -X DELETE -F \"type="++typ++"\" \' \\"
-      putStrLn $ "\t\t$(SITE_URL)"++p++" \' \' | $(IH_PATH) -m -f$(IH_DELAY) -v $(PSK) | $(SHELL)\n"
+      let isPandoc fn = (fn,length fn > 6 && take 5 (reverse fn) /= ".lmth")
+      print $ mkUpdate id (isPandoc dpF,isPandoc dpS) ct ti i ts su typ (cn,fetchContent co) s w
+ 
       
-makeHandleS (Make id Basic) = case id of
-  "timecheck" -> pTimeCheck
-  "cleantmp" -> pCleanTmp
-  "site" -> pSite
-  "shell" -> pShell
-  "curl" -> pCURL
-  "comment" -> pComment
-  "all" -> do pComment
-              pCURL
-              pShell
-              pSite
-              pTimeCheck
-              pCleanTmp
-  where
-    pTimeCheck = do
-      putStrLn $ unlines [ "# time check #"
-                         , "check-delay:"
-                         , (unlines.map ('\t':))
-                           [ "@$(ECHO)"
-                           , "@$(ECHO) check time"
-                           , "@$(ECHO) $(CURL_PATH) \' -X GET ' $(SITE_URL)/@/~servertime | $(SHELL) | $(TIMECHECK_PATH)"
-                           , "@$(ECHO)"
-                           ]
-                         ]
-    pCleanTmp = do
-      putStrLn $ unlines [ "# clean #"
-                         , "clean-tmp:"
-                         , (unlines.map ('\t':))
-                           [ "@$(ECHO) Clean .ignore/tmp.*"
-                           , "@rm -f .ignore/tmp.*"
-                           , "@$(ECHO) DONE"
-                           ]
-                         ]
-    pSite = do
-      putStrLn "# SITE #"
-      putStrLn "## URL of site"
-      site_url <- siteUrl <$> getGlobal
-      putStrLn $ "SITE_URL=" ++ site_url
-      putStrLn "## Password"
-      psk' <- psk <$> getGlobal
-      putStrLn $ "PSK=" ++ psk'
-      putStrLn "## The path of glob-ih"
-      ih_path <- ihPath <$> getGlobal
-      putStrLn $ "IH_PATH=" ++ ih_path
-      putStrLn "## The delay between server and glob-ih"
-      ih_delay <- ihDelay <$> getGlobal
-      putStrLn $ "IH_DELAY=" ++ ih_delay
-      putStrLn "## Get the time of now via glob-ih"
-      ih_now <- ihNow <$> getGlobal
-      putStrLn $ "IH_NOW="++ih_now
-      putStrLn "## Check the delay"
-      tc_path <- timeCheckPath <$> getGlobal
-      putStrLn $ "TIMECHECK_PATH=" ++ tc_path ++ "\n"
-    pShell = do
-      putStrLn "# SHELL #"
-      putStrLn "## The shell we used"
-      shell_kind <- shellKind <$> getGlobal
-      putStrLn $ "SHELL=" ++ shell_kind
-      putStrLn "## The echo or some things like that"
-      echo_kind <- echoKind <$> getGlobal
-      putStrLn $ "ECHO=" ++ echo_kind ++ "\n"
-    pCURL = do
-      putStrLn "# CURL #"
-      putStrLn "## Path of CURL"
-      curl_path <- curlPath <$> getGlobal
-      putStrLn $ "CURL_PATH=" ++ curl_path
-      putStrLn $ "## show details or not"
-      curl_detail <- curlDetail <$> getGlobal
-      putStrLn $ "CURL_DETAIL=" ++ curl_detail ++ "\n"
-    pComment = do
-      putStrLn   "#\n# Makefile\n#"
-      putStrLn $ replicate 60 '#'
-      putStrLn   "##"
-      putStrLn   "##\tGlob Updating"
-      putStrLn   "##"
-      putStrLn   "##\tCreated by glob-update"
-      putStrLn   "##\tCopyright (C) 2016"
-      putStrLn   "##"
-      putStrLn $ replicate 60 '#'
-      putStrLn   "#\n"
+
+      
+makeHandleS (Make id Basic) = do
+  su    <- siteUrl       <$> getGlobal
+  pri   <- privateKey    <$> getGlobal
+  ihp   <- ihPath        <$> getGlobal
+  ihd   <- ihDelay       <$> getGlobal
+  ihn   <- ihNow         <$> getGlobal
+  tc    <- timeCheckPath <$> getGlobal
+  shell <- shellKind     <$> getGlobal
+  echo  <- echoKind      <$> getGlobal
+  cp    <- curlPath      <$> getGlobal
+  cd    <- curlDetail    <$> getGlobal
+  print $ case id of
+    "timecheck" -> mkTimeCheck
+    "cleantmp"  -> mkClean
+    "site"      -> mkSettingSite su pri ihp ihd ihn tc
+    "shell"     -> mkSettingShell shell echo
+    "curl"      -> mkSettingcURL cp cd
+    "comment"   -> mkComment
+    "all"    -> do mkComment
+                   mkSettingcURL cp cd
+                   mkSettingShell shell echo
+                   mkSettingSite su pri ihp ihd ihn tc
+                   mkTimeCheck
+                   mkClean
+     
+--mkUpdate :: UpdateM ()
+mkUpdate tag ((dpF,isF),(dpS,isS)) ct ti i ts su typ (cn,co) s w = do
+  target tag [dpF,dpS] $ echoM $ do
+    let chg is ii dp = when is $ cmd $
+          string $ "pandoc -o .ignore/" ++ ii ++ ".html" ++ dp
+    chg isF  i          dpF
+    chg isS (i++".sum") dpS
+    tCurlPath
+    tCurlDetail
+    tCurlMethod "PUT" >> nonEndLine
+    tCurlF "create-time" $ show ct
+    tCurlF "update-time" "$(IH_NOW)"
+    tCurlF "title" ti
+    tCurlF cn co
+    case s of
+      Left f'  -> tCurlF "summary" $ "@.ignore/" ++ i ++".sum.html"
+      Right "" -> return ()
+      Right t' -> tCurlF "summary" t'
+    case w of
+      Just w -> tCurlF "whose" w
+      _ -> return ()
+    mapM_ (\x -> tCurlF "tag" x) ts
+    tSiteUrl su
+    tShellPipe
+    string  " $(IH_PATH) -m "
+    string $ "-p \'$(PRIVATE_KEY)\'"
+    string $ "-d \'$(SITE_DETAL)\' -v"
+    tShellPipe >>  tShell >> endLine
+  target (tag ++ ".del") [] $ echoM $ do
+    tCurlPath
+    tCurlDetail
+    tCurlMethod "DELETE" >> nonEndLine
+    tCurlF "type" typ
+    tSiteUrl su
+    tShellPipe
+    string  " $(IH_PATH) -m "
+    string $ "-p \'$(PRIVATE_KEY)\'"
+    string $ "-d \'$(SITE_DETAL)\' -v"
+    tShellPipe >>  tShell >> endLine
+    
+                   
+mkClean :: UpdateM ()
+mkClean = do
+  comP "clean"
+  target "clean-tmp" [] $ do
+    echo "Clean .ignore/tmp.*"
+    cmd $ string "rm -rf .ignore/tmp.*" >> endLine
+    echo "DONE"
+  
+mkTimeCheck :: UpdateM ()
+mkTimeCheck = do
+  comP "TIME CHECK"
+  target "check-delay" [] $ do
+    echo ""
+    echo "check time"
+    echoM $ do
+      tCurlPath
+      tCurlMethod "GET"
+      tSiteUrl "/@/~servertime"
+      tShellPipe >> tShell >> tShellPipe
+      string "$(TIMECHECK_PATH)"
+    echo ""
+
+mkSettingSite :: String -> String -> String
+              -> String -> String -> String -> UpdateM ()
+mkSettingSite su pri ihp ihd ihn tc = do
+  comP "SITE"
+  comments 2 "URL of site"
+  "SITE_URL" \=\ su
+  comments 2 "Private key file"
+  "PRIVATE_KEY" \=\ pri
+  comments 2 "The path of glob-ih"
+  "IH_PATH" \=\ ihp
+  comments 2 "The delay between server and glob-ih"
+  "IH_DELAY" \=\ ihd
+  comments 2 "Get the time of now via glob-ih or date"
+  "IH_NOW" \=\ ihn
+  comments 2 "Check the delay"
+  "TIMECHECK_PATH" \=\ tc
+  comments 2 "Delta of site's check"
+  "DELTA" \=\ "6"
+
+mkSettingShell :: String -> String -> UpdateM ()
+mkSettingShell shell echo = do
+  comP "SHELL"
+  comments 2 "The shell will be used"
+  "SHELL" \=\ shell
+  comments 2 "The echo or some things like that"
+  "ECHO" \=\ echo
+      
+mkSettingcURL :: String -> String -> UpdateM ()
+mkSettingcURL cp cd = do
+  comP "cURL"
+  comments 2 "Path of cURL"
+  "CURL_PATH" \=\ cp
+  comments 2 "show details(flag, if don\'t want => spaces)"
+  "CURL_DELTAIL" \=\ cd
+
+mkComment :: UpdateM ()
+mkComment = do
+  string "#" >> endLine
+  comP "Makefile"
+  chars 60 '#' >> endLine
+  comments 2 ""
+  comS 2 "Glob Updating"
+  comments 2 ""
+  comS 2 "Created by glob-update"
+  comS 2 "Copyright (C) 2016-2017"
+  comments 2 ""
+  chars 60 '#' >> endLine
+  string "#" >> endLine  
 \end{code}
 
 
@@ -384,8 +423,10 @@ mkGlobalSetting = do
       echo_kind <- getLine
       putStrLn "type in the site's url:"
       site_url <- getLine
-      putStrLn "type in your password(WARRNING: THE PASSWORD WILL BE STORED IN PLAIN TEXT):"
+      putStrLn "type in your private key's path:"
       psk' <- getLine
+      putStrLn "type in your delta settings:"
+      delta <- getLine 
       putStrLn "type in your glob-ih's path:"
       ih_path <- getLine
       putStrLn "type in your delay between the site:"
@@ -396,7 +437,7 @@ mkGlobalSetting = do
       timecheck_path <- getLine
       putStrLn "type in who are your:"
       whose <- getLine
-      return $ GlobalSettings curl_path curl_detail shell_kind echo_kind site_url psk' ih_path ih_delay ih_now timecheck_path whose
+      return $ GlobalSettings curl_path curl_detail shell_kind echo_kind site_url psk' delta ih_path ih_delay ih_now timecheck_path whose
 \end{code}
 
 

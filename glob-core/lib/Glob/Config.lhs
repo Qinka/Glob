@@ -46,6 +46,7 @@ class FromJSON a => ToConfig a where
   getTimeout :: a -> Int
   getServerName :: a -> String
   getServerName = defGetServerName
+  getPKD :: a -> String
   toCfgD :: a -> IO (CfgD a)
   getListenType :: a -> String
   sigINTHandle :: a -> IO () -> IO ()

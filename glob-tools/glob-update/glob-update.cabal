@@ -27,6 +27,7 @@ executable glob-update
                        Import
                        Import.ByteString
                        Import.ByteString.Lazy
+                       Glob.Update
   default-extensions:  OverloadedStrings
                        RecordWildCards
                        DeriveDataTypeable

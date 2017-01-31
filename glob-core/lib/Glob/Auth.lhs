@@ -13,26 +13,19 @@
 
 \begin{code}
 module Glob.Auth
-       ( bgAuth
+       (
        ) where
 
-import Control.Concurrent(threadDelay)
-import Network.HTTP.Date
-import System.Environment
-import Yesod.Core
-import Yesod.Core.Handler
-       
-import Glob.Auth.Token
-import Glob.Model
-import Glob.Common
-       
-import Import
-import qualified Import.ByteStringUtf8 as B
-import qualified Import.Text as T
+
+\end{code}
+
+
+\begin{code}
+
 \end{code}
 
 用于后台验证的
-\begin{code}
+\begin{spec}
 bgAuth :: Yesod site
        => String
        -> HandlerT site IO AuthResult
@@ -66,4 +59,4 @@ bgAuth pskKeyEnvVal = do
         Just ti -> f tokens ti
         _ -> invalidArgs ["Error Header","token","Date"]
     parseHTTPDateMaybe = (fromHttpDate2UTC.b2sUtf8 <$>)
-\end{code}
+\end{spec}

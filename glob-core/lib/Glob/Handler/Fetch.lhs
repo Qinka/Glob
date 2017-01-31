@@ -32,7 +32,6 @@ module Glob.Handler.Fetch
 import Control.Exception (throw)
 import Control.Monad(mapM)
 import Data.Conduit
-import Glob.Auth.Token(globAuthVersionQuote)
 import Glob.Common
 import Glob.Foundation
 import Glob.Model

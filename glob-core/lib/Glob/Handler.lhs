@@ -23,7 +23,6 @@ module Glob.Handler
 
 import Control.Exception (throw)
 import Control.Monad(mapM)
-import Glob.Auth.Token(globAuthVersionQuote)
 import Glob.Common
 import Glob.Handler.Fetch
 import Glob.Handler.Query

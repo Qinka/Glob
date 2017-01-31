@@ -22,7 +22,6 @@ module Glob.Handler.Query
        , returnSucc
        ) where
 
-import Glob.Auth.Token(globAuthVersionQuote)
 import Glob.Common
 import Glob.Foundation
 import Glob.Handler.Internal
@@ -51,8 +50,6 @@ query
 getQueryR :: [T.Text] -> Maybe Rest -> Handler TypedContent
 getQueryR idx r  =
   case tail idx of
-    "~version":"glob-auth":_ -> respondSource "text/plain" $
-      sendChunkText $globAuthVersionQuote
     "~version":_ -> respondSource "text/plain" $
       sendChunkText $globCoreVersionQuote
     "~name":_ -> respondSource "text/plain" $

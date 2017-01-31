@@ -24,8 +24,7 @@ library
                        Glob.Common.Infos
                        Glob.Core
                        Glob.Model
-  other-modules:       Glob.Auth
-                       Glob.Config
+  other-modules:       Glob.Config
                        Glob.Foundation
                        Glob.Handler
                        Glob.Handler.Fetch
@@ -49,15 +48,16 @@ library
                        ViewPatterns
   build-depends:       aeson >= 0.10
                      , base >= 4.7 && < 4.10
+                     , base64-bytestring >= 1.0.0.0
                      , blaze-markup >= 0.7
                      , blaze-html >= 0.8.1
                      , bytestring >= 0.10.8
                      , cmdargs >= 0.10.10
                      , conduit >= 1.2.6
+                     , cryptonite >= 0.21
                      , directory >= 1.2.6
                      , fast-logger >= 2.4
                      , gitrev >= 1.2
-                     , glob-auth >= 0.1
                      , http-date >= 0.0.6
                      , http-types >= 0.9.1
                      , monad-control >= 1.0.1

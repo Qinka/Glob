@@ -104,17 +104,18 @@ instance FromJSON Res where
 the basic settings
 \begin{code}
 data GlobalSettings = GlobalSettings
-                      { curlPath :: String
-                      , curlDetail  :: String
-                      , shellKind :: String
-                      , echoKind :: String
-                      , siteUrl :: String
-                      , psk :: String
-                      , ihPath :: String
-                      , ihDelay :: String
-                      , ihNow :: String
+                      { curlPath      :: String
+                      , curlDetail    :: String
+                      , shellKind     :: String
+                      , echoKind      :: String
+                      , siteUrl       :: String
+                      , privateKey    :: String
+                      , siteDelta     :: String
+                      , ihPath        :: String
+                      , ihDelay       :: String
+                      , ihNow         :: String
                       , timeCheckPath :: String
-                      , owener :: String
+                      , owener        :: String
                       } deriving (Eq,Show)
                       
 instance ToJSON GlobalSettings where
@@ -124,12 +125,13 @@ instance ToJSON GlobalSettings where
     , "shell" .= shellKind
     , "echo" .= echoKind
     , "site-url" .= siteUrl
-    , "password" .= psk
+    , "private-key" .= privateKey
     , "ih-path" .= ihPath
     , "ih-delay" .= ihDelay
     , "ih-now" .= ihNow
     , "time-check-path" .= timeCheckPath
     , "owener" .= owener
+    , "site-delta" .= siteDelta
     ]
 
 instance FromJSON GlobalSettings where
@@ -139,7 +141,8 @@ instance FromJSON GlobalSettings where
     <*> v .: "shell"
     <*> v .: "echo"
     <*> v .: "site-url"
-    <*> v .: "password"
+    <*> v .: "private-key"
+    <*> v .: "site-delta"
     <*> v .: "ih-path"
     <*> v .: "ih-delay"
     <*> v .: "ih-now"
