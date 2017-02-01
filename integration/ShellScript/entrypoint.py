@@ -27,7 +27,6 @@ def getEnvStr(envName):
   return rt
 
 
-
 def fromurl(url):
     print "From url", url
     if len(url) >0:

@@ -15,8 +15,22 @@ matrix:
         apt:
           sources:
             - hvr-ghc
+            - sourceline: "deb http://apt.llvm.org/$OS_CORENAME/ llvm-toolchain-$OS_CORENAME main"
+            - sourceline: "deb-src http://apt.llvm.org/$OS_CORENAME/ llvm-toolchain-$OS_CORENAME main"
+            - sourceline: "deb http://apt.llvm.org/$OS_CORENAME/ llvm-toolchain-$OS_CORENAME-$LLVM main"
+            - sourceline: "deb-src http://apt.llvm.org/$OS_CORENAME/ llvm-toolchain-$OS_CORENAME-$LLVM main"
+              key_url: http://apt.llvm.org/llvm-snapshot.gpg.key
           packages:
+            - wget
+            - curl
             - ghc-8.0.2
+            - libllem$LLVM
+            - libllvm$LLVM-db
+            - lldb-$LLVM
+            - llvm-$LLVM
+            - llvm-$LLVM-dev
+            - llvm-$LLVM-runtime
+            - lldb-$LLVM-dev
     - env: GHC_VER=8.0.2 THREADED=t DEBUG=debug IS_DOCKER=docker
       addons:
         apt:

@@ -23,7 +23,6 @@ import Data.Char
 import Data.Maybe
 import Data.Time
 import Data.Time.Format
-import Glob.Auth.Token
 import System.Console.GetOpt
 import System.Environment
 import System.IO

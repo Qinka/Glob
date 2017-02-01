@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-core
-version:             0.1.0.0
+version:             0.1.0.50
 synopsis:            The core of the glob.
 description:         Just a small blog backend.
 license-file:        LICENSE
