@@ -90,7 +90,7 @@ def getEnvE(d,env):
     if len(rt) == 0:
         return d
     else:
-        return rt
+        return eval(rt)
 
 
                                             
