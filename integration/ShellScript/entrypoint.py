@@ -7,12 +7,6 @@ import re
 
 
 
-
-
-
-
-
-
 ## Functions
 
 def evalEnv(str):
@@ -144,8 +138,39 @@ def writeToEtc(content):
     cfg.close()
         
 
-    
-## run .....
+
+def recordPublicKey():
+  pkPath = os.getenv("PUBLIC_KEY_PATH")
+  pkList = os.getenv("PUBLIC_KEY_LIST")
+  if (pkPath is None) || (pkList is None):
+    print('There no public key to write down')
+  else:
+    print('There is(are) public key(s) to write down')
+    # create directory
+    if not os.path.exists(pkPath):
+      printD('Create '+pkPath)
+      os.makedirs(pkPath)
+    # load
+    pkls = string.split(pkList,' ')
+    for i in range(len(pkls)):
+      item = pkls[i]
+      itemContext = os.getenv(item)
+      itemName = os.getenv(item+'_NAME')
+      if (itemContext is None) || (itemName is None):
+        printD(item+' do not exist')
+        continue
+      cfg = open(pkPath+itemName)
+      cfg.write(itemContext)
+      printD(itemName + 'was written with:')
+      printD(itemContext)
+      cfg.close()
+
+
+## write the public key
+      
+recordPublicKey()
+
+## run ......
 
 if len(sys.argv) > 1 and sys.argv[1] == 'from':
     if len(sys.argv) >3 and sys.argv[2] == 'url':
