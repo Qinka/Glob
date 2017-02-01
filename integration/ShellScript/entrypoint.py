@@ -45,7 +45,7 @@ def fromenv():
     etcObj ={ 'port' : getEnvE(3000,'GLOB_PORT')
             , 'title' : getEnv('Glob','GLOB_TITLE')
             , 'log-path' : getEnv('stdout','GLOB_LOG_PATH')
-            , 'password-environment-variable' : getEnv('GLOB_PSK','GLOB_PSK_ENV')
+            , 'public-key' : getEnv('/etc/glob/pubkey','GLOB_PUB_KEY')
             , 'listen-type' : getEnv('*','GLOB_TYPE')
             , 'database' :
                 { 'hostaddr' : getEnv('localhost:27017','GLOB_DB_ADDR')
@@ -77,24 +77,12 @@ def fromlocal(path,k):
         
 
 def getEnv(d,env,k=False):
-    e = os.getenv(env)
-    if not (e is None):
-        ee = os.getenv(e[0:len(e)-3])
-        if not (ee is None) and len(e)>1 and e[len(e)-2,len(e)-1] == "&&":
-            printD("Env "+env+" with "+ee)
-            if k:
-                return eval(ee)
-            else:
-                return ee
-        else:
-            printD("Env "+env+" with "+e)
-            if k:
-                return eval(e)
-            else:
-                return e
+    e = os.evalEnv('$('+env+')')
+    if len(e) = 0:
+      printD("Env "+env+" with default "+str(d))
+      return d
     else:
-        printD("Env "+env+" with default "+str(d))
-        return d
+      return e
         
 def getEnvE(d,env):
     env = '$(' + env + ')'
