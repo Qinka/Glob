@@ -77,7 +77,7 @@ def fromlocal(path,k):
         
 
 def getEnv(d,env,k=False):
-    e = os.evalEnv('$('+env+')')
+    e = evalEnv('$('+env+')')
     if len(e) == 0:
       printD("Env "+env+" with default "+str(d))
       return d
@@ -95,16 +95,6 @@ def getEnvE(d,env):
 
                                             
 def checkPassword():
-    cfg = open("/etc/glob/config")
-    c = cfg.read()
-    cfg.close()
-    j = json.loads(c)
-    pskE = j['password-environment-variable']
-    printD(pskE)
-    env = os.getenv(pskE[1:len(pskE)-1])
-    if env is None:
-        print "Warning, no password set"
-        return False
     return True
 
 def execGlob(path='/etc/glob/config'):
@@ -129,7 +119,7 @@ def writeToEtc(content):
 def recordPublicKey():
   pkPath = os.getenv("PUBLIC_KEY_PATH")
   pkList = os.getenv("PUBLIC_KEY_LIST")
-  if (pkPath is None) || (pkList is None):
+  if ((pkPath is None) or (pkList is None)):
     print('There no public key to write down')
   else:
     print('There is(are) public key(s) to write down')
@@ -143,7 +133,7 @@ def recordPublicKey():
       item = pkls[i]
       itemContext = os.getenv(item)
       itemName = os.getenv(item+'_NAME')
-      if (itemContext is None) || (itemName is None):
+      if (itemContext is None) or (itemName is None):
         printD(item+' do not exist')
         continue
       cfg = open(pkPath+itemName)
