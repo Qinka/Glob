@@ -145,7 +145,7 @@ def recordPublicKey():
 
 ## write the public key
       
-recordPublicKey()
+#recordPublicKey()
 
 ## run ......
 
