@@ -10,7 +10,7 @@ export OS_CORENAME=$(lsb_release -a | grep Codename | awk '{print $2}')
 export OS_DISTRIBUTOR=$(lsb_release -a | grep Description | awk '{print $2}')
 echo using $OS_DISTRIBUTOR  $OS_CORENAME
 ######
-if [ -n "$LLVdddM" ]; then
+if [ -n "$LLVM" ]; then
   echo install llvm
   wget -O - http://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
   echo deb http://apt.llvm.org/$OS_CORENAME/ llvm-toolchain-$OS_CORENAME main | sudo tee -a /etc/apt/sources.list.d/llvm.list
