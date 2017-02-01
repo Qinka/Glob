@@ -39,7 +39,6 @@ resolver: nightly-2017-01-28
 packages:
 - glob-core/
 - glob-launch/
-- glob-tools/glob-tool/
 - glob-tools/glob-ih/
 - glob-tools/glob-timecheck/
 - glob-tools/glob-update/
