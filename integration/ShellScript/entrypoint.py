@@ -78,7 +78,7 @@ def fromlocal(path,k):
 
 def getEnv(d,env,k=False):
     e = os.evalEnv('$('+env+')')
-    if len(e) = 0:
+    if len(e) == 0:
       printD("Env "+env+" with default "+str(d))
       return d
     else:
