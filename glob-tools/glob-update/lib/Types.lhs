@@ -13,6 +13,7 @@ module Types
        , Content(..)
        , GlobalSettings(..)
        , fetchContent
+       , toHtml
        ) where
 
 import Data.Aeson
@@ -51,12 +52,21 @@ data Content = Post FilePath
 
 fetchContent :: Content -> String
 fetchContent i = case i of
-  Post p -> p
-  Frame f -> f
+  Post p -> toHtml p
+  Frame f -> toHtml f
   Binary b -> b
   TextFile t -> t
   Static u -> u
   Query v -> v
+
+toHtml :: String -> String
+toHtml fn = if ext == "html"
+            then fn
+            else ".ignore/" ++ fn' ++ ".html"
+  where nf' = takeWhile (/='/') $ reverse $ fn
+        ext = reverse $ takeWhile (/='.') nf'
+        fn' = reverse $ tail $ dropWhile (/='.') nf'
+
 
 instance ToJSON Res where
   toJSON (Res i p t ts s c ct w) = object $ 

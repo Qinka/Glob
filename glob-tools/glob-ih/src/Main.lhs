@@ -87,7 +87,7 @@ mixMain f tokens v dl fp = do
   signed    <- (T.unpack . TE.decodeUtf8 . B64.encode . (\(Right r) -> r)) <$> signSafer sha512pss priKey sByte
   cmds <- getContents
   put.concat.lines $ cmds
-    ++ "-F \"sha-text="
+    ++ " -F \"sha-text="
     ++ signed
     ++ "\" -F \"time="
     ++ show dt

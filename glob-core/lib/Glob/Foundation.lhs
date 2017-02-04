@@ -30,7 +30,6 @@ import Crypto.Hash.Algorithms
 import Crypto.PubKey.RSA
 import Crypto.PubKey.RSA.PSS
 import Data.Pool
-import Glob.Auth
 import Glob.Common
 import Glob.Config
 import Glob.Model

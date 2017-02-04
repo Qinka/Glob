@@ -9,7 +9,7 @@ module Glob.Update
        , comS, comment, comments, comPs, comP
        , target, (\=\), cmd, echo, echoM, tCurlPath
        , tCurlMethod, tCurlDetail, tCurlF, tSiteUrl
-       , tShell, tShellPipe, tShellOutputPipe                          
+       , tShell, tShellPipe, tShellOutputPipe, aLine                    
        ) where
 \end{code}
 
@@ -52,6 +52,13 @@ instance Monad UpdateM where
                             in UpdateM (str ++ str') t'
 \end{code}
 
+
+\begin{code}
+instance IsString (UpdateM a) where
+  fromString str = UpdateM [str] undefined
+\end{code}
+
+  
 \begin{code}
 chars :: Int -> Char -> UpdateM ()
 chars i c = UpdateM [replicate i c] ()
@@ -63,6 +70,8 @@ nonEndLine :: UpdateM ()
 nonEndLine = UpdateM [" \\\n\t"] ()
 tabs :: Int -> UpdateM ()
 tabs i = UpdateM [replicate i '\t'] ()
+aLine :: String -> UpdateM ()
+aLine str = string str >> endLine
 \end{code}
 
 \begin{code}

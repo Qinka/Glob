@@ -5,11 +5,10 @@ name:                glob-launch
 version:             0.1.0.0
 synopsis:            The launch of glob.
 description:         Just a small blog backend.
-license:             AllRightsReserved
 license-file:        LICENSE
 author:              Qinka
 maintainer:          qinka@live.com
-copyright:           2016-2017 Qinka <qinka@live.com>
+copyright:           Copymiddle (C-M) 2016-2017 Qinka <qinka@live.com>
 category:            Web
 build-type:          Simple
 extra-source-files:  ChangeLog.md

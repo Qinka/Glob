@@ -35,6 +35,9 @@ data Update = New
               { mkOpt :: String
               , mkTyp :: MakeKind
               }
+            | Script
+              { scKind :: String
+              }
             deriving (Show,Eq,Data,Typeable)
 \end{code}
 
@@ -54,6 +57,15 @@ make = Make
   } &=name "make"
 \end{code}
 
+
+\begin{code}
+script :: Update
+script = Script
+  { scKind = "all"
+          &= typ "KIND"
+          &= argPos 0
+  } &=name "script"
+\end{code}
 
 for new
 \begin{code}
@@ -110,6 +122,31 @@ new = New
   }
 \end{code}
 
+
+\begin{code}
+scriptHandle :: Update -> IO ()
+scriptHandle (Script kind) = do
+  print $ case kind of
+    "all" -> do
+      "script for fix the bug in \"whose\"(fix-whose): "
+      scriptFixWhose >> endLine
+      "script for make all(make-all): "
+      scriptMakeAll >> endLine
+    "fix-whose" -> scriptFixWhose
+    "make-all" -> scriptMakeAll
+
+
+scriptFixWhose :: UpdateM ()
+scriptFixWhose = do
+  "sed -i \'s/\\(,\"whose\":\"[^\"]*\"\\)//\' .infos/*.json"
+scriptMakeAll :: UpdateM ()
+scriptMakeAll = do
+  "ls -1 .infos  | sed \'s/.json//\' | sed \'/global/d\' | awk \'{print \"glob-update make item  \"$0}\' | sh"
+  
+\end{code}
+
+
+
 \begin{code}
 makeHandle :: Update -> IO ()
 makeHandle = makeHandleS
@@ -135,7 +172,7 @@ makeHandleS (Make id Item) = do
             TextFile t' -> ("text","text",' ':t')
             Static u' -> ("static","url","")
             Query v' -> ("query","var","")
-      let isPandoc fn = (fn,length fn > 6 && take 5 (reverse fn) /= ".lmth")
+      let isPandoc fn = (fn,length fn > 6 && take 5 (reverse fn) /= "lmth.")
       print $ mkUpdate id (isPandoc dpF,isPandoc dpS) ct ti i ts su typ (cn,fetchContent co) s w
  
       
@@ -152,48 +189,60 @@ makeHandleS (Make id Basic) = do
   echo  <- echoKind      <$> getGlobal
   cp    <- curlPath      <$> getGlobal
   cd    <- curlDetail    <$> getGlobal
+  utc   <-                   getCurrentTime
+  let mkCHighlight = mkChange ("change-code-highlight","Change Site Code Highlight") "/@/~highlight" "CODE_STYLE" utc
+      mkCTheme     = mkChange ("change-site-theme","Change Site Theme") "/@/~site-theme" "SITE_STYLE" utc
   print $ case id of
-    "timecheck" -> mkTimeCheck
-    "cleantmp"  -> mkClean
-    "site"      -> mkSettingSite su pri ihp ihd ihn tc
-    "shell"     -> mkSettingShell shell echo
-    "curl"      -> mkSettingcURL cp cd
-    "comment"   -> mkComment
-    "all"    -> do mkComment
-                   mkSettingcURL cp cd
-                   mkSettingShell shell echo
-                   mkSettingSite su pri ihp ihd ihn tc
-                   mkTimeCheck
-                   mkClean
+    "timecheck"    -> mkTimeCheck
+    "cleantmp"     -> mkClean
+    "site"         -> mkSettingSite su pri ihp ihd ihn tc
+    "shell"        -> mkSettingShell shell echo
+    "curl"         -> mkSettingcURL cp cd
+    "comment"      -> mkComment
+    "change-theme" -> mkCTheme
+    "change-highlight" -> mkCHighlight
+    "all"          -> do mkComment
+                         mkSettingcURL cp cd
+                         mkSettingShell shell echo
+                         mkSettingSite su pri ihp ihd ihn tc
+                         mkTimeCheck
+                         mkClean
+                         mkCTheme
+                         mkCHighlight
      
 --mkUpdate :: UpdateM ()
 mkUpdate tag ((dpF,isF),(dpS,isS)) ct ti i ts su typ (cn,co) s w = do
-  target tag [dpF,dpS] $ echoM $ do
-    let chg is ii dp = when is $ cmd $
-          string $ "pandoc -o .ignore/" ++ ii ++ ".html" ++ dp
+  target tag [dpF,dpS] $ do
+    let chg is ii dp = when (is && (typ == "post" || typ == "frame")) $ cmd $ do
+          string $ "pandoc -o " ++ toHtml (tail dp) ++ dp
+          endLine
     chg isF  i          dpF
     chg isS (i++".sum") dpS
-    tCurlPath
-    tCurlDetail
-    tCurlMethod "PUT" >> nonEndLine
-    tCurlF "create-time" $ show ct
-    tCurlF "update-time" "$(IH_NOW)"
-    tCurlF "title" ti
-    tCurlF cn co
-    case s of
-      Left f'  -> tCurlF "summary" $ "@.ignore/" ++ i ++".sum.html"
-      Right "" -> return ()
-      Right t' -> tCurlF "summary" t'
-    case w of
-      Just w -> tCurlF "whose" w
-      _ -> return ()
-    mapM_ (\x -> tCurlF "tag" x) ts
-    tSiteUrl su
-    tShellPipe
-    string  " $(IH_PATH) -m "
-    string $ "-p \'$(PRIVATE_KEY)\'"
-    string $ "-d \'$(SITE_DETAL)\' -v"
-    tShellPipe >>  tShell >> endLine
+    echoM $ do
+      tCurlPath
+      tCurlDetail
+      tCurlMethod "PUT" >> nonEndLine
+      tCurlF "type" typ
+      tCurlF "create-time" $ show ct
+      tCurlF "update-time" "$(IH_NOW)"
+      tCurlF "title" ti
+      tCurlF cn ('@':co)
+      tCurlF "sha-file-name" "/`$(MD5) $(PRIVATE_KEY).pub`"
+      case s of
+        Left f'  -> tCurlF "summary" $ "@" ++ (reverse $ dropWhile(/='.') $ reverse co) ++ "sum.html"
+        Right "" -> return ()
+        Right t' -> tCurlF "summary" t'
+      case w of
+        Just w -> tCurlF "whose" w
+        _ -> return ()
+      mapM_ (\x -> tCurlF "tag" x) ts
+      tSiteUrl su
+      tShellPipe
+      string " $(IH_PATH) -m "
+      string " -f \'$(IH_DELAY)\'"
+      string " -p \'$(PRIVATE_KEY)\'"
+      string " -d \'$(SITE_DELTA)\' -v"
+      tShellPipe >>  tShell >> endLine
   target (tag ++ ".del") [] $ echoM $ do
     tCurlPath
     tCurlDetail
@@ -201,10 +250,23 @@ mkUpdate tag ((dpF,isF),(dpS,isS)) ct ti i ts su typ (cn,co) s w = do
     tCurlF "type" typ
     tSiteUrl su
     tShellPipe
-    string  " $(IH_PATH) -m "
-    string $ "-p \'$(PRIVATE_KEY)\'"
-    string $ "-d \'$(SITE_DETAL)\' -v"
+    string " $(IH_PATH) -m "
+    string " -f \'$(IH_DELAY)\'"
+    string " -p \'$(PRIVATE_KEY)\'"
+    string " -d \'$(SITE_DETAL)\' -v"
     tShellPipe >>  tShell >> endLine
+
+mkChange :: (String,String) -> String -> String -> UTCTime ->  UpdateM ()
+mkChange (t,tc) path var utc = do
+  comP tc
+  target t [] $ do
+    aLine $ "OLD=$($(CURL_PATH) -X GET $(SITE_URL)"++path++")"
+    cmd $ aLine "if [ \"$(OLD)\" = \"{\\\"error\\\":\\\"not found\\\"}\" ]; then OLD=\"\";fi;"
+    cmd $ aLine "$(ECHO) The old theme is $(OLD_THEME)"
+    cmd $ aLine $ "$(ECHO) The new theme is $("++var++")"
+    cmd $ string $ "if [ \"$(OLD)\" = \"$("++var++")\" ]; then $(ECHO) The new one is eq2 old one. DO NOTHING; \\\n"
+    string $ "\telse $(ECHO) $(CURL_PATH) $(CURL_DETAIL)  -X PUT  -F \\\"sha-file-name=/`$(MD5) $(PRIVATE_KEY).pub`\\\" -F \\\"var=$("++var++")\\\" -F \\\"type=query\\\" -F \\\"create-time=" ++ show utc ++ "\\\" -F \\\"update-time=$(IH_NOW)\\\" -F \\\"title=query\\\"  \\\n"
+    string $ "\t$(SITE_URL)"++path++" ' '  | $(IH_PATH) -m -f$(IH_DELAY) -p$(PRIVATE_KEY) -d$(SITE_DELTA) -v  | $(SHELL) ; fi"
     
                    
 mkClean :: UpdateM ()
@@ -246,7 +308,12 @@ mkSettingSite su pri ihp ihd ihn tc = do
   comments 2 "Check the delay"
   "TIMECHECK_PATH" \=\ tc
   comments 2 "Delta of site's check"
-  "DELTA" \=\ "6"
+  "SITE_DELTA" \=\ "6"
+  comments 2 "MD5 cmd"
+  "MD5" \=\ "md5"
+  comments 2 "Site Theme"
+  "SITE_THEME" \=\ "hack"
+  "CODE_THEME" \=\ "default"
 
 mkSettingShell :: String -> String -> UpdateM ()
 mkSettingShell shell echo = do
@@ -369,7 +436,7 @@ transform to Res
 
 \begin{code}
 update :: Update
-update = modes [new,make]
+update = modes [new,make,script]
   &= program "glob-update"
   &= summary "summary"
   &= verbosity
@@ -387,6 +454,7 @@ main = do
     main' :: Update -> IO ()
     main' n@New{..} = newHandle n
     main' m@Make{..} = makeHandle m
+    main' s@Script{..} = scriptHandle s
 \end{code}
 
 
