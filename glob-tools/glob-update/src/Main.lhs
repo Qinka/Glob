@@ -132,8 +132,14 @@ scriptHandle (Script kind) = do
       scriptFixWhose >> endLine
       "script for make all(make-all): "
       scriptMakeAll >> endLine
+      "script for update all(update-all): "
+      scriptUpdateAll >> endLine
+      "script for delete all(delete-all): "
+      scriptDeleteAll >> endLine
     "fix-whose" -> scriptFixWhose
     "make-all" -> scriptMakeAll
+    "update-all" -> scriptUpdateAll
+    "delete-all" -> scriptDeleteAll
 
 
 scriptFixWhose :: UpdateM ()
@@ -141,7 +147,17 @@ scriptFixWhose = do
   "sed -i \'s/\\(,\"whose\":\"[^\"]*\"\\)//\' .infos/*.json"
 scriptMakeAll :: UpdateM ()
 scriptMakeAll = do
-  "ls -1 .infos  | sed \'s/.json//\' | sed \'/global/d\' | awk \'{print \"glob-update make item  \"$0}\' | sh"
+  "ls -1 .infos  | sed \'s/.json//\' | sed \'/global/d\' | awk \'{print \"glob-update make item  \"$0}\' "
+
+scriptUpdateAll,scriptDeleteAll :: UpdateM ()
+scriptUpdateAll = do
+  "ls -1 .infos  | sed \'s/.json//\' | sed \'/global/d\' | "
+  "sed \':a;N;$ s/\\n/ /g;ba\' | "
+  "awk \'{print \"make \"$0}\'"
+scriptDeleteAll = do
+  "ls -1 .infos  | sed \'s/.json//\' | sed \'/global/d\' | awk \'{print $0\".del\"}\' | "
+  "sed \':a;N;$ s/\\n/ /g;ba\' | "
+  "awk \'{print \"make \"$0}\'"
   
 \end{code}
 
