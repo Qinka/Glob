@@ -242,6 +242,7 @@ bgAuth = do
         isText <- checkText ct pk ch checkDelta'
         if isText
           then do
+           $logDebugS "Auth" "Auth one"
           return Authorized
           else do
           liftIO $ threadDelay 60
