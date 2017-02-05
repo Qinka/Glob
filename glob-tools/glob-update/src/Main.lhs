@@ -264,12 +264,13 @@ mkUpdate tag ((dpF,isF),(dpS,isS)) ct ti i ts su typ (cn,co) s w = do
     tCurlDetail
     tCurlMethod "DELETE" >> nonEndLine
     tCurlF "type" typ
+    tCurlF "sha-file-name" "/`$(MD5) $(PRIVATE_KEY).pub`"
     tSiteUrl su
     tShellPipe
     string " $(IH_PATH) -m "
     string " -f \'$(IH_DELAY)\'"
     string " -p \'$(PRIVATE_KEY)\'"
-    string " -d \'$(SITE_DETAL)\' -v"
+    string " -d \'$(SITE_DELTA)\' -v"
     tShellPipe >>  tShell >> endLine
 
 mkChange :: (String,String) -> String -> String -> UTCTime ->  UpdateM ()
