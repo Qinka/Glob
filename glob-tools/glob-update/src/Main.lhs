@@ -24,7 +24,7 @@ data Update = New
               , newTyp :: Maybe String
               , newPath :: Maybe Path
               , newTitle :: Maybe Title
-              , newTags :: Maybe Tags
+              , newTags :: Tags
               , newSum :: Maybe String
               , newContent :: Maybe String
               , newWhose :: Maybe Whose
@@ -375,7 +375,7 @@ newHandle New{..} = do
   typ' <- newTyp `fetch` getTyp
   path' <- newPath `fetch` getPath
   title' <- newTitle `fetch` getTitle
-  tags' <- newTags `fetch` getTags
+  tags' <- newTags `fetchF` getTags
   sum' <- newSum `fetchM` getSum >>= getSum'
   content' <- newContent `fetch` getContent
   whose' <- newContent `fetchM` getWhose
@@ -449,6 +449,9 @@ transform to Res
     fetchM :: Maybe a -> IO (Maybe a) -> IO (Maybe a)
     fetchM j@(Just x) _ = return j
     fetchM Nothing f = f
+    fetchF :: [a] -> IO [a] -> IO [a]
+    fetchF [] fm = fm
+    fetchF xs _  = return xs
 \end{code}
 
 \begin{code}
