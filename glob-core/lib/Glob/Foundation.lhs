@@ -89,6 +89,7 @@ instance Yesod Glob where
   makeLogger = return.globLogger
   defaultLayout = globLayout
   shouldLogIO _ _ = sl
+  maximumContentLength _ _ = Nothing
 \end{code}
 
 Glob's Layout
