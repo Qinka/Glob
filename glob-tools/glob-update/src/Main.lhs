@@ -378,7 +378,7 @@ newHandle New{..} = do
   tags' <- newTags `fetchF` getTags
   sum' <- newSum `fetchM` getSum >>= getSum'
   content' <- newContent `fetch` getContent
-  whose' <- newWhose `fetchM` getWhose
+  whose' <- newWhose `fetch` getWhose
   ctime <- getCurrentTime
 \end{code}
 transform to Res
