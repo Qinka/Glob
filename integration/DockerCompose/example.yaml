@@ -1,27 +1,56 @@
 # Example.yaml
-# The example of how glob-stack's file written.
 
+# The example of how glob-stack's file written.
 # glob-core: the core of glob
 # here we use glob-lauch one
 glob-core:
   # load image from docker hub
-  image: index.docker.io/qinka/glob:glob-0.0.10-Linux-Ubuntu-trusty-GHC_-x86_64
-  # use start.sh from url config-server/config/glob.json
-  # config-server is a hostname
-  command: start.sh fromurl config.server/config/glob.json
-  # set passwords
-  # it is good to add space in it
-  environment:
-    - "GLOB_PSK=921 924"
-  # export the port
-  ports:
-    - "3000:3000"
-  # restart ?
-  restart: always
-  # extra_host
+  image: index.docker.io/qinka/glob:glob-0.1.0-docker-0.1.0.50-beta1-Linux-Ubuntu-trusty-GHC_8.0.2-x86_64-threaded-debug
+  # generate config file
+  ## via download
+  ### use from url config-server/config/glob.json
+  ### config-server is a hostname
+  command: from url config.server/config/glob.json
+  ### extra_host
   extra_hosts:
     # for configure service
     - "config.server:0.0.0.0" # should be repleace
+  ### public key
+  volumes:
+  - /data/etc/glob/pubkey:/etc/glob/pubkey
+  ## via environment variable
+  ### command: from env
+  ### environment:
+  ###   - GLOB_LOG_PATH=stdout
+  ###   - GLOB_PORT=3000
+  ###   - GLOB_DB_USR=dev10
+  ###   - GLOB_TYPE=*
+  ###   - GLOB_DB_PK=6
+  ###   - GLOB_DB_ADDR=db:27017
+  ###   - GLOB_PSK_ENV_VAR=GLOB_PSK
+  ###   - GLOB_DB_PSK=dev10
+  ###   - GLOB_PUB_KEY=/etc/config/publc/key
+  ###   - GLOB_TITLE=Glob
+  ###   - GLOB_DB_PSM=200
+  ###   - GLOB_DB_PS=6
+  ###   - GLOB_DB_AM=master
+  ###   - GLOB_DB_NAME=rls
+  ## via local file 1
+  ### command: from local /etc/glob/config
+  ### volumes:
+  ###   - /path/to/config:/etc/glob/config
+  ###   - /path/to/public/key:/etc/glob/pubkey
+  ## via local file 2
+  ### command: from local /foo/bar/config [copy]
+  ### volumes:
+  ###   - /path/to/config:/foo/bar/config
+  ###   - /path/to/public/key/dir:/etc/glob/pubkey
+  # it is good to add space in it
+  # export the port
+  ports:
+    - "3000:3000"
+  # restart 
+  restart: always
   # link db for we ues it
   links:
     - db
@@ -30,7 +59,7 @@ glob-core:
 # use MongoDB
 db:
   # load image
-  image: mongo:latest
+  image: index.docker.io/library/mongo:latest
   # volumes where saved datas
   volumes:
     - "/my/own/data:/data/db" # do not replace /data/db unless you know what you are doing
@@ -41,3 +70,21 @@ db:
     - "27017"
   # restart ?
   restart: always
+
+
+# CONFIG Example
+port: 3000
+database:
+    hostaddr: db:27017
+    database: glob
+    access-mode: master
+    username: admin
+    password: admin
+    pool-stripes: 10
+    pool-kept-time: 100
+    pool-strp-max: 10
+title: Glob
+public-key: /etc/glob/pubkey
+log-path: stdout
+listen-type: '*'
+public-key: .ignore
