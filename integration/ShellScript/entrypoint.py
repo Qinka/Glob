@@ -112,19 +112,32 @@ def writeToEtc(content):
     cfg.write(content)
     cfg.close()
 
+def printHelp():
+    print 'Help for Enterypoint'
+    print 'There are 3 ways to generate config file to launch: download, generate via environment variables, and from the local files.'
+    print 'DOWNLOAD: from url http://your.url'
+    print 'ENV VAR : from env'
+    print 'LOCAL   : from local /path/of/file [copy]'
+
+def main():
+    if len(sys.argv) > 1 and sys.argv[1] == 'from':
+        if len(sys.argv) >3 and sys.argv[2] == 'url':
+            fromurl(sys.argv[3])
+        elif  len(sys.argv) >2 and sys.argv[2] == 'env':
+            fromenv()
+        elif  len(sys.argv) >3 and sys.argv[2] == 'local':
+            isCp = len(sys.argv) >4 and sys.argv[4] == 'copy'
+            fromlocal(sys.argv[3],isCp)
+        else:
+            raise Exception('You need to point out where you load config')
+    elif  len(sys.argv) > 1 and sys.argv[1] == 'help':
+        printHelp()
+    else:
+        printHelp()
+        raise Exception('Here a "from" or "help" is needed.')
+
 ## run ......
 
-if len(sys.argv) > 1 and sys.argv[1] == 'from':
-    if len(sys.argv) >3 and sys.argv[2] == 'url':
-        fromurl(sys.argv[3])
-    elif  len(sys.argv) >2 and sys.argv[2] == 'env':
-        fromenv()
-    elif  len(sys.argv) >3 and sys.argv[2] == 'local':
-        isCp = len(sys.argv) >4 and sys.argv[4] == 'copy'
-        fromlocal(sys.argv[3],isCp)
-    else:
-        raise Exception('You need to point out where you load config')
-elif  len(sys.argv) > 1 and sys.argv[1] == 'help':
-    print 'This is help...'
-else:
-    raise Exception('Here a "from" or "help" is needed.')
+if __name__ == "__main__":
+    main()
+
