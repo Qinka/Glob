@@ -17,7 +17,7 @@ def evalEnv(str):
   for i in range(len(subs)):
     finstr += spls[i]
     finstr += evalEnv(getEnvStr(subs[i]))
-  finstr += spls[len(subs)];
+  finstr += spls[len(subs)]
   return finstr
 
 def getEnvStr(envName):
@@ -91,8 +91,6 @@ def getEnvE(d,env):
         return d
     else:
         return eval(rt)
-
-
                                             
 def checkPassword():
     return True
@@ -113,39 +111,6 @@ def writeToEtc(content):
     cfg = open("/etc/glob/config","w")
     cfg.write(content)
     cfg.close()
-        
-
-
-def recordPublicKey():
-  pkPath = os.getenv("PUBLIC_KEY_PATH")
-  pkList = os.getenv("PUBLIC_KEY_LIST")
-  if ((pkPath is None) or (pkList is None)):
-    print('There no public key to write down')
-  else:
-    print('There is(are) public key(s) to write down')
-    # create directory
-    if not os.path.exists(pkPath):
-      printD('Create '+pkPath)
-      os.makedirs(pkPath)
-    # load
-    pkls = string.split(pkList,' ')
-    for i in range(len(pkls)):
-      item = pkls[i]
-      itemContext = os.getenv(item)
-      itemName = os.getenv(item+'_NAME')
-      if (itemContext is None) or (itemName is None):
-        printD(item+' do not exist')
-        continue
-      cfg = open(pkPath+itemName)
-      cfg.write(itemContext)
-      printD(itemName + 'was written with:')
-      printD(itemContext)
-      cfg.close()
-
-
-## write the public key
-      
-#recordPublicKey()
 
 ## run ......
 
