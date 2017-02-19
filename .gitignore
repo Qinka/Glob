@@ -13,6 +13,10 @@ test.config
 .stack-work
 .cabal-sandbox.bak
 
+## temp stack.yaml
+stack-tmp.yaml
+
+
 # For VS Code
 
 .vscode
