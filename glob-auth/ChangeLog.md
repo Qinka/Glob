@@ -1,5 +1,5 @@
 # Revision history for glob-auth
 
-## 0.2  -- YYYY-mm-dd
+## 0.2.0.10  -- 2017-03-16
 
-* First version. Released on an unsuspecting world.
+* Add a test suite for Glob.Auth.Core

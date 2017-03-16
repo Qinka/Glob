@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-auth
-version:             0.2
+version:             0.2.0.10
 synopsis:            For authentication.
 description:         For authentication
 homepage:            https://github/Qinka/Glob
@@ -42,8 +42,8 @@ library
 
 test-suite test-core
   type:           exitcode-stdio-1.0
-  main-is:    test-core.hs
-  hs-source-dirs: test/core
+  main-is:        test-core.hs
+  hs-source-dirs: test.src/core
   build-depends:  base
                 , random
                 , MonadRandom
