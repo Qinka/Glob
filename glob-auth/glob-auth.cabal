@@ -17,11 +17,10 @@ cabal-version:       >=1.20
 
 flag without-yesod
      default: False
-     description: When installing to client, for tools, Yesod is not necessary.
+     description: When installing client, for tools, Yesod is not necessary.
 
 library
-  exposed-modules:     Glob.Auth
-  other-modules:       Glob.Auth.Internal
+  exposed-modules:     Glob.Auth.Core
   default-extensions:  OverloadedStrings
                        TemplateHaskell
                        CPP   
@@ -36,5 +35,6 @@ library
      cc-options:      -DWITHOUT_YESOD
   else
      other-modules:    Glob.Auth.Types
+                       Glob.Auth
      build-depends:    wai >= 3.2
                      , yesod-core >= 1.4
