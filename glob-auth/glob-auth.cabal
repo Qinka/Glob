@@ -16,8 +16,8 @@ extra-source-files:  ChangeLog.md
 cabal-version:       >=1.20
 
 flag without-yesod
-     default: False
-     description: When installing client, for tools, Yesod is not necessary.
+  default: False
+  description: When installing client, for tools, Yesod is not necessary.
 
 library
   exposed-modules:     Glob.Auth.Core
@@ -38,3 +38,26 @@ library
                        Glob.Auth
      build-depends:    wai >= 3.2
                      , yesod-core >= 1.4
+
+
+test-suite test-core
+  type:           exitcode-stdio-1.0
+  main-is:    test-core.hs
+  hs-source-dirs: test/core
+  build-depends:  base
+                , random
+                , MonadRandom
+                , glob-common == 0.2.*
+                , glob-auth   == 0.2.*
+                     
+--test-suite test-auth
+--  type: exitcode-stdio-1.0
+--  main-is: Spec.hs
+--  other-modules: 
+--  hs-source-dirs: test
+--  default-extensions: OverloadedStrings
+--  build-depends: base
+--               , glob-auth
+--               , glol-common == 0.2.*
+--               , yesod-test
+--               , yesod-core
