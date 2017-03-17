@@ -13,27 +13,27 @@ import System.Directory
 
 import qualified Glob.Import.Text            as T
 import qualified Glob.Import.ByteString      as B
-import qualified Glob.Import.ByesString.Lazy as BL
+import qualified Glob.Import.ByteString.Lazy as BL
 
 -- App
 
 data App = App
 
 mkYesod "App" [parseRoutes|
-                           auth AuthR GET PUT
+                           auth AuthR GET POST
                            |]
 
 instance Yesod App where
-  authRoute _ = auth
+  isAuthorized _ _ = auth
   
 instance Authly App where
   clientPublicKeyDir _ = ""
   
-getAuthR :: Handler Text
+getAuthR :: Handler T.Text
 getAuthR = return "get"
 
-postAuthR :: Handler Text
-podtAuthR = return "post"
+postAuthR :: Handler T.Text
+postAuthR = return "post"
 
 withApp :: SpecWith (TestApp App) -> Spec
 withApp x = do -- SpecM
@@ -47,9 +47,8 @@ withApp x = do -- SpecM
     
   where beforeDo = before $ do -- IO
           let app = App
-          logWare <- liftIO $ makeLogWare app
-          return (app logWare)
-        afterDo = afterAll_ $ -- IO
+          return (app,id)
+        afterDo = afterAll_ $ do -- IO
           removeFile "pubkey"
           removeFile "prikey"
                    

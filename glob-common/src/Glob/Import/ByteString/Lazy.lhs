@@ -1,6 +1,5 @@
-
-\begin{code}.Lazy
-module Glob.Import.ByteString
+\begin{code}
+module Glob.Import.ByteString.Lazy
        ( module X
        , Glob.Import.ByteString.Lazy.read
        , Glob.Import.ByteString.Lazy.show

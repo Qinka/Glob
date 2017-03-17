@@ -15,8 +15,8 @@ build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.20
 
-flag without-yesod
-  default: False
+flag with-yesod
+  default: True
   description: When installing client, for tools, Yesod is not necessary.
 
 library
@@ -31,10 +31,8 @@ library
   hs-source-dirs:      src
   default-language:    Haskell2010
 
-  if flag(without-yesod)
-     cc-options:      -DWITHOUT_YESOD
-  else
-     other-modules:    Glob.Auth.Types
+  if flag(with-yesod)
+     exposed-modules:    Glob.Auth.Types
                        Glob.Auth
      build-depends:    wai >= 3.2
                      , yesod-core >= 1.4
@@ -44,21 +42,34 @@ test-suite test-core
   type:           exitcode-stdio-1.0
   main-is:        test-core.hs
   hs-source-dirs: test.src/core
+  default-language: Haskell2010
   build-depends:  base
                 , random
                 , MonadRandom
                 , glob-common == 0.2.*
                 , glob-auth   == 0.2.*
-                     
+
+                 
 test-suite test-auth
+  if flag(with-yesod)
+    buildable: True
+  else
+    buildable: False 
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules: TestImport
-                 AuthSpec.hs
+                 AuthSpec
   hs-source-dirs: test.src/auth
+  default-language: Haskell2010
   default-extensions: OverloadedStrings
+                      TemplateHaskell
+                      QuasiQuotes
+                      TypeFamilies
   build-depends: base
---               , glob-auth == 0.2.*
---               , glol-common == 0.2.*
---               , yesod-test
---               , yesod-core
+               , glob-auth == 0.2.*
+               , glob-common == 0.2.*
+               , yesod-test
+               , yesod-core
+               , directory
+               , hspec >= 2
+               , cryptonite

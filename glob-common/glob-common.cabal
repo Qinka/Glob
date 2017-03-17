@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-common
-version:             0.2
+version:             0.2.0.5
 synopsis:            The common import and export
 description:         The common import and export
 homepage:            https://github.com/Qinka/Glob
@@ -19,6 +19,7 @@ library
   exposed-modules:   Glob.Import
                      Glob.Import.Aeson
                      Glob.Import.ByteString
+                     Glob.Import.ByteString.Lazy
                      Glob.Import.Text
   -- other-modules:       
   -- default-extensions:    

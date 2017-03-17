@@ -58,7 +58,7 @@ authlyPost :: Authly site => HandlerT site IO AuthResult
 authlyPost = do
   now <- liftIO getCurrentTime
   pub <- fetchCliPubKey
-  token     <-  T.concat <$> lookupPostParams "token"
+  token     <-  T.replace " " "+" . T.concat <$> lookupPostParams "token"
   timestamp <-  T.concat <$> lookupPostParams "timestamp"
   $logDebugS "token timestamp" $ T.unlines [T.show token,T.show timestamp]
   if checkTime timestamp now
@@ -66,7 +66,7 @@ authlyPost = do
             case rt of
               Right True -> return Authorized
               Right False -> return AuthenticationRequired
-              Left e -> return $ Unauthorized $ T.pack e
+              Left e -> return $ Unauthorized $ T.show e
     else return $ Unauthorized $ "Who are you! The thing did not answer."
   where checkTime ::T.Text -> UTCTime -> Bool
         checkTime timestamp now = let (ts,limit') = T.read timestamp
