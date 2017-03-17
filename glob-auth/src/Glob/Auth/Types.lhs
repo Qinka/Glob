@@ -17,7 +17,6 @@ import Yesod.Core (Yesod(..))
 The type class Authly
 
 \begin{code}
-class Yesod a => Authly a where
+class Authly a where
   clientPublicKeyDir  :: a -> String
-  serverPrivateKetDir :: a -> String
 \end{code}
