@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-auth
-version:             0.2.0.10
+version:             0.2.0.11
 synopsis:            For authentication.
 description:         For authentication
 homepage:            https://github/Qinka/Glob
@@ -50,14 +50,15 @@ test-suite test-core
                 , glob-common == 0.2.*
                 , glob-auth   == 0.2.*
                      
---test-suite test-auth
---  type: exitcode-stdio-1.0
---  main-is: Spec.hs
---  other-modules: 
---  hs-source-dirs: test
---  default-extensions: OverloadedStrings
---  build-depends: base
---               , glob-auth
+test-suite test-auth
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules: TestImport
+                 AuthSpec.hs
+  hs-source-dirs: test.src/auth
+  default-extensions: OverloadedStrings
+  build-depends: base
+--               , glob-auth == 0.2.*
 --               , glol-common == 0.2.*
 --               , yesod-test
 --               , yesod-core
