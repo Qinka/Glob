@@ -99,7 +99,7 @@ def checkPassword():
 
 def execGlob(path='/etc/glob/config'):
     printD(open(path).read())
-    os.system('glob-launch -c '+path +' +RTS -N -RTS')
+    os.system('glob-launch -c '+path +' +RTS -N -s -RTS')
 
 def printD(text):
     isDebug = os.getenv("GLOB_DEBUG")
@@ -175,4 +175,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

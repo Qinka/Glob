@@ -1,6 +1,6 @@
 #!/bin/bash
 ghc -V
-O2FLAG=" --ghc-options -O2 "
+O2FLAG=" --ghc-options -O3 "
 if [ -n "$STACKSOLVER" ]; then
   export STACKFILE=" --stack-yaml $TRAVIS_BUILD_DIR/integration/StackSolver/$STACKSOLVER "
 fi
@@ -12,6 +12,7 @@ if [ -n "$THREADED" ]; then
 fi
 if [ -n "$DEBUG" ]; then
     export DEBUGFLAG=" --flag glob-core:debug-info "
+    export DEBUGFLAG=$DEBUGFLAG" --ghc-options -rtsopts "
     if [ -z "$LLVM" ]; then
 	O2FLAG=" "
     fi
