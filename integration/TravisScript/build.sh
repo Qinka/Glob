@@ -1,6 +1,6 @@
 #!/bin/bash
 ghc -V
-O2FLAG=" --ghc-options -O2 "
+O2FLAG=" --ghc-options -O3 "
 if [ -n "$STACKSOLVER" ]; then
   export STACKFILE=" --stack-yaml $TRAVIS_BUILD_DIR/integration/StackSolver/$STACKSOLVER "
 fi
