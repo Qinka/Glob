@@ -24,10 +24,10 @@ spec = withApp $ do -- SpecM
           let limit = 6
               s = show (now,limit)
           Just pri <- decodeStrict <$> B.readFile "prikey"          
-          t <- generateToken s pri
-          print $ T.decodeUtf8' <$> t
+          t <-  generateToken True s pri
+          print t
           return (s,t) 
-        addPostParam "token" $ T.decodeUtf8 token
+        addPostParam "token" $ T.pack token
         addPostParam "timestamp" $ T.pack stamp
         addPostParam "pubtoken" "pubkey"
        -- addFile "asd" "prikey" "text"

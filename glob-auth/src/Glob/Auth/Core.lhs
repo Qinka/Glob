@@ -15,29 +15,35 @@ import Crypto.Hash.Algorithms(SHA256(..))
 import qualified Glob.Import.ByteString as B
 import qualified Glob.Import.Text       as T
 import qualified Data.ByteString.Base64 as Base64
+import qualified Network.HTTP.Base      as H
 \end{code}
 
 function generateToken
-inoput timestamp, Server side public key, and client side private key
+input wherther encode, timestamp, Server side public key, and client side private key
 return the base64, and signed byteString Token
 \begin{code}
-generateToken :: String -> PrivateKey -> IO (Either Error B.ByteString)
-generateToken stamp' pri = (Base64.encode <$>) <$> signSafer dPP pri stamp
+generateToken :: Bool -> String -> PrivateKey -> IO (Either Error String)
+generateToken is stamp' pri = en . (Base64.encode <$>) <$> signSafer dPP pri stamp
   where stamp = B.pack stamp'
+        en (Left l) = Left l
+        en (Right bstr) = if is
+                          then Right . H.urlEncode $ B.unpack bstr
+                          else Right $               B.unpack bstr
 \end{code}
 
 function verifyToken
 input text of token, server side private key, and client side public key
 return True or False (for is right or not)
 \begin{code}
-verifyToken :: T.Text -> T.Text -> PublicKey -> Either String Bool
-verifyToken token' base' pub = 
+verifyToken :: Bool -> T.Text -> T.Text -> PublicKey -> Either String Bool
+verifyToken is token' base' pub = 
   (v <$>) . showError $ Base64.decode token
-  where token = T.encodeUtf8 token'
+  where token = de token'
         base  = T.encodeUtf8 base'
         showError (Left e) = Left $ show e
         showError r@(Right _) = r
         v = verify dPP pub base
+        de = if is then B.pack . H.urlDecode . T.unpack  else T.encodeUtf8
 \end{code}
 
 default PSSParams

@@ -18,16 +18,16 @@ main = do
   str <- mkRandomStrMax 100 
   (pub,pri) <- generate 1000 10001
   print (pri,pub,str)
-  rt <-  generateToken str pri
+  rt <-  generateToken True str pri
   checkToken rt pub str
   where
     checkToken (Left e) _ _ = do
       print e
       exitFailure
     checkToken (Right token) pub str = do
-      let token' = T.decodeUtf8 token
+      let token' = T.pack token
       let str' = T.pack str
-      case verifyToken token' str' pub of
+      case verifyToken True token' str' pub of
         Left e -> do
           print e
           exitFailure

@@ -20,10 +20,11 @@ stack-tmp.yaml
 # For VS Code
 
 .vscode
-TEST
-test
 
 \#*\#
+
+
+
 .markdown-preview.html
 .\#*
 *~
