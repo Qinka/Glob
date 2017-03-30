@@ -31,6 +31,11 @@ generateToken is stamp' pri = en . (Base64.encode <$>) <$> signSafer dPP pri sta
                           else Right $               B.unpack bstr
 \end{code}
 
+
+\begin{spec}
+generateToken True "asd" "prikey"
+\end{spec}
+
 function verifyToken
 input text of token, server side private key, and client side public key
 return True or False (for is right or not)

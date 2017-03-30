@@ -21,6 +21,7 @@ flag with-yesod
 
 library
   exposed-modules:     Glob.Auth.Core
+  other-modules:       Paths_glob_auth
   default-extensions:  OverloadedStrings
                        TemplateHaskell
                        CPP   
@@ -33,8 +34,9 @@ library
   default-language:    Haskell2010
 
   if flag(with-yesod)
-     exposed-modules:    Glob.Auth.Types
-                       Glob.Auth
+     exposed-modules:    Glob.Auth
+                         Glob.Auth.Types
+                         Glob.Auth.Info
      build-depends:    wai >= 3.2
                      , yesod-core >= 1.4
 
