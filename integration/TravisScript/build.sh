@@ -12,6 +12,7 @@ if [ -n "$THREADED" ]; then
 fi
 if [ -n "$DEBUG" ]; then
     export DEBUGFLAG=" --flag glob-core:debug-info "
+    export DEBUGFLAG=$DEBUGFLAG" --ghc-options -rtsopts "
     if [ -z "$LLVM" ]; then
 	O2FLAG=" "
     fi
