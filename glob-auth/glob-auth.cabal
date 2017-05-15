@@ -21,6 +21,7 @@ flag with-yesod
 
 library
   exposed-modules:     Glob.Auth.Core
+                       Glob.Auth.Info
   other-modules:       Paths_glob_auth
   default-extensions:  OverloadedStrings
                        TemplateHaskell
@@ -36,7 +37,6 @@ library
   if flag(with-yesod)
      exposed-modules:    Glob.Auth
                          Glob.Auth.Types
-                         Glob.Auth.Info
      build-depends:    wai >= 3.2
                      , yesod-core >= 1.4
 
