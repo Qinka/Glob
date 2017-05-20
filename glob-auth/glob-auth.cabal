@@ -16,7 +16,7 @@ extra-source-files:  ChangeLog.md
 cabal-version:       >=1.20
 
 flag with-yesod
-  default: True
+  default: False
   description: When installing client, for tools, Yesod is not necessary.
 
 library
@@ -25,7 +25,8 @@ library
   other-modules:       Paths_glob_auth
   default-extensions:  OverloadedStrings
                        TemplateHaskell
-                       CPP   
+                       FlexibleContexts
+                       TypeFamilies
   build-depends:       base >=4.9 && <4.10
                      , glob-common == 0.2.*
                      , cryptonite >= 0.20
@@ -78,3 +79,4 @@ test-suite test-auth
                , hspec >= 2
                , cryptonite
                , HTTP > 4000.3
+               , wai >= 3.2

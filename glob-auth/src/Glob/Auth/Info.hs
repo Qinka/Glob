@@ -37,8 +37,8 @@ glob_auth_version_quote = stringE $ showVersion version
 glob_auth_git_commit_quote :: Q Exp -- ^ String
 glob_auth_git_commit_quote = gitHash
 -- | The commit of the branch
-glob_auth_git_commit_quote :: Q Exp -- ^ String
-glob_auth_version_quote = stringE $ showVersion version
+glob_auth_git_branch_quote :: Q Exp -- ^ String
+glob_auth_git_branch_quote = gitBranch
 
 
 -- | Use these as a string

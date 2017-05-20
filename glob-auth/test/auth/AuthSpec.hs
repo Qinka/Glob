@@ -1,13 +1,14 @@
 module AuthSpec
        ( spec
        ) where
-       
-import TestImport
-import Glob.Import
-import Glob.Auth.Core
-import Glob.Import.Aeson
+
+import           Glob.Auth.Core
+import           Glob.Import
+import           Glob.Import.Aeson
 import qualified Glob.Import.ByteString as B
-import qualified Glob.Import.Text as T
+import qualified Glob.Import.Text       as T
+import qualified Network.HTTP.Base      as H
+import           TestImport
 
 spec :: Spec
 spec = withApp $ do -- SpecM
@@ -22,14 +23,13 @@ spec = withApp $ do -- SpecM
         (stamp,Right token) <- liftIO $ do -- IO
           now <- getCurrentTime
           let limit = 6
-              s = show (now,limit)
-          Just pri <- decodeStrict <$> B.readFile "prikey"          
-          t <-  generateToken True s pri
+              s = B.pack $ show (now,limit)
+          Just pri <- decodeStrict <$> B.readFile "prikey"
+          t <-  generateToken True s pri defaultPSSParamsSHA1
           print t
-          return (s,t) 
-        addPostParam "token" $ T.pack token
-        addPostParam "timestamp" $ T.pack stamp
+          return (s,t)
+        addRequestHeader ("token",token)
+        addRequestHeader ("stamp",stamp)
         addPostParam "pubtoken" "pubkey"
-       -- addFile "asd" "prikey" "text"
       printBody
       statusIs 200

@@ -18,8 +18,7 @@ module Glob.Auth
        , globAuth
        )  where
 
-import           Glob.Auth.Core
-import           Glob.Auth.Types
+import           Glob.Auth.Core         as X
 import           Glob.Auth.Types        as X
 import           Glob.Import
 import           Glob.Import.Aeson
@@ -37,14 +36,14 @@ import           Yesod.Core
 -- | fetch the client's public key file
 readPublicKey :: Auth site -- ^ Has the @clientPublicKeyDir@ and @str2PublicKey@ method
               => HandlerT site IO PublicKey -- ^ The public key context
-readPublicKey fn = do
+readPublicKey = do
   site <- getYesod
   dir <- clientPublicKeyDir site
   fn  <- lookupPostParam "pubtoken"
   case fn of
     Nothing -> invalidArgs ["PUBLIC TOKEN is missing"]
     Just fn' -> do
-      pubBytes <- liftIO $ B.readFile $ dir ++ T.unpack fn
+      pubBytes <- liftIO $ B.readFile $ dir ++ T.unpack fn'
       let  pub = str2PublicKey site pubBytes 
       case pub of
         Left i -> invalidArgs ["PUBLIC TOKEN is invalied!",i]
@@ -56,13 +55,14 @@ globAuth :: Auth site -- ^ Has the @clientPublicKeyDir@ method
          => HandlerT site IO AuthResult -- ^ return the result of the verification
 globAuth = do  
   now <- liftIO getCurrentTime
-  pub <- fetchCliPubKey
-  token <-  T.concat <$> lookupHeader "token"
-  stamp <-  T.concat <$> lookupHeader "stamp"
+  pub <- readPublicKey
+  token <-  B.concat <$> lookupHeaders "token"
+  stamp <-  B.concat <$> lookupHeaders "stamp"
   $logDebugS "token stamp" $ T.unlines $
-    map T.decodeUtf8 [T.show token,T.show stamp]
-  if checkTime timestamp now
-    then do let rt = verifyToken True token stamp pub
+    map T.decodeUtf8 [B.show token,B.show stamp]
+  if checkTime stamp now
+    then do pssp <- pssparam =<< getYesod
+            let rt = verifyToken True token stamp pub pssp
             case rt of
               Right True -> return Authorized
               Right False -> return AuthenticationRequired
@@ -70,7 +70,7 @@ globAuth = do
     else return $ Unauthorized $ "Who are you! The thing did not answer."
   where checkTime :: B.ByteString -> UTCTime -> Bool
         checkTime stamp now = let (ts,limit') = B.read stamp
-                                      limit = toND limit'
-                                  in abs (ts `diffUTCTime` now) < limit
+                                  limit = toND limit'
+                              in abs (ts `diffUTCTime` now) < limit
         toND = fromRational . (toRational  :: Double -> Rational)
-
+          

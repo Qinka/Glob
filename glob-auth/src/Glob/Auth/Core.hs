@@ -18,6 +18,9 @@ module Glob.Auth.Core
          generateToken
        , -- * verification token
          verifyToken
+       , -- * genrate PSSParam
+         defaultPSSParams
+       , defaultPSSParamsSHA1
        ) where
 
 
@@ -29,6 +32,7 @@ import           Crypto.PubKey.RSA.PSS
 import qualified Data.ByteString.Base64 as Base64
 import           Glob.Import
 import           Glob.Import.Aeson
+import           Glob.Import.ByteString (ByteString (..))
 import qualified Glob.Import.ByteString as B
 import qualified Glob.Import.Text       as T
 import qualified Network.HTTP.Base      as H
@@ -48,14 +52,15 @@ generateToken isEncode stamp priKey pssp =
 
 
 -- | verify token
-verifyToken :: Bool -- ^ Whether decode(HTTP)
+verifyToken :: HashAlgorithm hash
+            => Bool -- ^ Whether decode(HTTP)
             -> B.ByteString -- ^ the token to be verified
             -> B.ByteString -- ^ the source of the token
             -> PublicKey    -- ^ the public key of the client
             -> PSSParams hash ByteString ByteString -- ^ The param of PSS
             -> Either String Bool -- ^ the error or whether is value token
-verifyToken isDecode token' base pubKey pssp =
-  (verify' <$>) . showError $ deBa64 token
+verifyToken isDecode token base pubKey pssp =
+  (verify' <$>) . showError $ deBa64 $ deUrl token
   where deUrl = (if isDecode then B.pack . H.urlDecode . B.unpack else id)
         deBa64 = Base64.decode
         verify' = verify pssp pubKey base

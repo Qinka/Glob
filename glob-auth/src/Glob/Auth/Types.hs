@@ -16,14 +16,21 @@ module Glob.Auth.Types
          Auth(..)
        ) where
 
-import           Crypto.PubKey.RSA      (RSA)
+import           Crypto.Hash.Algorithms (HashAlgorithm)
+import           Crypto.PubKey.RSA      (PublicKey)
+import           Crypto.PubKey.RSA.PSS  (PSSParams)
+import           Glob.Import.ByteString (ByteString)
 import qualified Glob.Import.ByteString as B
-import           Yesod.Core             (Yesod)
+import qualified Glob.Import.Text       as T
+import           Yesod.Core             (MonadHandler, Yesod)
 import           Yesod.Core.Handler
 
 -- | The class where has the method to get the public key directory.
-class Yesod a => Auth a where
+class (Yesod a,HashAlgorithm (HashType a)) => Auth a where
+  type HashType a :: *
   clientPublicKeyDir :: MonadHandler m => a -> m String
+  pssparam :: MonadHandler m
+           => a -> m (PSSParams (HashType a) ByteString ByteString)
   str2PublicKey :: a -> B.ByteString -> Either T.Text PublicKey
 
 
