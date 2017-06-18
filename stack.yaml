@@ -1,0 +1,7 @@
+# stack yaml
+resolver: lts-8.18
+packages:
+  - glob-common
+  - glob-auth
+extra-deps: []
+
