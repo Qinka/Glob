@@ -12,6 +12,7 @@ category:            Web
 build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
+                     
 flag client
      description: For client, disable some function about server.
      default: False
@@ -27,7 +28,7 @@ library
   default-language:    Haskell2010
   if !flag(client)
      exposed-modules: Glob.Auth
-     build-depends:   yesod-core >= 1.4.30
+     -- build-depends:   yesod-core >= 1.4.30
   
 test-suite test-core
   type:              exitcode-stdio-1.0
