@@ -1,68 +1,54 @@
 {-|
-Module        : Glob.Auth.Core
-Description   : Core method for encrypt and decrypt
-Copyright     : Qinka 2017
-License       : GPL-3
-Maintainer    : qinka@live.com
-                me@qinka.pro
-Stability     : experimental
-Portability   : x86/64
+Module:      Glob.Auth.Core
+Desription:  Core method of the authentication
+Copyright:   (C) Qinka 2017
+License:     GPL-3
+Maintainer:  me@qinka.pro
+Stability:   experimental
+Portability: unknown
 
-The core module for encrpyt and decrypt(verification)
+The collection of core method for authentication.
 -}
 
-
 module Glob.Auth.Core
-       ( module X
-       , -- * generate token
-         generateToken
-       , -- * verification token
-         verifyToken
-       , -- * genrate PSSParam
-         defaultPSSParams
-       , defaultPSSParamsSHA1
+       ( -- * method for hash
+         generateHash
+       , verifyHash
+       , hash
+       , -- * hash algorithm
+         SHA512(..)
+       , SHA384(..)
+       , SHA3_512(..)
+       , SHA3_384(..)
+       , SHA3_256(..)
+       , SHA3_224(..)
+       , SHA256(..)
+       , SHA224(..)
+       , SHA1(..)
+       , SHA512t_256(..)
+       , SHA512t_224(..)
+       , HashAlgorithm(..)
+       , ByteArrayAccess(..)
        ) where
 
-
-
-import           Crypto.Hash.Algorithms as X
-import           Crypto.PubKey.RSA      as X
-import           Crypto.PubKey.RSA.PSS
-
-import qualified Data.ByteString.Base64 as Base64
+import           Crypto.Hash
+import           Data.ByteArray
 import           Glob.Import
-import           Glob.Import.Aeson
-import           Glob.Import.ByteString (ByteString (..))
+import           Glob.Import.ByteString (ByteString)
 import qualified Glob.Import.ByteString as B
-import qualified Glob.Import.Text       as T
-import qualified Network.HTTP.Base      as H
 
 
--- | generate token
-generateToken :: HashAlgorithm hash                   -- ^ The SHA
-              => Bool                                 -- ^ Whether encode(HTTP)
-              -> B.ByteString                         -- ^ The stamp string
-              -> PrivateKey                           -- ^ The private key for encrypt
-              -> PSSParams hash ByteString ByteString -- ^ The param of PSS
-              -> IO (Either Error ByteString)         -- ^ Return the Error or Token
-generateToken isEncode stamp priKey pssp =
-  enUrl . enBa64 <$> signSafer pssp  priKey stamp
-  where enUrl  = fmap (if isEncode then B.pack . H.urlEncode . B.unpack else id)
-        enBa64 = fmap Base64.encode
 
+generateHash :: HashAlgorithm a
+                => a            -- ^ Hash algorithm
+                -> ByteString   -- ^ The hash of key
+                -> ByteString   -- ^ Hash string
+generateHash a = B.show . hashWith a
 
--- | verify token
-verifyToken :: HashAlgorithm hash
-            => Bool -- ^ Whether decode(HTTP)
-            -> B.ByteString -- ^ the token to be verified
-            -> B.ByteString -- ^ the source of the token
-            -> PublicKey    -- ^ the public key of the client
-            -> PSSParams hash ByteString ByteString -- ^ The param of PSS
-            -> Either String Bool -- ^ the error or whether is value token
-verifyToken isDecode token base pubKey pssp =
-  (verify' <$>) . showError $ deBa64 $ deUrl token
-  where deUrl = (if isDecode then B.pack . H.urlDecode . B.unpack else id)
-        deBa64 = Base64.decode
-        verify' = verify pssp pubKey base
-        showError (Left e) = Left $ show e
-        showError r        = r
+verifyHash :: HashAlgorithm a
+              => a          -- ^ Hash algorithm
+              -> ByteString -- ^ Hash for key
+              -> ByteString -- ^ Hash string
+              -> Bool
+verifyHash a hash token = (token ==) $ generateHash a hash
+

@@ -1,7 +1,0 @@
-resolver: lts-8.4
-packages:
-- glob-auth/
-- glob-common/
-extra-deps: []
-flags: {}
-extra-package-dbs: []

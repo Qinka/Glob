@@ -1,4 +1,4 @@
-# Revision history for glob-auth
+# Revision history for glob-common
 
 ## 0.1.0.0  -- YYYY-mm-dd
 
