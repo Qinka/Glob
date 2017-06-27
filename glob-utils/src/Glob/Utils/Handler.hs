@@ -26,6 +26,8 @@ module Glob.Utils.Handler
        , return_e_h
        , -- * others
          showJS
+       , from_bin_to_bytestr
+       , LogPath(..)
        ) where
 
 import           Control.Exception
@@ -98,3 +100,43 @@ return_e_h e = return_e e >>=
 -- | show the js
 showJS :: Show a => a -> RawJavascript
 showJS = rawJS . T.show
+
+
+-- | from binary to bytestring
+from_bin_to_bytestr :: Binary -> B.ByteString
+from_bin_to_bytestr (Binary x) = x
+
+-- | the path for logger
+data LogPath = LogFile FilePath -- ^ using files
+             | LogStdout        -- ^ using stdout
+             | LogStderr        -- ^ using stderr
+
+instance FromJSON LogPath where
+  parseJSON (Import.String v) = pure $ case T.toLower v of
+    "stdout" -> LogStdout
+    "stderr" -> LogStderr
+    _        -> LogFile $ T.unpack v
+
+
+-- | instance the error response to json
+instance ToJSON ErrorResponse where
+  toJSON NotFound =
+    object ["error" .= ("not found" ::String)]
+  toJSON (InternalError e) =
+    object [ "error" .= ("internal error"::String)
+           , "content" .= e
+           ]
+  toJSON (InvalidArgs es) =
+    object [ "error" .= ("invalid args"::String)
+           , "content" .= es
+           ]
+  toJSON NotAuthenticated =
+    object ["error" .= ("not authenticated!"::String)]
+  toJSON (PermissionDenied msg) =
+    object [ "error" .= ("permission denied"::String)
+           , "content" .= msg
+           ]
+  toJSON (BadMethod m) =
+    object [ "error" .= ("bad method" :: String)
+           , "content" .= show m
+           ]

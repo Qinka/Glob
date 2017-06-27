@@ -37,11 +37,31 @@ library
                      , time >= 1.6
                      , template-haskell >= 2.11
                      , gitrev >= 1.2
-                     , shakespeare >= 2.0.13
+                     , cmdargs >= 1.2.6
+                     , signal >=0.1.0.3
+                     
   hs-source-dirs:      src
   default-language:    Haskell2010
   if !flag(client)
      exposed-modules:  Glob.Utils.Handler
      build-depends:    yesod-core >= 1.4.30
+                     , blaze-markup >= 0.7
+                     , blaze-html >= 0.8
+                     , conduit >= 1.26
+                     , shakespeare >= 2.0.13
+                     , fast-logger >= 2.4
+                     , monad-control >= 1.0.1
+                     , monad-logger >= 0.3.19
+                     , mongoDB >= 2.1
+                     , network >= 2.6.2
+                     , parsec >= 3.1.10
+                     , resource-pool >= 0.2.3
+                     , transformers >= 0.5.2
+                     , wai >= 3.2
+                     , wai-logger >= 2.3
+                     , warp >= 3.2.7
+                     , xml-hamlet >= 0.4.0.10
+                     
      reexported-modules: Yesod.Core
+                         Database.MongoDB
      other-extensions: OverloadedStrings
