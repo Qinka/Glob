@@ -28,6 +28,6 @@ test
 .\#*
 *~
 .ignore
-
+*.ignore
 
 *.lhs~

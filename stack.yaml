@@ -4,7 +4,7 @@ resolver: lts-8.20
 packages:
 - glob-auth
 - glob-utils
-# - glob-core/
+- glob-core
 # - glob-launch/
 # - glob-tools/glob-ih/
 # - glob-tools/glob-timecheck/

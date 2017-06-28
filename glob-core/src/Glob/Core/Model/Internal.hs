@@ -9,7 +9,8 @@ Portability   : unknown
 
 The basic method and type for model in MVC
 -}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 module Glob.Core.Model.Internal
        ( -- * navigation bar
@@ -35,15 +36,18 @@ module Glob.Core.Model.Internal
        , delete_context_maybe
        ) where
 
-
-import           Control.Monad.Class.IO
+import           Control.Monad.IO.Class
 import           Data.Pool
 import           Database.MongoDB       as Mongo
 import           Glob.Import
+import           Glob.Import.Aeson
 import qualified Glob.Import.ByteString as B
 import qualified Glob.Import.Text       as T
-import           Yesod.Core
+import           Glob.Utils.Handler
 
+
+-- | ConnectionPool
+type ConnectionPool = Pool Pipe
 
 -- | model for navigation bar
 data Nav = Nav
@@ -82,7 +86,7 @@ instance ToJSON Nav where
 -- | the resource type for item
 data ResT = ResT
             { rIndex   :: [T.Text]      -- ^ the path of the url
-            , rRes     :: ObjectID      -- ^ the id of the object in the db
+            , rRes     :: ObjectId      -- ^ the id of the object in the db
             , rType    :: T.Text        -- ^ the type of resource
             , rCTime   :: UTCTime       -- ^ the time when it created
             , rUTime   :: UTCTime       -- ^ the time when it updated
@@ -95,8 +99,8 @@ data ResT = ResT
           deriving (Eq,Show)
 
 -- | transform between res document
-rest_to_doc :: ResT -> Document
-rest_to_doc ResT{..} =
+res_to_doc :: ResT -> Document
+res_to_doc ResT{..} =
   [ "index"       =: rIndex
   , "res"         =: rRes
   , "type"        =: rType
@@ -113,7 +117,7 @@ rest_to_doc ResT{..} =
 
 -- | transform between res document
 doc_to_res :: Document -> Maybe ResT
-doc_to_res doc = Rest
+doc_to_res doc = ResT
   <$>       doc !? "index"
   <*>       doc !? "res"
   <*>       doc !? "type"
@@ -165,34 +169,36 @@ fetch_context :: (MonadIO m,Val a)
 fetch_context field ResT{..} =  ((!? field) <%>).findOne.select ["_id" =: rRes]
 
 -- | fetch resource index
-fetch_res :: Moand m
+fetch_res :: MonadIO m
              => [T.Text]
              -> Action m (Maybe ResT)
 fetch_res index = (doc_to_res <%>) . findOne $ select ["index" =: index] "index"
 
 -- | update context
-update_context :: (Monad m, Val a)
+update_context :: (MonadIO m, Val a)
                   => T.Text            -- ^ Collection
                   -> Maybe ObjectId    -- ^ obj id of item
                   -> T.Text            -- ^ field name
+                  -> a
                   -> Action m ObjectId -- ^ return id
 update_context c oid field v = case oid of
   Just i -> upsert (select ["_id" =: i] c) [field =: v] >> return i
-  _ -> (\(ObjId i) -> i) <$> insert c [field =: v]
-  
+  _      -> (\(ObjId i) -> i) <$> insert c [field =: v]
+
 -- | the update for item
 update_item :: (MonadIO m, Val a)
                => T.Text   -- ^ type, or say collection
                -> T.Text   -- ^ field name
                -> a        -- ^ item
                -> ResT     -- ^ ``undefined'' ResT
+               -> Action m ()
 update_item t f v uR = do
   let index = rIndex uR
   res <- fetch_res index
-  rr <- if (rType <$> res) /= Just typ
-        then delete_context res typ >> return Nothing
+  rr <- if (rType <$> res) /= Just t
+        then delete_context_maybe res t >> return Nothing
         else return $ rRes <$> res
-  rO <- update_context t rr field v
+  rO <- update_context t rr f v
   update_res (uR {rRes = rO})
 
 -- | the update for resource
@@ -210,16 +216,18 @@ delete_context :: MonadIO m
 delete_context ResT{..} c =
   delete $ select ["_id" =: rRes] c
 
+
 -- | delete resource
 delete_res :: MonadIO m
               => ResT        -- ^ index
               -> Action m ()
 delete_res ResT{..} =
-  delete $ seletc ["index" =: rIndex] "index"
+  delete $ select ["index" =: rIndex] "index"
 
 -- | delete the resouce in maybe
 delete_context_maybe :: MonadIO m
                     => Maybe ResT -- ^ index
+                    -> T.Text     -- ^ field
                     -> Action m ()
 delete_context_maybe (Just r) = delete_context r
 delete_context_maybe _        = \_ -> return ()
@@ -231,5 +239,5 @@ delete_item :: MonadIO m
                -> Action m ()
 delete_item index c = fetch_res index >>=
   (\res -> case res of
-      Just r -> deleteContext r c >> delete_res r
-      -      -> return ())
+      Just r -> delete_context r c >> delete_res r
+      _      -> return ())

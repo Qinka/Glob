@@ -37,7 +37,7 @@ library
                      , time >= 1.6
                      , template-haskell >= 2.11
                      , gitrev >= 1.2
-                     , cmdargs >= 1.2.6
+                     , cmdargs >= 0.10
                      , signal >=0.1.0.3
                      
   hs-source-dirs:      src
@@ -47,7 +47,7 @@ library
      build-depends:    yesod-core >= 1.4.30
                      , blaze-markup >= 0.7
                      , blaze-html >= 0.8
-                     , conduit >= 1.26
+                     , conduit >= 1.2
                      , shakespeare >= 2.0.13
                      , fast-logger >= 2.4
                      , monad-control >= 1.0.1
@@ -63,5 +63,5 @@ library
                      , xml-hamlet >= 0.4.0.10
                      
      reexported-modules: Yesod.Core
-                         Database.MongoDB
+                       , Database.MongoDB
      other-extensions: OverloadedStrings

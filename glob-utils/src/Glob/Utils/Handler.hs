@@ -33,10 +33,11 @@ module Glob.Utils.Handler
 import           Control.Exception
 import           Control.Monad
 import           Control.Monad.IO.Class
+import           Data.Aeson
 import           Data.Either
+import           Database.MongoDB
 import           Text.Julius            (RawJavascript, rawJS)
 import           Yesod.Core
-
 
 import qualified Glob.Import.ByteString as B
 import qualified Glob.Import.Text       as T
@@ -112,7 +113,7 @@ data LogPath = LogFile FilePath -- ^ using files
              | LogStderr        -- ^ using stderr
 
 instance FromJSON LogPath where
-  parseJSON (Import.String v) = pure $ case T.toLower v of
+  parseJSON (Yesod.Core.String v) = pure $ case T.toLower v of
     "stdout" -> LogStdout
     "stderr" -> LogStderr
     _        -> LogFile $ T.unpack v
