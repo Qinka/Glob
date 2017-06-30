@@ -23,7 +23,7 @@ module Glob.Core.Model.Internal
        , nav_to_doc
        , doc_to_nav
        , -- * the resource
-         ResT
+         ResT(..)
        , res_to_doc
        , doc_to_res
        , -- * transform

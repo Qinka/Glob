@@ -25,7 +25,7 @@ module Glob.Utils.Handler
        , return_e_t
        , return_e_h
        , -- * others
-         showJS
+         show_js
        , from_bin_to_bytestr
        , LogPath(..)
        ) where
@@ -99,8 +99,8 @@ return_e_h e = return_e e >>=
   )
 
 -- | show the js
-showJS :: Show a => a -> RawJavascript
-showJS = rawJS . T.show
+show_js :: Show a => a -> RawJavascript
+show_js = rawJS . T.show
 
 
 -- | from binary to bytestring

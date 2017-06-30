@@ -61,9 +61,11 @@ library
                      , wai-logger >= 2.3
                      , warp >= 3.2.7
                      , xml-hamlet >= 0.4.0.10
+                     , mtl >= 2.2
                      
      reexported-modules: Yesod.Core
                        , Yesod.Core.Handler
                        , Database.MongoDB
                        , Control.Monad.Trans.Control
+                       , Control.Monad.Writer.Lazy
      other-extensions: OverloadedStrings

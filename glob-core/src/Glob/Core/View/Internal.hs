@@ -19,18 +19,24 @@ TODO
 module Glob.Core.View.Internal
        ( Hamletic(..)
        , glob_layout
+       , glob_error_handler
        ) where
 
 import           Glob.Core.Model
 import           Glob.Import.Text   (Text)
+import qualified Glob.Import.Text   as T
+import           Glob.Utils.Handler
 import           Yesod.Core
 import           Yesod.Core.Handler
+import           Yesod.Core.Json
 
 -- | The Hamtletic
 class (MonadHandler m, Mongodic a m) => Hamletic a m | m -> a where
   get_title        :: m Text         -- ^ get title
   get_frame_prefix :: m Text  -- ^ get the prefix path of frame
 
+
+-- | the default of glob with Yesod
 glob_layout :: (Hamletic a (HandlerT a IO),Yesod a)
                => WidgetT a IO ()     -- ^ widget
                -> HandlerT a IO Html  -- ^ return
@@ -63,5 +69,18 @@ glob_layout w = do
             ^{pageBody page_content}
             #{bottom}
     |]
+
+
+-- | handler the error
+glob_error_handler :: Yesod site
+                      => ErrorResponse -- ^ error
+                      -> HandlerT site IO TypedContent
+glob_error_handler er = selectRep $ do
+  provideJson er
+  provideRep $
+    defaultLayout [whamlet|
+                          <h1> error
+                          <p> #{T.show er}
+                          |]
 
 
