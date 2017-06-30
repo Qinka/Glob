@@ -36,14 +36,14 @@ services:
 
 # pre-install
 before_install:
-  - source $TRAVIS_BUILD_DIR/integration/TravisScript/before.sh
+  - source $TRAVIS_BUILD_DIR/.integration/TravisScript/before.sh
 
 
 # build
 script:
-  - source $TRAVIS_BUILD_DIR/integration/TravisScript/test.sh
-  - source $TRAVIS_BUILD_DIR/integration/TravisScript/build.sh
+  - source $TRAVIS_BUILD_DIR/.integration/TravisScript/test.sh
+  - source $TRAVIS_BUILD_DIR/.integration/TravisScript/build.sh
 
 # update docker image
 after_success:
-  - source $TRAVIS_BUILD_DIR/integration/TravisScript/update.sh
+  - source $TRAVIS_BUILD_DIR/.integration/TravisScript/update.sh
