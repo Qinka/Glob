@@ -9,28 +9,58 @@ Portability  : unknown
 
 The codes for model
 -}
-{-# LANGUAGE TemplateHaskell #-}
 
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TemplateHaskell       #-}
 
 module Glob.Core.Model
-       (
+       ( -- * run database
+         run_db
+       , run_db_default
+       , -- * model
+         fetch_frame
+       , update_frame
+       , fetch_post
+       , update_post
+       , fetch_resource_b
+       , update_resource_b
+       , fetch_resource_t
+       , update_resource_t
+       , fetch_static
+       , update_static
+       , fetch_query
+       , update_query
+       , fetch_maybe_i
+       , fetch_maybe_r
+       , -- re-export
+         module Glob.Core.Model.Internal
        ) where
 
 
+import           Control.Monad.IO.Class
+import           Control.Monad.Trans.Control
 import           Data.Pool
 import           Glob.Core.Model.Internal
 import           Glob.Core.Model.TH
-import           Glob.Import.ByteString   (ByteString (..))
-import           Glob.Import.Text         (Text (..))
+import           Glob.Import.ByteString      (ByteString (..))
+import           Glob.Import.Text            (Text (..))
 import           Glob.Utils.Handler
-import           Text.Blaze.Html          (Html (..), preEscapedToHtml)
+import           Glob.Utils.Handler
+import           Text.Blaze.Html             (Html (..))
+import qualified Text.Blaze.Html             as TBH
+
+-- | escapted to html
+preEscapedToHtml :: Text -> Html
+preEscapedToHtml = TBH.preEscapedToHtml
+
 -- about frame
 make_fetch 'preEscapedToHtml "frame" ''Html "html" "frame"
-make_update                  "frame" ''Html "html" "frame"
+make_update                  "frame" ''Text "html" "frame"
 
 -- about post
 make_fetch 'preEscapedToHtml "post" ''Html "html" "post"
-make_update                  "post" ''Html "html" "post"
+make_update                  "post" ''Text "html" "post"
 
 -- about text resource
 make_fetch 'id "resource_t" ''Text "text" "resource"
@@ -38,15 +68,52 @@ make_update    "resource_t" ''Text "text" "resource"
 
 -- about binary resource
 make_fetch 'fromBinary "resource_b" ''ByteString "binary" "resource"
-make_update            "resource_b" ''ByteString "binary" "resource"
+make_update            "resource_b" ''Binary "binary" "resource"
 
 -- about static
 make_fetch 'id "static" ''Text "url" "static"
 make_update    "static" ''Text "url" "static"
 
--- about static
+-- about query
 make_fetch 'id "query" ''Text "var" "query"
 make_update    "query" ''Text "var" "query"
 
 
+-- | fetch maybe index
+fetch_maybe_i :: MonadIO m
+                 => (ResT -> Action m (Maybe a))
+                 -> [Text] -- ^ index
+                 -> Action m (Maybe a)
+fetch_maybe_i mf idx =
+  fetch_res idx >>= fetch_maybe_r mf
 
+-- | fetch maybe resource
+fetch_maybe_r :: MonadIO m
+                 => (ResT -> Action m (Maybe a))
+                 -> Maybe ResT -- ^ index
+                 -> Action m (Maybe a)
+fetch_maybe_r mf (Just r) = mf r
+fetch_maybe_r _  _        = return Nothing
+
+
+-- | run mongo
+run_db :: Mongodic site m
+          => AccessMode  -- ^ access mode
+          -> Database    -- ^ database
+          -> Action m a  -- ^ action
+          -> m a
+run_db am db mf = get_pool >>= \pool ->
+  withResource pool $ \p -> do
+  (user,pass) <- get_db_u_p
+  access p am db $ do
+    auth user pass
+    mf
+
+-- | run mongo with default
+run_db_default  :: Mongodic site m
+                => Action m a  -- ^ action
+                -> m a
+run_db_default mf = do
+  am <- get_default_access_mode
+  db <- get_default_db
+  run_db am db mf

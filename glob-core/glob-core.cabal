@@ -22,6 +22,8 @@ flag debug-info
 library 
   exposed-modules:     Glob.Core.Model.Internal
                        Glob.Core.Model.TH
+                       Glob.Core.Model
+                       Glob.Core.View.Internal
   
   build-depends:       aeson >= 0.10
                      , base >= 4.7 && < 4.10

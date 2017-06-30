@@ -141,3 +141,4 @@ instance ToJSON ErrorResponse where
     object [ "error" .= ("bad method" :: String)
            , "content" .= show m
            ]
+

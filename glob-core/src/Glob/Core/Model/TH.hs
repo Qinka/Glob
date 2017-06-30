@@ -38,16 +38,16 @@ make_fetch func n kind field collection = do
       dec = SigD name $ ForallT [PlainTV m] [AppT (ConT ''MonadIO) (VarT m)]
         (AppT
          (AppT ArrowT (ConT ''ResT))
-         (AppT (AppT (ConT ''Action) (VarT m)) (AppE (ConT ''Maybe) (ConT kind))))
+         (AppT (AppT (ConT ''Action) (VarT m)) (AppT (ConT ''Maybe) (ConT kind))))
       resv = mkName "res"
       body = FunD name
         [Clause [VarP resv] (NormalB $
-                             (AppE (VarE $ mkName "<#>")
-                              (AppE (VarE func)
+                             (AppE
+                              (AppE (VarE $ mkName "<#>") (VarE func))
                                (AppE (AppE (AppE (VarE 'fetch_context)
                                             (LitE $ StringL field))
                                       (VarE resv))
-                                (LitE $ StringL collection))))) []]
+                                (LitE $ StringL collection)))) []]
   return [dec,body]
 
 

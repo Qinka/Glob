@@ -9,8 +9,13 @@ Portability   : unknown
 
 The basic method and type for model in MVC
 -}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
+
+{-# LANGUAGE FlexibleContexts       #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE MultiParamTypeClasses  #-}
+{-# LANGUAGE OverloadedStrings      #-}
+{-# LANGUAGE RecordWildCards        #-}
+{-# LANGUAGE TypeFamilies           #-}
 
 module Glob.Core.Model.Internal
        ( -- * navigation bar
@@ -21,10 +26,11 @@ module Glob.Core.Model.Internal
          ResT
        , res_to_doc
        , doc_to_res
+       , -- * transform
+         fromBinary
        , -- * about mongoDB
          Mongodic(..)
-       , defaultAM
-       , defaultDB
+       , ConnectionPool
        , fetch_context
        , fetch_res
        , update_context
@@ -34,17 +40,18 @@ module Glob.Core.Model.Internal
        , delete_item
        , delete_res
        , delete_context_maybe
+       , module Database.MongoDB
        ) where
 
 import           Control.Monad.IO.Class
+import           Control.Monad.Trans.Control
 import           Data.Pool
-import           Database.MongoDB       as Mongo
+import           Database.MongoDB
 import           Glob.Import
 import           Glob.Import.Aeson
-import qualified Glob.Import.ByteString as B
-import qualified Glob.Import.Text       as T
+import qualified Glob.Import.ByteString      as B
+import qualified Glob.Import.Text            as T
 import           Glob.Utils.Handler
-
 
 -- | ConnectionPool
 type ConnectionPool = Pool Pipe
@@ -147,18 +154,12 @@ instance ToJSON ResT where
 
 
 -- | the type-class which means mongoDB available.
-class Mongodic a where
-  get_db_connect_pool     :: a -> ConnectionPool   -- ^ get the connection pool
-  get_default_access_mode :: a -> AccessMode       -- ^ get the accedd mode
-  get_default_access_mode =  defaultAM
-  get_default_db          :: a -> Database         -- ^ get the default database
-  get_default_db          =  defaultDB
-  get_db_u_p              :: a -> (T.Text,T.Text)  -- ^ get the user and pass
+class (MonadIO m,MonadBaseControl IO m) => Mongodic a m | m -> a where
+  get_default_access_mode :: m AccessMode      -- ^ get the accedd mode
+  get_default_db          :: m Database        -- ^ get the default database
+  get_db_u_p              :: m (T.Text,T.Text) -- ^ get the user and pass
+  get_pool                :: m ConnectionPool  -- ^ get the connection pool
 
--- | default access mode
-defaultAM _ = master
--- | default database
-defaultDB _ = "master"
 
 -- | fetch context
 fetch_context :: (MonadIO m,Val a)
@@ -241,3 +242,7 @@ delete_item index c = fetch_res index >>=
   (\res -> case res of
       Just r -> delete_context r c >> delete_res r
       _      -> return ())
+
+-- | Binary to ByteString
+fromBinary :: Binary -> B.ByteString
+fromBinary (Binary b) = b

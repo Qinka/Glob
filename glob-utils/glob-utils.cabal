@@ -63,5 +63,7 @@ library
                      , xml-hamlet >= 0.4.0.10
                      
      reexported-modules: Yesod.Core
+                       , Yesod.Core.Handler
                        , Database.MongoDB
+                       , Control.Monad.Trans.Control
      other-extensions: OverloadedStrings
