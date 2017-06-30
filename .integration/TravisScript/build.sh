@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ -n "$RUN_BUILD$" ]; then
+if [ -n "$RUN_BUILD" ]; then
     ghc -V	
     O2FLAG=" --ghc-options -O3 "
     if [ -n "$STACKSOLVER" ]; then
-	export STACKFILE=" --stack-yaml $TRAVIS_BUILD_DIR/integration/StackSolver/$STACKSOLVER "
+	export STACKFILE=" --stack-yaml $TRAVIS_BUILD_DIR/.integration/StackSolver/$STACKSOLVER "
     fi
     if [ -n "$LLVM" ]; then
 	export LLVMFLAG=" --ghc-options -fllvm --ghc-options -pgmlo --ghc-options opt-$LLVM --ghc-options -pgmlc --ghc-options llc-$LLVM "
