@@ -1,8 +1,0 @@
-# the settings of engines
-engines:
-  # using hlint to check codes
-  hlint:
-    enabled: true
-ratings:
-  paths: []
-exclude_paths: []
