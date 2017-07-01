@@ -23,8 +23,10 @@ module Glob.Core.View
 
 import           Control.Monad.Writer.Lazy
 import           Data.Monoid
-import           Glob.Core.Model
 import           Glob.Core.View.Internal
+import           Glob.Import.ByteString    (ByteString)
+import qualified Glob.Import.ByteString    as B
+import           Glob.Import.Text          (Text)
 import qualified Glob.Import.Text          as T
 import           Glob.Utils.Handler
 import           Text.Blaze.Html           (Html, preEscapedToHtml)
@@ -32,25 +34,21 @@ import           Yesod.Core
 import           Yesod.Core.Handler
 import           Yesod.Core.Widget
 
-response_post :: (Yesod a, Hamletic a (HandlerT a IO))
-                 => ResT
-                 -> HandlerT a IO TypedContent
-response_post res@ResT{..} = do
+-- | response the post with ResT and html
+respond_post :: (Yesod a, Hamletic a (HandlerT a IO))
+                => ResT -- ^ resource index
+                -> Html -- ^ html body
+                -> HandlerT a IO TypedContent
+respond_post res@ResT{..} raw_body = do
   isRaw <- null <$> lookupHeader "GLOBRAW"
-  raw_body_maybe <- run_db_default $ fetch_post res
-  case raw_body_maybe of
-    Just raw_body -> do
-      body <- if isRaw then return raw_body
-              else defaultLayout $ with_html raw_body res
-      respondSource "text/html" $ do
-        sendChunkHtml body
-        sendFlush
-    _             -> error "Can not found datas"
-
-
+  body <- if isRaw then return raw_body
+          else defaultLayout $ with_html raw_body res
+  respondSource "text/html" $ do
+    sendChunkHtml body
+      sendFlush
 
 -- | with tags, import tags to js
-with_tags :: [T.Text] -- ^ tags
+with_tags :: [Text] -- ^ tags
           -> WidgetT site IO ()
 with_tags tags = let tags_j = toJSON tags in toWidget [julius|tags=#{tags_j};|]
 
@@ -61,7 +59,7 @@ with_summary (Just summary_html) = [whamlet|<summary id=sum>#{summary_html}|]
 with_summary _                   = return ()
 
 -- | with whose, import the author to the js
-with_whose :: Maybe T.Text -- ^ author
+with_whose :: Maybe Text -- ^ author
            -> WidgetT site IO ()
 with_whose (Just whose) = let w = show_js whose in toWidget [julius|author=#{w}|]
 with_whose _                    = return ()
@@ -76,3 +74,25 @@ with_html body ResT{..} = do
   [whamlet|#{body}|]
   with_whose rWhose
   with_tags rTags
+
+
+-- | respond resource(text)
+respond_resource_t :: (Yesod a, Hamletic a (HandlerT a IO))
+                      => ResT    -- ^ resource index
+                      -> Text    -- ^ text
+                      -> HandlerT a IO TypedContent
+respond_resource_t ResT{..} text = do
+  respondSource (fromMaybe "" $ fmap encodeUtf8 rMIME) $ do
+    sendChunkText text
+    sendFlush
+
+-- | respond resource(binary)
+respond_resource_b :: (Yesod a, Hamletic a (HandlerT a IO))
+                      => ResT    -- ^ resource index
+                      -> ByteString    -- ^ text
+                      -> HandlerT a IO TypedContent
+respond_resource_b ResT{..} bin = do
+  respondSource (fromMaybe "" $ fmap encodeUtf8 rMIME) $ do
+    sendChunkBS bin
+    sendFlush
+
