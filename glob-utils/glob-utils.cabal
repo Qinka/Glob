@@ -68,4 +68,5 @@ library
                        , Database.MongoDB
                        , Control.Monad.Trans.Control
                        , Control.Monad.Writer.Lazy
+                       , Text.Parsec
      other-extensions: OverloadedStrings

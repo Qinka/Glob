@@ -23,12 +23,14 @@ module Glob.Core.View
 
 import           Control.Monad.Writer.Lazy
 import           Data.Monoid
+import           Glob.Core.Model           (ResT (..))
 import           Glob.Core.View.Internal
 import           Glob.Import.ByteString    (ByteString)
 import qualified Glob.Import.ByteString    as B
 import           Glob.Import.Text          (Text)
 import qualified Glob.Import.Text          as T
 import           Glob.Utils.Handler
+import           Network.Wai               (status301)
 import           Text.Blaze.Html           (Html, preEscapedToHtml)
 import           Yesod.Core
 import           Yesod.Core.Handler
@@ -96,3 +98,10 @@ respond_resource_b ResT{..} bin = do
     sendChunkBS bin
     sendFlush
 
+
+-- | response the static url
+respond_static :: (Yesod a, Hamletic a (HandlerT a IO))
+                  => ResT -- ^ index for resource
+                  -> Text -- ^ Url
+                  -> HandlerT a IO TypedContent
+respond_static _ url = redirectWith status301 u
