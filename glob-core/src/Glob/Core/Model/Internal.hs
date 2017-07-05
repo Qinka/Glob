@@ -40,6 +40,7 @@ module Glob.Core.Model.Internal
        , delete_item
        , delete_res
        , delete_context_maybe
+       , (=@)
        , module Database.MongoDB
        ) where
 
@@ -246,3 +247,12 @@ delete_item index c = fetch_res index >>=
 -- | Binary to ByteString
 fromBinary :: Binary -> B.ByteString
 fromBinary (Binary b) = b
+
+
+-- | update nothing
+infix 0 =@
+(=@) :: Val v
+        => Label        -- ^ label
+        -> Maybe v      -- ^ value
+        -> Maybe Field  -- ^ maybe field
+(=@) l = ((Just.(l =:)) =<<)

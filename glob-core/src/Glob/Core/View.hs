@@ -22,6 +22,7 @@ module Glob.Core.View
        ) where
 
 import           Control.Monad.Writer.Lazy
+import           Data.Maybe
 import           Data.Monoid
 import           Glob.Core.Model           (ResT (..))
 import           Glob.Core.View.Internal
@@ -30,7 +31,7 @@ import qualified Glob.Import.ByteString    as B
 import           Glob.Import.Text          (Text)
 import qualified Glob.Import.Text          as T
 import           Glob.Utils.Handler
-import           Network.Wai               (status301)
+import           Network.HTTP.Types        (status301)
 import           Text.Blaze.Html           (Html, preEscapedToHtml)
 import           Yesod.Core
 import           Yesod.Core.Handler
@@ -47,7 +48,7 @@ respond_post res@ResT{..} raw_body = do
           else defaultLayout $ with_html raw_body res
   respondSource "text/html" $ do
     sendChunkHtml body
-      sendFlush
+    sendFlush
 
 -- | with tags, import tags to js
 with_tags :: [Text] -- ^ tags
@@ -84,7 +85,7 @@ respond_resource_t :: (Yesod a, Hamletic a (HandlerT a IO))
                       -> Text    -- ^ text
                       -> HandlerT a IO TypedContent
 respond_resource_t ResT{..} text = do
-  respondSource (fromMaybe "" $ fmap encodeUtf8 rMIME) $ do
+  respondSource (fromMaybe "" $ fmap T.encodeUtf8 rMIME) $ do
     sendChunkText text
     sendFlush
 
@@ -94,7 +95,7 @@ respond_resource_b :: (Yesod a, Hamletic a (HandlerT a IO))
                       -> ByteString    -- ^ text
                       -> HandlerT a IO TypedContent
 respond_resource_b ResT{..} bin = do
-  respondSource (fromMaybe "" $ fmap encodeUtf8 rMIME) $ do
+  respondSource (fromMaybe "" $ fmap T.encodeUtf8 rMIME) $ do
     sendChunkBS bin
     sendFlush
 
@@ -104,4 +105,4 @@ respond_static :: (Yesod a, Hamletic a (HandlerT a IO))
                   => ResT -- ^ index for resource
                   -> Text -- ^ Url
                   -> HandlerT a IO TypedContent
-respond_static _ url = redirectWith status301 u
+respond_static _ url = redirectWith status301 url

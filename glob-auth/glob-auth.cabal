@@ -19,6 +19,7 @@ flag client
                      
 library
   exposed-modules:     Glob.Auth.Core
+                       Glob.Auth.Info
   other-modules:       Paths_glob_auth
   build-depends:       base >=4.9 && <4.10
                      , cryptonite >= 0.20

@@ -10,6 +10,7 @@ Portability  : unknown
 The codes for model
 -}
 
+{-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE TemplateHaskell       #-}
@@ -33,16 +34,22 @@ module Glob.Core.Model
        , update_query
        , fetch_maybe_i
        , fetch_maybe_r
+       , -- ** for navgation
+         fetch_nav
+       , update_nav
+       , delete_nav
        , -- re-export
          module Glob.Core.Model.Internal
        ) where
 
 
+import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Control
 import           Data.Pool
 import           Glob.Core.Model.Internal
 import           Glob.Core.Model.TH
+import           Glob.Import
 import           Glob.Import.ByteString      (ByteString (..))
 import           Glob.Import.Text            (Text (..))
 import           Glob.Utils.Handler
@@ -95,6 +102,33 @@ fetch_maybe_r :: MonadIO m
 fetch_maybe_r mf (Just r) = mf r
 fetch_maybe_r _  _        = return Nothing
 
+-- | fetch the nav
+fetch_nav :: (MonadBaseControl IO m, MonadIO m)
+             => Action m [Nav]
+fetch_nav = do
+  cr <- find $ select [] "nav"
+  navs <- map doc_to_nav <$> rest cr
+  closeCursor cr
+  return $ catMaybes navs
+
+-- update nav
+update_nav :: MonadIO m
+              => Maybe Text  -- ^ label
+              -> Maybe Text  -- ^ url
+              -> Maybe Int     -- ^ order
+              -> Action m ()
+update_nav label url order =
+  void $ upsert (select ["label" =: label] "nav") $ catMaybes
+  [ Just ("index" =: label)
+  , "url"   =@ url
+  , "order" =@ order
+  ]
+
+delete_nav :: MonadIO m
+              => Maybe Text -- ^ label ( if it is Nothing, the all nav item will be delete)
+              -> Action m ()
+delete_nav label =
+    delete $ select (catMaybes ["index" =@ label]) "nav"
 
 -- | run mongo
 run_db :: Mongodic site m
@@ -117,3 +151,4 @@ run_db_default mf = do
   am <- get_default_access_mode
   db <- get_default_db
   run_db am db mf
+

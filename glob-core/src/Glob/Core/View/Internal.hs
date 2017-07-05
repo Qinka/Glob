@@ -32,8 +32,9 @@ import           Yesod.Core.Json
 
 -- | The Hamtletic
 class (MonadHandler m, Mongodic a m) => Hamletic a m | m -> a where
-  get_title        :: m Text         -- ^ get title
+  get_title        :: m Text  -- ^ get title
   get_frame_prefix :: m Text  -- ^ get the prefix path of frame
+  get_version      :: m Text  -- ^ get the version of blog itself or application
 
 
 -- | the default of glob with Yesod

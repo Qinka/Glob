@@ -1,3 +1,5 @@
+{-# OPTIONS_HADDOCK hide #-}
+
 {-|
 Module:      Glob.Utils.Info
 Description: The information of the package
