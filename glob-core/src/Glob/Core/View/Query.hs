@@ -17,12 +17,32 @@ The View part for query command, nav query.
 
 
 module Glob.Core.View.Query
-       (
+       ( -- * querys
+         -- ** query version
+         query_version
+       , query_version_author
+       , query_version_utils
+       , -- ** name
+         query_name
+       , -- ** build info
+         query_build_info
+       , -- ** server time
+         query_server_time
+       , -- ** navbar
+         query_nav
+       , -- ** index
+         query_index
        ) where
 
+import           Data.Time
 import           Glob.Auth.Info
+import           Glob.Core.Info
+import           Glob.Core.Model.Internal    (Nav, ResT)
 import           Glob.Core.View.Internal
-import qualified Glob.Import.Text        as T
+import           Glob.Core.View.Query.Parsec
+import           Glob.Import
+import           Glob.Import.Aeson
+import qualified Glob.Import.Text            as T
 import           Glob.Utils.Info
 import           Yesod.Core
 
@@ -51,3 +71,12 @@ query_server_time = T.show <$> (liftIO getCurrentTime) >>= respondSource "text/p
 query_nav :: [Nav] -- ^ navs
              -> HandlerT a IO TypedContent
 query_nav = respondSource "application/json" . sendChunkLBS . encode
+
+query_index :: String -- ^ parameters
+            -> [ResT] -- ^ resources index
+            -> HandlerT a IO TypedContent
+query_index t = respondSource "application/json" . sendChunkLBS . encode . (run $ run_qp t)
+  where run (Left e)  = error $ show e
+        run (Right i) = i
+
+

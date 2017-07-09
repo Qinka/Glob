@@ -17,7 +17,7 @@ The information of thos package, such as version, git commit-id.
 
 
 
-module Glob.Auth.Info
+module Glob.Core.Info
        ( -- * TemplateHaskell's variables
          glob_core_version
        , glob_core_version_quote
@@ -27,13 +27,14 @@ module Glob.Auth.Info
        ) where
 
 import           Data.Char
+import           Data.Time
 import           Glob.Import.TH
 import           Glob.Import.Version
 import           Paths_glob_core
 import           System.Info
 
 -- | The version of this package, in Data.Version.Version
-glob_auth_version :: Version -- ^ The version
+glob_core_version :: Version -- ^ The version
 glob_core_version = version
 -- | The version of the package, in a Q Exp
 glob_core_version_quote :: Q Exp -- ^ String
@@ -55,9 +56,7 @@ glob_build_info_quote = do
   stringE $ os ++ "-" ++ arch ++ "-"  ++ map toUpper compilerName
     ++ "-" ++ showVersion compilerVersion ++ timeStr
     ++ "-git:" ++ $gitBranch ++ ":" ++ $gitHash
-    ++ debugInfo
-  where
-    debugInfo = if isDebug then "-debug" else ""
+
 
 
 -- | Use these as a string

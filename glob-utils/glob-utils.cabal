@@ -39,6 +39,7 @@ library
                      , gitrev >= 1.2
                      , cmdargs >= 0.10
                      , signal >=0.1.0.3
+  reexported-modules:    Data.Time
   hs-source-dirs:      src
   default-language:    Haskell2010
   if !flag(client)
@@ -74,4 +75,5 @@ library
                        , Text.Blaze.Html
                        , Yesod.Core.Json
                        , Yesod.Core.Widget
+                       
      other-extensions: OverloadedStrings

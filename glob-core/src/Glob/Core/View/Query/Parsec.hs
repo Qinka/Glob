@@ -18,9 +18,8 @@ module Glob.Core.View.Query.Parsec
 
 import           Data.Time
 import           Glob.Core.Model  (ResT (..))
-import           Text.Parsec
-
 import qualified Glob.Import.Text as T
+import           Text.Parsec
 
 
 -- | the ADT for parser
@@ -104,7 +103,7 @@ qps = foldl (<|>) qpEmpty $ try <$>
   ]
 
 -- | transform to filter
-to_filter :: [QueryParsec] -> ([ResT] -> [ResT])
+to_filter :: [QueryParser] -> ([ResT] -> [ResT])
 to_filter [] = id
 to_filter (QPTake i:xs) = take i . to_filter xs
 to_filter (QPDrop i:xs) = drop i . to_filter xs
@@ -113,7 +112,7 @@ to_filter (QPAfter i b:xs) = filter (time_filter i (<) b) . to_filter xs
 to_filter (QPTag  t i:xs) = filter ((==t) . tag_filter i) . to_filter xs
 to_filter (QPType t i:xs) = filter ((==t) . typ_filter i) . to_filter xs
 to_filter (QPOr s:xs) = concat . map sg . to_filter xs
-  where funcs = (\y -> toFunc [y]) <$> s
+  where funcs = (\y -> to_filter [y]) <$> s
         sg y = take 1 $ concatMap (\f -> f [y]) funcs
 to_filter (QPAnd s:xs) = to_filter s . to_filter xs
 
@@ -126,5 +125,5 @@ time_filter t o b ResT{..} = t `o` res_time
   where res_time = if b then rCTime else rUTime
 
 -- | transform the command to function
-run_qp :: String -> Either ParseError ([Rest]->[Rest])
-run_qp str = to_func <$> runP qp () "QueryPaserError" str
+run_qp :: String -> Either ParseError ([ResT]->[ResT])
+run_qp str = to_filter <$> runP qp () "QueryPaserError" str

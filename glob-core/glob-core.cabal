@@ -24,7 +24,10 @@ library
                        Glob.Core.Model.TH
                        Glob.Core.Model
                        Glob.Core.View.Internal
+                       Glob.Core.View.Query.Parsec
+                       Glob.Core.View.Query
                        Glob.Core.View
+                       Glob.Core.Info
   
   build-depends:       base >= 4.7 && < 5
                      , glob-utils == 0.1.5.*
