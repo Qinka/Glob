@@ -18,7 +18,14 @@ The view part of the glob.
 {-# LANGUAGE TypeFamilies          #-}
 
 module Glob.Core.View
-       (
+       ( -- * responds
+         respond_post
+       , respond_resource_t
+       , respond_resource_b
+       , respond_static
+       , -- * reexport module
+         module Glob.Core.View.Internal
+       , module Glob.Core.View.Query
        ) where
 
 import           Control.Monad.Writer.Lazy
@@ -31,6 +38,7 @@ import qualified Glob.Import.ByteString    as B
 import           Glob.Import.Text          (Text)
 import qualified Glob.Import.Text          as T
 import           Glob.Utils.Handler
+import           Glob.View.Query
 import           Network.HTTP.Types        (status301)
 import           Text.Blaze.Html           (Html, preEscapedToHtml)
 import           Yesod.Core
