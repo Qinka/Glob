@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-core
-version:             0.1.0.50
+version:             0.1.5.0
 synopsis:            The core of the glob.
 description:         Just a small blog backend.
 license-file:        LICENSE
@@ -30,7 +30,7 @@ library
                        Glob.Core.Info
                        Glob.Core.Control
                        Glob.Core.Control.Internal
-  
+  other-modules:       Paths_glob_core
   build-depends:       base >= 4.7 && < 5
                      , glob-utils == 0.1.5.*
                      , glob-auth  == 0.1.5.*

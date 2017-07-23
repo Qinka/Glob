@@ -43,6 +43,7 @@ module Glob.Core.Model.Internal
        , delete_context_maybe
        , (=@)
        , module Database.MongoDB
+       , module Data.Pool
        ) where
 
 import           Control.Monad.IO.Class
@@ -59,11 +60,10 @@ import           Glob.Utils.Handler
 type ConnectionPool = Pool Pipe
 
 -- | model for navigation bar
-data Nav = Nav
-           { navUrl   :: T.Text -- ^ The url of the link
-           , navLabel :: T.Text -- ^ The label of the link
-           , navOrder :: Int    -- ^ The order of the link
-           }
+data Nav = Nav { navUrl   :: T.Text -- ^ The url of the link
+               , navLabel :: T.Text -- ^ The label of the link
+               , navOrder :: Int    -- ^ The order of the link
+               }
 
 -- instance eq, order for nav
 instance Eq Nav where

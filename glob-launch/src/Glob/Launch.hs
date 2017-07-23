@@ -1,68 +1,55 @@
-% src/Glob/Launch.lhs
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE QuasiQuotes           #-}
+{-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE TypeFamilies          #-}
 
-\begin{codeinfo}
-  \CodePath{src/Glob/Launch.lhs}
-  \CodeInfo{The launcher of Glob}
-  \CodeProject{glob-launch}
-  \CodeCreater{Qinka}
-  \CodeCreatedDate{2016-07-25}
-  \CodeChangeLog{2016-08-19}{0.0.10.0}{changed version}
-  \CodeChangeLog{2016-09-25}{0.0.10.1}{with lts-7.0}
-  %\CodeChangeLog{date}{text}
-\end{codeinfo}
-
-\begin{code}
 module Glob.Launch
-       ( Path(..)
-       , parseCfgFile
-       , parseCfgFileJSON
-       , parseCfgFileYAML
-       , readFromFile
-       , readFromPath
-       , runToConfig
-       , globLaunchVersionQuote
-       , globLaunchVersion
-       , globLaunchGitBranchQuote
-       , globLaunchGitCommitQuote
-       , glob_middleware
+       ( createRain
+       , warp
+       , module Glob.Launch.Internal
        ) where
 
---import Glob.Common
-import Glob.Common.Infos as CoreInfos
-import Glob.Core
-import Glob.Model
-import Paths_glob_launch
-       
-import Control.Applicative ((<|>))
-import Data.Char
-import Data.String
-import Development.GitRev
-import System.IO
+import           Glob.Core.Control
+import           Glob.Core.Model
+import qualified Glob.Import.Text     as T
+import           Glob.Launch.Internal
+import           System.IO
+import           Yesod.Core.Dispatch
 
-import Yesod.Core
-import Network.Wai.Handler.Warp
 
-import Network.Wai
-import Network.Wai.Middleware.RequestLogger
-import Network.Wai.Middleware.Gzip
-import Data.Version
-import Language.Haskell.TH
-       
-import qualified Data.Aeson as A
-import qualified Data.ByteString.Lazy as BL
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as TE
-import qualified Data.Yaml as Y
-\end{code}
+mkYesodDispatch "Rain" resourcesRain
 
-the data of files' path
-\begin{code}
+createRain :: [RainConfig]
+           -> IO (Maybe Rain)
+createRain rcs = do
+  case (filter rain_config_isServer rcs, filter (not.rain_config_isServer) rcs) of
+    (RCServer{..}:_,RCDatabase{..}:_) -> do
+      cp <- createPool (connect $ readHostPort rcdDBAddr) close 10 20 1000
+      return $ Just $ Rain { rainTitle    = rcsTitle
+                           , rainDb       = rcdDB
+                           , rainDBUP     = (T.pack rcdUser,T.pack rcdPass)
+                           , rainConnPool = cp
+                           , rainPort     = rcsPort
+                           }
+    _ -> do
+      hPutStrLn stderr "invaild config"
+      return Nothing
+
+
+
+
+{-
+
+
 data Path = PathFile    FilePath
           | PathStdout
           | PathStderr
           | PathStdin
           deriving (Show,Eq)
-                   
+
 instance IsString Path where
   fromString str = case lowerStr of
     "stdin"  -> PathStdin
@@ -71,10 +58,7 @@ instance IsString Path where
     _        -> PathFile str
     where
       lowerStr = toLower <$> str
-\end{code}
 
-read Config from file
-\begin{code}
 parseCfgFileJSON :: ToConfig a => String -> Maybe a
 parseCfgFileJSON str = A.decode blStr
   where blStr = BL.fromStrict $ TE.encodeUtf8 $ T.pack str
@@ -91,11 +75,8 @@ readFromFile :: ToConfig a => FilePath -> IO (Maybe a)
 readFromFile = (parseCfgFile <$>)
   . readFromPath
   . fromString
-\end{code}
 
-run from ToConfig
 
-\begin{code}
 runToConfig :: ( ToConfig a
                , CfgD a ~ b
                , Yesod b
@@ -106,10 +87,7 @@ runToConfig cfg = toCfgD cfg >>= toWaiApp >>= run
   where
     settings = setSettings cfg
     run = runSettings (settings defaultSettings).glob_middleware
-\end{code}
 
-version
-\begin{code}
 globLaunchVersion :: Version
 globLaunchVersion = version
 globLaunchVersionQuote :: Q Exp
@@ -118,10 +96,7 @@ globLaunchGitBranchQuote :: Q Exp
 globLaunchGitBranchQuote = gitBranch
 globLaunchGitCommitQuote :: Q Exp
 globLaunchGitCommitQuote = gitHash
-\end{code}
 
-
-\begin{code}
 glob_middleware :: Middleware
 glob_middleware = debugItem.gzipItem
   where
@@ -132,4 +107,4 @@ glob_middleware = debugItem.gzipItem
 #else
        id
 #endif
-\end{code}
+-}

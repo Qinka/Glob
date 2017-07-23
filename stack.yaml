@@ -5,7 +5,7 @@ packages:
 - glob-auth
 - glob-utils
 - glob-core
-# - glob-launch/
+- glob-launch/
 # - glob-tools/glob-ih/
 # - glob-tools/glob-timecheck/
 # - glob-tools/glob-update/

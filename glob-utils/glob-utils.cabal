@@ -39,7 +39,8 @@ library
                      , gitrev >= 1.2
                      , cmdargs >= 0.10
                      , signal >=0.1.0.3
-  reexported-modules:    Data.Time
+  reexported-modules:  Data.Time
+                     , Development.GitRev
   hs-source-dirs:      src
   default-language:    Haskell2010
   if !flag(client)
@@ -59,6 +60,7 @@ library
                      , transformers >= 0.5.2
                      , wai >= 3.2
                      , wai-logger >= 2.3
+                     , wai-extra >= 3.0.15
                      , warp >= 3.2.7
                      , xml-hamlet >= 0.4.0.10
                      , mtl >= 2.2
@@ -74,7 +76,11 @@ library
                        , Data.Pool
                        , Text.Blaze.Html
                        , Yesod.Core.Json
+                       , Yesod.Core.Dispatch
                        , Yesod.Core.Widget
                        , Data.Conduit
+                       , Network.Wai
+                       , Network.Wai.Middleware.RequestLogger
+                       , Network.Wai.Middleware.Gzip
                        
      other-extensions: OverloadedStrings
