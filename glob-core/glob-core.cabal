@@ -28,6 +28,8 @@ library
                        Glob.Core.View.Query
                        Glob.Core.View
                        Glob.Core.Info
+                       Glob.Core.Control
+                       Glob.Core.Control.Internal
   
   build-depends:       base >= 4.7 && < 5
                      , glob-utils == 0.1.5.*

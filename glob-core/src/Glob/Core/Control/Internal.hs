@@ -13,19 +13,21 @@ The control part of the glob.
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE OverloadedStrings     #-}
 
-module Glob.Core.Control
+module Glob.Core.Control.Internal
        ( lookupPostUnResT
        , getFile
        , getField
        , putItem
        , return_succ
+       , Controly(..)
        ) where
 
 import           Data.Conduit
 import           Glob.Core.Model
 import           Glob.Core.View
-import           Glob.Import.ByteStringUtf8 (toStrictBS)
+import qualified Glob.Import.ByteString     as B
 import           Glob.Import.Text           (Text)
 import qualified Glob.Import.Text           as T
 import           Glob.Utils.Handler
@@ -37,7 +39,7 @@ import           Yesod.Core
 class (Mongodic site (HandlerT site IO), MonadHandler (HandlerT site IO), Hamletic site (HandlerT site IO), Yesod site) => Controly site
 
 -- | lookup the undefined index
-lookupPostUnResT :: Control site
+lookupPostUnResT :: Controly site
                     => [Text] -- ^ index
                     -> HandlerT site IO (Maybe ResT)
 lookupPostUnResT idx = do
@@ -52,7 +54,7 @@ lookupPostUnResT idx = do
   ts <- T.words <#> lookupPostParams "tags"
   return $ case (ty,ct,ut,ti) of
     (Just t,Just c,Just u,Just i) -> Just . ResT
-      idx undefined t (T.readT c) (T.readT u) i su wh mi . concat $ tg:ts
+      idx undefined t (T.read c) (T.read u) i su wh mi . concat $ tg:ts
     _ -> Nothing
 
 
@@ -78,7 +80,7 @@ getField fieled = do
 putItem :: (Controly site, Val a)
            => Maybe ResT
            -> Maybe a
-           -> ( a -> ResT -> Action Handler ())
+           -> (a -> ResT -> Action (HandlerT site IO) ())
            -> HandlerT site IO TypedContent
 putItem unR item f = case (unR,item) of
   (Just r,Just i) -> do

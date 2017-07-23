@@ -33,6 +33,7 @@ module Glob.Core.Model.Internal
        , ConnectionPool
        , fetch_context
        , fetch_res
+       , fetch_res_all
        , update_context
        , update_item
        , update_res
@@ -175,6 +176,15 @@ fetch_res :: MonadIO m
              => [T.Text]
              -> Action m (Maybe ResT)
 fetch_res index = (doc_to_res <%>) . findOne $ select ["index" =: index] "index"
+
+-- | fetch all resource index
+fetch_res_all :: (MonadIO m, MonadBaseControl IO m)
+                 => Action m [ResT]
+fetch_res_all = do
+  cur <- find $ select [] "index"
+  rt  <- rest cur
+  closeCursor cur
+  return . catMaybes $ doc_to_res <$> rt
 
 -- | update context
 update_context :: (MonadIO m, Val a)

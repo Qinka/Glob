@@ -75,5 +75,6 @@ library
                        , Text.Blaze.Html
                        , Yesod.Core.Json
                        , Yesod.Core.Widget
+                       , Data.Conduit
                        
      other-extensions: OverloadedStrings

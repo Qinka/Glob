@@ -13,18 +13,24 @@ The control part of the glob.
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Glob.Core.Control
-       (
+       ( Controly(..)
+       , getUrlR
+       , putUrlR
+       , deleteUrlR
        ) where
 
+import           Glob.Core.Control.Internal
 import           Glob.Core.Model
 import           Glob.Core.View
-import           Glob.Import.Text   (Text)
-import qualified Glob.Import.Text   as T
+import           Glob.Import.Aeson
+import qualified Glob.Import.ByteString     as B
+import           Glob.Import.Text           (Text)
+import qualified Glob.Import.Text           as T
 import           Glob.Utils.Handler
 import           Yesod.Core
-
 
 
 
@@ -32,7 +38,7 @@ import           Yesod.Core
 getUrlR :: Controly site
            => [T.Text] -- ^ index
            -> HandlerT site IO TypedContent
-getUrlR idx@("@":_) = getQuery idx =<< run_db_default (fetch_res idx)
+getUrlR idx@("@":_) = getQueryR idx =<< run_db_default (fetch_res idx)
 getUrlR idx = do
   res <- run_db_default $ fetch_res idx
   case rType <$> res of
@@ -54,8 +60,8 @@ putUrlR idx = do
     Just "text"   -> putResourceR True  idx
     Just "binary" -> putResourceR False idx
     Just "static" -> putStaticR         idx
-    Just "frame"  -> putFrame           idx
-    Just "query"  -> putQuery           idx
+    Just "frame"  -> putFrameR          idx
+    Just "query"  -> putQueryR          idx
     _             -> notFound
 
 -- | delete
@@ -74,8 +80,8 @@ deleteUrlR idx = do
     _             -> notFound
   rt <- tryH.run_db_default $ delete_item idx db
   case rt of
-    Left e  -> returnER e
-    Right _ -> returnSucc
+    Left e  -> return_e_h e
+    Right _ -> return_succ
 
 
 -- | get post
@@ -95,26 +101,25 @@ putPostR :: Controly site
 putPostR idx = do
   unR  <- lookupPostUnResT idx
   html <- T.decodeUtf8 <#> getFile "html"
-  putItem unR html updatePost
+  putItem unR html update_post
 
 getResourceR :: Controly site
                 => Bool
                 -> Maybe ResT
                 -> HandlerT site IO TypedContent
 getResourceR t (Just res@ResT{..}) = do
-  ct <- run_db_default $ fetch_item rest
+  ct <- run_db_default $ fetch_item res
   case ct of
     Just (Left    text) -> respond_resource_t res text
-    Just (Right binary) -> respond_resource_b res bin
+    Just (Right binary) -> respond_resource_b res binary
     _                   -> notFound
   where
-    gmime = fromMaybe "" . (T.encodeUtf8 <$>)
     fetch_item :: Controly site
                   => ResT
                   -> Action (HandlerT site IO) (Maybe (Either T.Text B.ByteString))
     fetch_item = if t
-                then (Left  <#>) <$> fetch_resource_t
-                else (Right <#>) <$> fetch_resource_b
+                 then (Left  <#>) <$> fetch_resource_t
+                 else (Right <#>) <$> fetch_resource_b
 getResourceR _ _ = notFound
 
 
@@ -137,7 +142,7 @@ getStaticR :: Controly site
 getStaticR (Just res@ResT{..}) = do
   url <- run_db_default $ fetch_static res
   case url of
-    Just u -> respond_static u
+    Just u -> respond_static res u
     _      -> notFound
 getStaticR _ = notFound
 
@@ -146,24 +151,24 @@ putStaticR :: Controly site
                => [Text]
                -> HandlerT site IO  TypedContent
 putStaticR idx = do
-  unR <- lookupPostUnRest idx
+  unR <- lookupPostUnResT idx
   url <- lookupPostParam "url"
   putItem unR url update_static
 
 
 
-putFrame :: Controly site
-            => [T.Text]
-            -> HandlerT site IO TypedContent
-putFrame idx = do
+putFrameR :: Controly site
+             => [T.Text]
+             -> HandlerT site IO TypedContent
+putFrameR idx = do
   unR <- lookupPostUnResT idx
   html <- T.decodeUtf8 <#> getFile "html"
   putItem unR html update_frame
 
-getQueryR :: Contronly site
+getQueryR :: Controly site
              => [Text]
              -> Maybe ResT
-             -> HandlerT site TypedContent
+             -> HandlerT site IO TypedContent
 getQueryR idx r =
   case tail idx of
     "~version":"author":_ -> query_version_author
@@ -171,3 +176,37 @@ getQueryR idx r =
     "~version":"core":_   -> query_version_core
     "~version":_          -> query_version
     "~name":_             -> query_name
+    "~buildinfo":_        -> query_build_info
+    "~servertime":_       -> query_server_time
+    "@nav":_              -> run_db_default fetch_nav >>= query_nav
+    ".index":xs           -> run_db_default fetch_res_all >>= query_index (T.unpack $ T.concat xs)
+    _ -> run_db_default (fetch_maybe_r fetch_query r)
+      >>= (\t -> case t of
+              Just text -> query_query text
+              _ -> notFound
+          )
+putQueryR :: Controly site
+            => [T.Text]
+            -> HandlerT site IO TypedContent
+putQueryR idx = do
+  unR <- lookupPostUnResT idx
+  var <- lookupPostParam "var"
+  putItem unR var update_query
+
+
+putNavR :: Controly site
+           => HandlerT site IO TypedContent
+putNavR = do  
+  idx   <- lookupPostParam "label"
+  url   <- lookupPostParam "url"
+  order <- lookupPostParam "order"
+  run_db_default $ update_nav idx url (T.read <$> order)
+  return_succ
+
+delNavR :: Controly site
+           => HandlerT site IO TypedContent
+delNavR = do
+  idx <- lookupPostParam "label"
+  run_db_default $ delete_nav idx
+  return_succ
+

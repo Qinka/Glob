@@ -22,6 +22,7 @@ module Glob.Core.View.Query
          query_version
        , query_version_author
        , query_version_utils
+       , query_version_core
        , -- ** name
          query_name
        , -- ** build info
@@ -32,6 +33,8 @@ module Glob.Core.View.Query
          query_nav
        , -- ** index
          query_index
+       , -- ** normal query
+         query_query
        ) where
 
 import           Data.Time
@@ -42,6 +45,7 @@ import           Glob.Core.View.Internal
 import           Glob.Core.View.Query.Parsec
 import           Glob.Import
 import           Glob.Import.Aeson
+import           Glob.Import.Text            (Text)
 import qualified Glob.Import.Text            as T
 import           Glob.Utils.Info
 import           Yesod.Core
@@ -69,7 +73,7 @@ query_server_time :: HandlerT a IO TypedContent
 query_server_time = T.show <$> (liftIO getCurrentTime) >>= respondSource "text/plain" . sendChunkText
 
 query_nav :: [Nav] -- ^ navs
-             -> HandlerT a IO TypedContent
+          -> HandlerT a IO TypedContent
 query_nav = respondSource "application/json" . sendChunkLBS . encode
 
 query_index :: String -- ^ parameters
@@ -79,4 +83,9 @@ query_index t = respondSource "application/json" . sendChunkLBS . encode . (run 
   where run (Left e)  = error $ show e
         run (Right i) = i
 
+query_query :: Text -- ^ query value
+            -> HandlerT a IO TypedContent
+query_query t = respondSource "text/plain" $ do
+  sendChunkText t
+  sendFlush
 

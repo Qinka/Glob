@@ -38,7 +38,7 @@ import qualified Glob.Import.ByteString    as B
 import           Glob.Import.Text          (Text)
 import qualified Glob.Import.Text          as T
 import           Glob.Utils.Handler
-import           Glob.View.Query
+import           Glob.Core.View.Query
 import           Network.HTTP.Types        (status301)
 import           Text.Blaze.Html           (Html, preEscapedToHtml)
 import           Yesod.Core
