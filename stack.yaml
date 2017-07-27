@@ -2,11 +2,12 @@
 resolver: lts-9.0
 
 packages:
-- glob-auth
-- glob-utils
-- glob-core
+- glob-auth/
+- glob-utils/
+- glob-core/
 - glob-launch/
-- glob-tool
+- glob-tool/
+- submodule/mask/
 # - glob-tools/glob-ih/
 # - glob-tools/glob-timecheck/
 # - glob-tools/glob-update/

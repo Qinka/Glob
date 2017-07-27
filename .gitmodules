@@ -1,0 +1,3 @@
+[submodule "submodel/mask"]
+	path = submodel/mask
+	url = https://github.com/Qinka/mask.git

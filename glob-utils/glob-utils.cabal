@@ -41,6 +41,7 @@ library
                      , signal >=0.1.0.3
   reexported-modules:  Data.Time
                      , Development.GitRev
+                     , Data.Text.IO
   hs-source-dirs:      src
   default-language:    Haskell2010
   if !flag(client)
