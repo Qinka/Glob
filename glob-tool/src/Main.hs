@@ -6,14 +6,17 @@ module Main
   ) where
 
 
-import System.IO
 import qualified Glob.Import.ByteString as B
-import Glob.Tool.Opt
-import Glob.Tool.Ih
+import           Glob.Tool.Ih
+import           Glob.Tool.Init
+import           Glob.Tool.Opt
+import           System.IO
 
 main :: IO ()
 main = do
   it <- cmdArgs glob
   case it of
-    ih_@Ih{..} -> do
-    new_@New{..} -> do
+    Ih{..}   -> ihHandler   it
+    Init{..} -> initHandler it
+    New{..}  -> newHandler  it
+    Del{..}  -> delHandler  it
