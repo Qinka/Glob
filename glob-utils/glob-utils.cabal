@@ -42,6 +42,8 @@ library
   reexported-modules:  Data.Time
                      , Development.GitRev
                      , Data.Text.IO
+                     , Data.Text.Lazy
+                     , Data.Text.Internal.Builder
   hs-source-dirs:      src
   default-language:    Haskell2010
   if !flag(client)

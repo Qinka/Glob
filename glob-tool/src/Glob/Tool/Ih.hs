@@ -4,8 +4,9 @@ module Glob.Tool.Ih
   ( ihHandler
   ) where
 
-import           Glob.Auth.Core hiding (generateHash)
-import qualified Glob.Auth.Core as A
+import           Glob.Auth.Core         hiding (generateHash)
+import qualified Glob.Auth.Core         as A
+import qualified Glob.Import.ByteString as B
 import           Glob.Tool.Opt
 import           System.IO
 
@@ -22,7 +23,7 @@ ihHandler Ih{..} =
         ++ generateHash token
         ++"\" "
     _ ->  hPutStrLn stderr "token required"
-  where generateHash token = pack $ case ihHash of
+  where generateHash  = pack $ case ihHash of
           Just "sha512"      -> A.generateHash SHA512
           Just "sha384"      -> A.generateHash SHA384
           Just "sha3-512"    -> A.generateHash SHA3_512

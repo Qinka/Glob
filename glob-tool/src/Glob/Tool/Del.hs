@@ -1,7 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module Glob.Tool.Del
-  (
+  ( delHandler
   ) where
 
 import           Glob.Tool.Opt

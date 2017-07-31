@@ -7,6 +7,7 @@ module Glob.Tool.Init
 import           Glob.Import
 import           Glob.Tool.Opt
 import           Glob.Tool.Repo
+import           System.Directory
 import           System.IO
 import           System.IO.Echo
 
