@@ -1,13 +1,18 @@
-{-# LANGUAGE RecordWildCards #-}
+--{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs             #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 
-module Glob.Tool.Make
-  (
-  ) where
+module Glob.Tool.Make where
+ -- ( MakeM(..)
+ -- ,
+ -- ) where
 
 import           Control.Monad
 import           Data.Functor
 import           Data.String
-import           Data.Text.Internal.Builder
+import           Data.Text.Internal.Builder hiding (fromByteString)
+import qualified Data.Text.Internal.Builder as TB
 import qualified Data.Text.IO               as TIO
 import qualified Data.Text.Lazy             as TL
 import qualified Glob.Import.Text           as T
@@ -23,38 +28,40 @@ instance Functor MakeM where
   fmap f (MakeM mf c) = MakeM mf (f c)
 
 instance Applicative MakeM where
-  pure c = MakeM (Makefile mempty) c
+  pure c = MakeM mempty c
   (<*>) (MakeM a f) (MakeM b c) = MakeM (a `mappend` b) (f c)
 
 instance Monad MakeM where
   (>>=) (MakeM a c) f = let MakeM b t = f c
                         in MakeM (a `mappend` b) t
 
-instance IsString (MakeM ()) where
-  fromString str = MakeM (fromString str) ()
+instance (() ~ a) => IsString (MakeM a) where
+  fromString str = MakeM (TB.fromString str) undefined
 
+instance Show a => Show (MakeM a) where
+  show (MakeM mf c) = show c ++ "\n" ++ TL.unpack (toLazyText mf)
 
 endLine :: MakeM ()
 endLine = MakeM "\n" ()
 
 -- | add prefix for each line
 --   o(n)
-linesPrefix :: Text -- ^ prefix
+linesPrefix :: T.Text -- ^ prefix
             -> MakeM a -- ^ items
             -> MakeM a
-linesPrefix prefix (Make builder c) =
+linesPrefix prefix (MakeM builder c) =
   let (t:ts) = map (\x -> fromText prefix `mappend` fromText x) $
                T.lines $ TL.toStrict $ toLazyText builder
       new    = foldl (\a b -> a `mappend` singleton '\n' `mappend` b) t ts
-  in Make new c
+  in MakeM new c
 
 string :: String -> MakeM ()
-string str = MakaM (fromString str) ()
+string str = MakeM (TB.fromString str) ()
 stringT :: T.Text -> MakeM ()
 stringT str = MakeM (fromText str) ()
 stringLnT :: T.Text -> MakeM ()
 stringLnT str = MakeM (fromText str `mappend` "\n") ()
-charT :: Chat -> MakeM ()
+charT :: Char -> MakeM ()
 charT c = MakeM (singleton c) ()
 
 target :: T.Text -- ^ target
@@ -64,7 +71,7 @@ target :: T.Text -- ^ target
 target tar deps body = do
   stringT tar
   charT ':'
-  forM_ (\t -> charT ' ' >> stringT t) >> endLine
+  mapM_ (\t -> charT ' ' >> stringT t) deps >> endLine
   linesPrefix "\t" body
 
 comment :: T.Text
@@ -74,27 +81,27 @@ comment c = linesPrefix "# " $ stringT c
 (\=\) :: T.Text -> T.Text -> MakeM ()
 var \=\ value = MakeM (fromText var `mappend` " = " `mappend` fromText value) ()
 
-macro :: Text -> Text
-macro str = "${" `T.append` str `T.mappend` "}"
-macroM :: Text -> MakeM ()
+macro :: T.Text -> T.Text
+macro str = "${" `T.append` str `T.append` "}"
+macroM :: T.Text -> MakeM ()
 macroM = stringT . macro
 
 -- | echo
-echo :: Text -> MakeM ()
+echo :: T.Text -> MakeM ()
 echo t = MakeM ("echo" `mappend` fromText t `mappend` singleton '\n') ()
 
 -- | curl
-curl :: Text -- ^ flags
-     -> Text -- ^ http method
-     -> Text -- ^ url
-     -> [(Text,Text)] -- ^ settings
+curl :: T.Text -- ^ flags
+     -> T.Text -- ^ http method
+     -> T.Text -- ^ url
+     -> [(T.Text,T.Text)] -- ^ settings
      -> MakeM ()
 curl flags method url settings = do
-  macroM curlPATH >> " " >> macroM curlDetail >> " " >> stringT flags >> " \\n"
+  macroM curlPath >> " " >> macroM curlDetail >> " " >> stringT flags >> " \\\n"
   linesPrefix "\t" $ do
     "-X " >> stringT method >> " \\n"
-    let putSetting (label,value) = "\'-F \"" `T.append` label `T.append` "="
-          `T.append` value `T.append` "\"\' \\n"
+    let putSetting (label,value) = stringT $ "\'-F \"" `T.append` label `T.append` "="
+          `T.append` value `T.append` "\"\' \\\n"
     mapM_ putSetting settings
 
 
@@ -102,13 +109,13 @@ curl flags method url settings = do
 -- setttings
 ----------------------
 -- | curl's program name(path) macro
-curlPath :: Text
+curlPath :: T.Text
 curlPath = "CURL_PATH"
 -- | curl's option to show details
-curlDetail :: Text
+curlDetail :: T.Text
 curlDetail = "CURL_DETAIL"
 -- | site url
-siteURL :: Text
+siteURL :: T.Text
 siteURL = "SITE_URL"
 
 
@@ -122,20 +129,19 @@ mkClean = do
     stringT "@rm -rf .ignore/tmp.*" >> endLine
     echo "Down"
 
-mkSettings :: Repo -> MakeM ()
-mkSettings = do
+mkSettings :: RepoCfg -> MakeM ()
+mkSettings rc = do
   comment "site url"
-  siteURL \=\ T.pack siteUrl
-  comment $ do
-    "curl settings\n"
-    "detail: show details or not\n"
+  siteURL \=\ T.pack (siteUrl rc)
+  comment $   "curl settings\n"
+   `T.append` "detail: show details or not\n"
   curlPath   \=\ "curl"
   curlDetail \=\ "\'\'"
   return ()
 
 mkComment :: MakeM ()
 mkComment = do
-  "### Glob update Makefile\n"
+  "### Glob update Makefile\n" :: MakeM ()
   "### Copyright (C) 2017\n"
 
 mkItem :: Item -> MakeM ()
@@ -144,15 +150,18 @@ mkItem item =  mkItemUpdate item >> mkItemDel item
 mkItemUpdate :: Item -> MakeM ()
 mkItemUpdate item@Item{..} = do
   let sumDepends = case summary of
-        Left path -> [path]
-        _         -> []
-  target (T.pack id) (T.pack content:map T.pack summaryDepends) $ do
+        (Summary (Left p)) -> [p]
+        _                  -> []
+  target (T.pack id) (T.pack content:map T.pack sumDepends) $ do
     when (typ `elem` ["post","frame"]) $ do
-      when (not $ null summaryDepends) $ do
-        "pandoc -o" >> string (withoutExtension $ head sumDepends) >> ".html " >> string path
-      "pandoc -o" >> string (withoutExtension content) >> ".html " >> string content
+      when (not $ null sumDepends) $ do
+        "pandoc -o " >> string (withoutExtension $ head sumDepends) >> ".html " >> string path
+      "pandoc -o " >> string (withoutExtension content) >> ".html " >> string content
     "echo "
-    curl "" "PUT"
+    let url = macro siteURL `T.append` T.pack path
+    curl "" "PUT" url
+      [ ("a","b")
+      ]
 
 
 
@@ -160,3 +169,5 @@ withoutExtension :: String -> String
 withoutExtension path = if '.' `elem` path
   then reverse . dropWhile (== '.') . dropWhile (/='.') $ reverse path
   else path
+
+mkItemDel = undefined

@@ -19,6 +19,8 @@ executable glob
   main-is:             Main.hs
   other-modules:       Glob.Tool.Opt
                        Glob.Tool.Ih
+                       Glob.Tool.Repo
+                       Glob.Tool.Make
   -- other-extensions:    
   build-depends:       base >=4.9 && < 5
                      , glob-utils
