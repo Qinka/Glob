@@ -19,16 +19,16 @@ newHandler New{..} = findRepo globRepoName >>= \repo' -> case repo' of
       (Just nid, Just ntyp, Just npath, Just ncontent) -> do
         sum <- toSummary newSum repo
         cur <- getCurrentTime
-        let item = Item { summary = Summary sum
-                        , mime    = newMIME
-                        , path    = npath
-                        , whose   = newWhose
-                        , cTime   = cur
-                        , id      = nid
-                        , content = ncontent
-                        , title   = newTitle
-                        , typ     = ntyp
-                        , tags    = newTags
+        let item = Item { iSummary = Summary sum
+                        , iMIME    = newMIME
+                        , iPath    = npath
+                        , iWhose   = newWhose
+                        , iCreTime = cur
+                        , iId      = nid
+                        , iContent = ncontent
+                        , iTitle   = newTitle
+                        , iType    = ntyp
+                        , iTags    = newTags
                         }
         BL.writeFile (repo ++ "/" ++ globRepoName ++ nid ++ ".item.json") $ encode item
       _ -> hPutStrLn stderr "error: one(some) of id, typ, path, or content is(are) empty"

@@ -18,24 +18,24 @@ import           System.Directory
 data RepoCfg = RepoCfg { tokenFile :: FilePath
                        , siteUrl   :: String
                        }
-               deriving Show
+             deriving Show
 deriveJSON defaultOptions ''RepoCfg
 
 newtype Summary a = Summary (Either FilePath a)
                   deriving Show
 deriveJSON defaultOptions ''Summary
 
-data Item = Item { summary :: Summary String
-                 , mime    :: Maybe String
-                 , path    :: String
-                 , whose   :: Maybe String
-                 , cTime   :: UTCTime
-                 , id      :: String
-                 , content :: String
-                 , title   :: Maybe String
-                 , typ     :: String
-                 , tags    :: [String]
-                 }
+data Item a = Item { iSummary :: Summary a
+                   , iMIME    :: Maybe a
+                   , iPath    :: a
+                   , iWhose   :: Maybe a
+                   , iCreTime :: UTCTime
+                   , iId      :: a
+                   , iContent :: a
+                   , iTitle   :: Maybe a
+                   , iType    :: a
+                   , iTags    :: [a]
+                   }
           deriving Show
 deriveJSON defaultOptions ''Item
 
@@ -72,3 +72,6 @@ makeRepoAbsolute r p = findRepo r >>= \repo' -> case repo' of
 globRepoName :: String
 globRepoName = ".glob"
 
+
+
+updateRealPathT :: Item T.Text -> Item T.Text

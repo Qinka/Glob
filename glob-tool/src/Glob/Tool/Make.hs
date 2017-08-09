@@ -18,6 +18,8 @@ import qualified Data.Text.Lazy             as TL
 import qualified Glob.Import.Text           as T
 import           Glob.Tool.Opt
 import           Glob.Tool.Repo
+import qualified Glob.Import.ByteString as B
+import System.IO
 
 -- | MakeM
 data MakeM a = MakeM { mkBuilder  :: Builder
@@ -39,7 +41,7 @@ instance (() ~ a) => IsString (MakeM a) where
   fromString str = MakeM (TB.fromString str) undefined
 
 instance Show a => Show (MakeM a) where
-  show (MakeM mf c) = show c ++ "\n" ++ TL.unpack (toLazyText mf)
+  show (MakeM mf c) = TL.unpack (toLazyText mf)
 
 endLine :: MakeM ()
 endLine = MakeM "\n" ()
@@ -69,6 +71,7 @@ target :: T.Text -- ^ target
        -> MakeM () -- ^ body
        -> MakeM ()
 target tar deps body = do
+  "\n"
   stringT tar
   charT ':'
   mapM_ (\t -> charT ' ' >> stringT t) deps >> endLine
@@ -76,10 +79,10 @@ target tar deps body = do
 
 comment :: T.Text
         -> MakeM ()
-comment c = linesPrefix "# " $ stringT c
+comment c = linesPrefix "# " (stringT c) >> "\n"
 
 (\=\) :: T.Text -> T.Text -> MakeM ()
-var \=\ value = MakeM (fromText var `mappend` " = " `mappend` fromText value) ()
+var \=\ value = MakeM (fromText var `mappend` " = " `mappend` fromText value `mappend` singleton '\n') ()
 
 macro :: T.Text -> T.Text
 macro str = "${" `T.append` str `T.append` "}"
@@ -99,11 +102,17 @@ curl :: T.Text -- ^ flags
 curl flags method url settings = do
   macroM curlPath >> " " >> macroM curlDetail >> " " >> stringT flags >> " \\\n"
   linesPrefix "\t" $ do
-    "-X " >> stringT method >> " \\n"
-    let putSetting (label,value) = stringT $ "\'-F \"" `T.append` label `T.append` "="
-          `T.append` value `T.append` "\"\' \\\n"
+    "-X " >> stringT method >> " \\\n"
+    let putSetting (label,value) = stringT $ "-F \"" `T.append` label `T.append` "="
+          `T.append` value `T.append` "\" \\\n"
     mapM_ putSetting settings
+    "-H \"token=" >> macroM siteToken >> " \\\n"
+    stringT url
 
+curlF :: T.Text -- param
+      -> T.Text -- value
+      -> (T.Text,T.Text) -- pair
+curlF = (,)
 
 ----------------------
 -- setttings
@@ -117,9 +126,12 @@ curlDetail = "CURL_DETAIL"
 -- | site url
 siteURL :: T.Text
 siteURL = "SITE_URL"
-
-
-
+-- | now
+updateTime :: T.Text
+updateTime = "NOW_TIME"
+-- | token
+siteToken :: T.Text
+siteToken = "SITE_TOKEN"
 
 mkClean :: MakeM ()
 mkClean = do
@@ -135,8 +147,12 @@ mkSettings rc = do
   siteURL \=\ T.pack (siteUrl rc)
   comment $   "curl settings\n"
    `T.append` "detail: show details or not\n"
-  curlPath   \=\ "curl"
   curlDetail \=\ "\'\'"
+  curlPath   \=\ "curl"
+  comment "update time"
+  updateTime \=\ "`date -u \"+%Y-%m-%d %H:%M:%S UTC\"`"
+  comment "token for site"
+  siteToken \=\ "`cat /dev/null`"
   return ()
 
 mkComment :: MakeM ()
@@ -144,30 +160,77 @@ mkComment = do
   "### Glob update Makefile\n" :: MakeM ()
   "### Copyright (C) 2017\n"
 
-mkItem :: Item -> MakeM ()
+mkItem :: Item T.Text -> MakeM ()
 mkItem item =  mkItemUpdate item >> mkItemDel item
 
-mkItemUpdate :: Item -> MakeM ()
+mkItemUpdate :: Item T.Text -> MakeM ()
 mkItemUpdate item@Item{..} = do
-  let sumDepends = case summary of
-        (Summary (Left p)) -> [p]
+  let sumDepends = case iSummary of
+        (Summary (Left p)) -> [T.pack p]
         _                  -> []
-  target (T.pack id) (T.pack content:map T.pack sumDepends) $ do
-    when (typ `elem` ["post","frame"]) $ do
-      when (not $ null sumDepends) $ do
-        "pandoc -o " >> string (withoutExtension $ head sumDepends) >> ".html " >> string path
-      "pandoc -o " >> string (withoutExtension content) >> ".html " >> string content
-    "echo "
-    let url = macro siteURL `T.append` T.pack path
-    curl "" "PUT" url
-      [ ("a","b")
-      ]
+  target iId (iContent:sumDepends) $ do
+    when (not $ null sumDepends) $ do
+      "pandoc -t html -o " >> stringT (head sumDepends `renewExtensionT` "htmlout")
+        >> " " >> stringT (head sumDepends) >> "\n"
+    when (iType `elem` ["post","frame"]) $ do
+      "pandoc -t html -o " >> stringT (iContent `renewExtensionT` "htmlout")
+        >> " " >> stringT iContent >> "\n"
+    let url = macro siteURL `T.append` iPath
+    "@"
+    let commonF =
+          [ curlF "type"        iType
+          , curlF "create-time" (T.show iCreTime)
+          , curlF "update-time" (macro updateTime)
+          ]
+        titleF = case iTitle of
+          Just t -> [curlF "title" t]
+          _      -> []
+        summaryF = if null sumDepends
+          then let (Summary (Right s)) = iSummary in [curlF "summary" s]
+          else [curlF "summary" ('@' `T.cons` head sumDepends `renewExtensionT` "htmlout")]
+        whoseF = case iWhose of
+          Just w -> [curlF "whose" w]
+          _      -> []
+        mimeF = case iMIME of
+          Just m -> [curlF "mime" m]
+          _      -> []
+        tagsF = map (\t -> curlF "tag" t) iTags
+        contentF = return $  case T.toLower iType of
+          "post"   -> curlF "html"   ('@' `T.cons` iContent `renewExtensionT` "htmlout")
+          "frame"  -> curlF "html"   ('@' `T.cons` iContent `renewExtensionT` "htmlout")
+          "text"   -> curlF "text"   ('@' `T.cons` iContent)
+          "binary" -> curlF "binary" ('@' `T.cons` iContent)
+          "static" -> curlF "url"                  iContent
+          "query"  -> curlF "var"                  iContent
+    curl "" "PUT" url $ commonF ++ contentF ++ summaryF ++ titleF ++ whoseF ++ mimeF ++ tagsF
 
 
+mkItemDel :: Item T.Text -> MakeM ()
+mkItemDel item@Item{..} = target (iId `T.append` ".del") [] $ do
+  let url = macro siteURL `T.append` iPath
+  curl "" "DELETE" url [curlF "type" iType]
 
-withoutExtension :: String -> String
-withoutExtension path = if '.' `elem` path
-  then reverse . dropWhile (== '.') . dropWhile (/='.') $ reverse path
-  else path
 
-mkItemDel = undefined
+renewExtensionT :: T.Text -> T.Text -> T.Text
+renewExtensionT path new =
+  let (name,ext) = T.breakOnEnd "." path
+  in if T.null name || name == "." || T.null ext
+     then path
+     else name `T.append` new
+
+
+makeHandler :: Glob -> IO ()
+makeHandler Make{..} = do
+  repo <- findRepo globRepoName
+  let root = repo ++ ".."
+  case mkItem of
+    Nothing ->
+      let MakeM texts _ = mkSettings
+      in TIO.putStrLn $ toLazyText texts
+    Just item' -> do
+      itemMaybe <- decode <$> B.readFile (repo ++ "/" ++ item' ++ ".item.json")
+      case itemMaybe of
+        Nothing -> hPutStrLn stderr "Can not find the json file of item"
+        Just item -> do
+         
+    

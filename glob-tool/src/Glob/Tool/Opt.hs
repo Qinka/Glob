@@ -32,9 +32,8 @@ data Glob = Ih -- ^ identification helper
             { delId :: Maybe String -- ^ id
             }
           | Make -- ^ build make file
-            { mkOpt  :: Maybe String -- ^ make option(name)
-            , mkKind :: Maybe String -- ^ make kind
-            , mkOut  :: Maybe String -- ^ output file
+            { mkItem :: Maybe String -- ^ make kind
+            , mkOut  :: Maybe String -- ^ output file relate to repo
             }
           | Nav  -- ^ about nav
             { navOpt   :: Maybe String
@@ -131,12 +130,7 @@ del = Del { delId = def
           }
 
 make :: Glob
-make = Make { mkOpt = Just "all"
-              &= help "create a hold make file"
-              &= typ "all|item"
-              &= explicit &= name "opt"
-              &= explicit &= name "o"
-            , mkKind = def
+make = Make { mkItem = def
               &= help "label"
               &= typ "ID"
               &= explicit &= name "label"
@@ -144,8 +138,8 @@ make = Make { mkOpt = Just "all"
             , mkOut = def
               &= help "output"
               &= typFile
-              &= explicit &= name "out"
-              &= explicit &= name "f"
+              &= explicit &= name "output"
+              &= explicit &= name "o"
             }
 
 nav :: Glob
