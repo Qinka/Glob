@@ -9,12 +9,13 @@ module Glob.Tool.Repo
   , Nav(..)
   , findRepo
   , makeAbsoluteRepoT
-  , globRepoName
   , makePathRelateRepo
   , globRepoName
   , globRepoNameT
   ) where
 
+import           Data.Char             (toLower)
+import           Data.Function
 import           Data.List
 import           Glob.Import
 import           Glob.Import.Aeson
@@ -25,15 +26,14 @@ import           System.FilePath.Posix (makeRelative)
 data RepoCfg = RepoCfg { siteUrl   :: String
                        }
              deriving Show
-deriveJSON defaultOptions ''RepoCfg
+deriveJSON defaultOptions{ fieldLabelModifier = map toLower
+                         , constructorTagModifier = map toLower} ''RepoCfg
 
 newtype Summary a = Summary (Either FilePath a)
                   deriving Show
 deriveJSON defaultOptions ''Summary
 instance Functor Summary where
   fmap f (Summary summary) = Summary $ f <$> summary
-
-
 
 data Item a = Item { iSummary :: Summary a
                    , iMIME    :: Maybe a
@@ -47,7 +47,8 @@ data Item a = Item { iSummary :: Summary a
                    , iTags    :: [a]
                    }
           deriving Show
-deriveJSON defaultOptions ''Item
+deriveJSON defaultOptions{ fieldLabelModifier = map toLower . drop 1
+                         , constructorTagModifier = map toLower} ''Item
 instance Functor Item where
   fmap f Item{..} = Item
                     (f <$> iSummary)
@@ -62,15 +63,18 @@ instance Functor Item where
                     (f <$> iTags)
 
 
-data Nav a = Nav { order :: Int
-                 , url   :: a -- url
-                 , label :: a -- name, or say label
+data Nav a = Nav { nOrder :: Int
+                 , nUrl   :: a -- url
+                 , nLabel :: a -- name, or say label
                  }
            deriving Show
 instance Functor Nav where
-  fmap f Nav{..} = Nav order (f url) (f label)
+  fmap f Nav{..} = Nav nOrder (f nUrl) (f nLabel)
+instance Eq a => Eq (Nav a) where
+  (==) = (==) `on` nLabel
 
-deriveJSON defaultOptions ''Nav
+deriveJSON defaultOptions{ fieldLabelModifier = map toLower . drop 1
+                         , constructorTagModifier = map toLower} ''Nav
 
 -- | find out repo's dir
 --   If the path of the .git direcory is @/path/to/repo/.git@

@@ -28,5 +28,6 @@ initHandler Init{..} = do
       return ""
   BL.writeFile (globRepoName ++ "/global.json") $ encode (RepoCfg url)
   writeFile (globRepoName ++ "/token.glob-ignore") token
+  writeFile (globRepoName ++ "/navlist.json") "[]"
 
 

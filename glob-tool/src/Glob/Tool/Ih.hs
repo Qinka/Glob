@@ -4,6 +4,7 @@ module Glob.Tool.Ih
   ( ihHandler
   ) where
 
+import           Control.Monad          (when)
 import           Glob.Auth.Core         hiding (generateHash)
 import qualified Glob.Auth.Core         as A
 import qualified Glob.Import.ByteString as B
@@ -16,12 +17,7 @@ ihHandler Ih{..} =
   case ihToken of
     Just token -> do
       cmds <- getContents
-      let put t = hPutStrLn stdout t
-               >> hPutStrLn stderr t
-      put . concat . lines $ cmds
-        ++ " -F \"token="
-        ++ generateHash token
-        ++"\" "
+      put ihDebug $ generateHash token
     _ ->  hPutStrLn stderr "token required"
   where generateHash  = pack $ case ihHash of
           Just "sha512"      -> A.generateHash SHA512
@@ -36,3 +32,5 @@ ihHandler Ih{..} =
           Just "sha512t-224" -> A.generateHash SHA512t_224
           _                  -> A.generateHash SHA1
         pack f = B.unpack . f . B.pack
+        put i t = hPutStr   stdout t
+             >> when i (hPutStrLn stderr t)

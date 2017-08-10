@@ -21,6 +21,8 @@ executable glob
                        Glob.Tool.Ih
                        Glob.Tool.Repo
                        Glob.Tool.Make
+                       Glob.Tool.MakeM
+                       Glob.Tool.Nav
                        Glob.Tool.Del
                        Glob.Tool.Init
                        Glob.Tool.New

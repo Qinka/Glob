@@ -12,6 +12,7 @@ import           System.Console.CmdArgs
 data Glob = Ih -- ^ identification helper
             { ihToken :: Maybe String
             , ihHash  :: Maybe String
+            , ihDebug :: Bool
             }
           | Init -- ^ init a repo
             { initSiteUrl   :: Maybe String
@@ -38,8 +39,8 @@ data Glob = Ih -- ^ identification helper
           | Nav  -- ^ about nav
             { navOpt   :: Maybe String
             , navLabel :: Maybe String
-            , navOrder :: Maybe String
-            , navName  :: Maybe String
+            , navOrder :: Maybe Int
+            , navUrl   :: Maybe String
             }
           | Script -- ^ about script
             { sptKind :: Maybe String
@@ -58,6 +59,11 @@ ih = Ih { ihToken = def
                  &= typ "shaXX"
                  &= explicit &= name "hash"
                  &= explicit &= name "h"
+        , ihDebug = False
+          &= help "debug to show the token"
+          &= typ "BOOL"
+          &= explicit &= name "debug"
+          &= explicit &= name "d"
         }
 
 init_ :: Glob
@@ -153,11 +159,11 @@ nav = Nav { navOpt = def
             &= typ "LABEL"
             &= explicit &= name "label"
             &= explicit &= name "l"
-          , navName = def
+          , navUrl = def
             &= help "name"
-            &= typ "NAME"
-            &= explicit &= name "name"
-            &= explicit &= name "n"
+            &= typ "URL"
+            &= explicit &= name "url"
+            &= explicit &= name "u"
           , navOrder = def
             &= help "order"
             &= typ "INT"

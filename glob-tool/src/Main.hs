@@ -11,6 +11,7 @@ import           Glob.Tool.Del
 import           Glob.Tool.Ih
 import           Glob.Tool.Init
 import           Glob.Tool.Make
+import           Glob.Tool.Nav
 import           Glob.Tool.New
 import           Glob.Tool.Opt
 import           System.Console.CmdArgs
@@ -25,3 +26,4 @@ main = do
     New{..}  -> newHandler  it
     Del{..}  -> delHandler  it
     Make{..} -> makeHandler it
+    Nav{..}  -> navHandler  it
