@@ -3,23 +3,26 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 
-module Glob.Tool.Make where
- -- ( MakeM(..)
- -- ,
- -- ) where
+module Glob.Tool.Make
+  ( makeHandler
+  ) where
 
 import           Control.Monad
 import           Data.Functor
 import           Data.String
-import           Data.Text.Internal.Builder hiding (fromByteString)
-import qualified Data.Text.Internal.Builder as TB
-import qualified Data.Text.IO               as TIO
-import qualified Data.Text.Lazy             as TL
-import qualified Glob.Import.Text           as T
-import           Glob.Tool.Opt
+import           Data.Text.Internal.Builder  hiding (fromByteString)
+import qualified Data.Text.Internal.Builder  as TB
+import qualified Data.Text.IO                as TIO
+import qualified Data.Text.Lazy              as TL
+import           Glob.Import.Aeson
+import qualified Glob.Import.ByteString      as B
+import qualified Glob.Import.ByteString.Lazy as BL
+import qualified Glob.Import.Text            as T
+import           Glob.Tool.Opt               (Glob (Make, mkItem, mkOut))
 import           Glob.Tool.Repo
-import qualified Glob.Import.ByteString as B
-import System.IO
+import           System.Directory
+import           System.IO
+
 
 -- | MakeM
 data MakeM a = MakeM { mkBuilder  :: Builder
@@ -41,7 +44,7 @@ instance (() ~ a) => IsString (MakeM a) where
   fromString str = MakeM (TB.fromString str) undefined
 
 instance Show a => Show (MakeM a) where
-  show (MakeM mf c) = TL.unpack (toLazyText mf)
+  show (MakeM mf _) = TL.unpack (toLazyText mf)
 
 endLine :: MakeM ()
 endLine = MakeM "\n" ()
@@ -160,8 +163,8 @@ mkComment = do
   "### Glob update Makefile\n" :: MakeM ()
   "### Copyright (C) 2017\n"
 
-mkItem :: Item T.Text -> MakeM ()
-mkItem item =  mkItemUpdate item >> mkItemDel item
+makeItem :: Item T.Text -> MakeM ()
+makeItem item =  mkItemUpdate item >> mkItemDel item
 
 mkItemUpdate :: Item T.Text -> MakeM ()
 mkItemUpdate item@Item{..} = do
@@ -170,10 +173,10 @@ mkItemUpdate item@Item{..} = do
         _                  -> []
   target iId (iContent:sumDepends) $ do
     when (not $ null sumDepends) $ do
-      "pandoc -t html -o " >> stringT (head sumDepends `renewExtensionT` "htmlout")
+      "pandoc -t html -o " >> stringT (head sumDepends `T.append` ".htmlout")
         >> " " >> stringT (head sumDepends) >> "\n"
     when (iType `elem` ["post","frame"]) $ do
-      "pandoc -t html -o " >> stringT (iContent `renewExtensionT` "htmlout")
+      "pandoc -t html -o " >> stringT (iContent `T.append` ".htmlout")
         >> " " >> stringT iContent >> "\n"
     let url = macro siteURL `T.append` iPath
     "@"
@@ -187,7 +190,7 @@ mkItemUpdate item@Item{..} = do
           _      -> []
         summaryF = if null sumDepends
           then let (Summary (Right s)) = iSummary in [curlF "summary" s]
-          else [curlF "summary" ('@' `T.cons` head sumDepends `renewExtensionT` "htmlout")]
+          else [curlF "summary" ('@' `T.cons` head sumDepends `T.append` ".htmlout")]
         whoseF = case iWhose of
           Just w -> [curlF "whose" w]
           _      -> []
@@ -196,8 +199,8 @@ mkItemUpdate item@Item{..} = do
           _      -> []
         tagsF = map (\t -> curlF "tag" t) iTags
         contentF = return $  case T.toLower iType of
-          "post"   -> curlF "html"   ('@' `T.cons` iContent `renewExtensionT` "htmlout")
-          "frame"  -> curlF "html"   ('@' `T.cons` iContent `renewExtensionT` "htmlout")
+          "post"   -> curlF "html"   ('@' `T.cons` iContent `T.append` ".htmlout")
+          "frame"  -> curlF "html"   ('@' `T.cons` iContent `T.append` ".htmlout")
           "text"   -> curlF "text"   ('@' `T.cons` iContent)
           "binary" -> curlF "binary" ('@' `T.cons` iContent)
           "static" -> curlF "url"                  iContent
@@ -218,19 +221,64 @@ renewExtensionT path new =
      then path
      else name `T.append` new
 
+makeNavList :: [Nav T.Text] -> MakeM ()
+makeNavList navs = target "navs" [] $ do
+  "@" >> curl "" "DELETE" "/@/@nav" []
+  flip mapM_ navs $ \Nav{..} -> do
+    "@" >> curl "" "PUT" url [ curlF "order" (T.show order)
+                             , curlF "url"           url
+                             , curlF "label"         label
+                             ]
+
+
 
 makeHandler :: Glob -> IO ()
 makeHandler Make{..} = do
-  repo <- findRepo globRepoName
-  let root = repo ++ ".."
-  case mkItem of
-    Nothing ->
-      let MakeM texts _ = mkSettings
-      in TIO.putStrLn $ toLazyText texts
-    Just item' -> do
-      itemMaybe <- decode <$> B.readFile (repo ++ "/" ++ item' ++ ".item.json")
-      case itemMaybe of
-        Nothing -> hPutStrLn stderr "Can not find the json file of item"
-        Just item -> do
-         
-    
+  repo' <- findRepo globRepoName
+  case repo' of
+    Nothing -> hPutStrLn stderr "Can not find out the repo"
+    Just repo ->
+      case mkItem of
+        Nothing -> do
+          let cfgPath = repo ++ "/.glob/global.json"
+          is <- doesFileExist cfgPath
+          if is then do
+            rcfg' <- decode <$> BL.readFile cfgPath
+            case rcfg' of
+              Nothing -> hPutStrLn stderr "Can not parse the global config file"
+              Just rcfg ->
+                let text = show $ mkSettings rcfg
+                in case mkOut of
+                  Nothing   -> putStrLn text
+                  Just file -> appendFile (repo ++ "/" ++ file) text
+            else hPutStrLn stderr $ "Can not find file: " ++ cfgPath
+        Just "navlist" -> do
+          let navsPath = repo ++ "/.glob/navlist.json"
+          is <- doesFileExist navsPath
+          if is
+            then do
+            navs' <- decode <$> BL.readFile (repo ++ "/.glob/navlist.json")
+            case navs' of
+              Nothing   -> hPutStrLn stderr "Can not parse the json file for nav list"
+              Just navs ->
+                let text = show $ makeNavList navs
+                in case mkOut of
+                  Nothing   -> putStrLn text
+                  Just file -> appendFile (repo ++ file) text
+            else hPutStrLn stderr "Can not find the json file for nav-list"
+        Just item' -> do
+          let itemPath = repo ++ "/.glob/" ++ item' ++ ".item.json"
+          is <- doesFileExist itemPath
+          if is then do
+            itemMaybe <- decode <$> BL.readFile itemPath
+            case itemMaybe of
+              Nothing -> hPutStrLn stderr "Can not find the json file of item"
+              Just item'' -> do
+                let item = makeAbsoluteRepoT repo item''
+                    text = show $ makeItem item''
+                case mkOut of
+                  Nothing   -> putStrLn text
+                  Just file -> appendFile (repo ++ file) text
+            else hPutStrLn stderr $ "Can not find the json file for item file: " ++ item' ++ ".item.json"
+
+

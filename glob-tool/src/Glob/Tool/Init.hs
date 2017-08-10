@@ -5,6 +5,8 @@ module Glob.Tool.Init
   ) where
 
 import           Glob.Import
+import           Glob.Import.Aeson
+import qualified Glob.Import.ByteString.Lazy as BL
 import           Glob.Tool.Opt
 import           Glob.Tool.Repo
 import           System.Directory
@@ -24,7 +26,7 @@ initHandler Init{..} = do
     Nothing -> do
       hPutStrLn stderr "warrning: token file unset"
       return ""
-  writeFile (globRepoName ++ "/url.glob-ignore")   url
+  BL.writeFile (globRepoName ++ "/global.json") $ encode (RepoCfg url)
   writeFile (globRepoName ++ "/token.glob-ignore") token
 
 

@@ -21,6 +21,9 @@ executable glob
                        Glob.Tool.Ih
                        Glob.Tool.Repo
                        Glob.Tool.Make
+                       Glob.Tool.Del
+                       Glob.Tool.Init
+                       Glob.Tool.New
   -- other-extensions:    
   build-depends:       base >=4.9 && < 5
                      , glob-utils
