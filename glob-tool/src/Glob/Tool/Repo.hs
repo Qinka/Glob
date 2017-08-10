@@ -14,6 +14,7 @@ import           Data.List
 import           Glob.Import
 import           Glob.Import.Aeson
 import           System.Directory
+import System.FilePath.Posix (makeRelative)
 
 data RepoCfg = RepoCfg { tokenFile :: FilePath
                        , siteUrl   :: String
@@ -24,6 +25,10 @@ deriveJSON defaultOptions ''RepoCfg
 newtype Summary a = Summary (Either FilePath a)
                   deriving Show
 deriveJSON defaultOptions ''Summary
+instance Functor Summary where
+  fmap f (Summary summary) = Summary $ f <$> summary
+
+
 
 data Item a = Item { iSummary :: Summary a
                    , iMIME    :: Maybe a
@@ -39,11 +44,14 @@ data Item a = Item { iSummary :: Summary a
           deriving Show
 deriveJSON defaultOptions ''Item
 
-data Nav = Nav { order :: Int
-               , label :: String -- url
-               , name  :: String -- name
-               }
+instance Functor Item where
+
+data Nav a = Nav { order :: Int
+                 , label :: a -- url
+                 , name  :: a -- name
+                 }
            deriving Show
+instance Functor Nav where
 deriveJSON defaultOptions ''Nav
 
 -- | find out repo's dir
@@ -73,5 +81,14 @@ globRepoName :: String
 globRepoName = ".glob"
 
 
+makePathRelateRepo :: FilePath -> Item String -> IO (Item String)
+makePathRelateRepo repo item = do
+  newSum <- case iSummary of
+        Summary (Left path) -> makeAbsolute path >>= (return . Summary . Left . makeRelative repo)
+        _ -> return iSummary
+  newCon -> makeRelative repo <$> makeAbsolute iContent
+  return item{iSummary = newSumm, iContent = newCon}
+  
 
 updateRealPathT :: Item T.Text -> Item T.Text
+

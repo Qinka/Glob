@@ -28,5 +28,6 @@ executable glob
                      , cmdargs
                      , directory
                      , echo
+                     , filepath
   hs-source-dirs:      src
   default-language:    Haskell2010
