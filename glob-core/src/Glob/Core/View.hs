@@ -33,12 +33,12 @@ import           Data.Maybe
 import           Data.Monoid
 import           Glob.Core.Model           (ResT (..))
 import           Glob.Core.View.Internal
+import           Glob.Core.View.Query
 import           Glob.Import.ByteString    (ByteString)
 import qualified Glob.Import.ByteString    as B
 import           Glob.Import.Text          (Text)
 import qualified Glob.Import.Text          as T
 import           Glob.Utils.Handler
-import           Glob.Core.View.Query
 import           Network.HTTP.Types        (status301)
 import           Text.Blaze.Html           (Html, preEscapedToHtml)
 import           Yesod.Core
@@ -51,8 +51,9 @@ respond_post :: (Yesod a, Hamletic a (HandlerT a IO))
                 -> Html -- ^ html body
                 -> HandlerT a IO TypedContent
 respond_post res@ResT{..} raw_body = do
+  willRaw <- get_raw
   isRaw <- null <$> lookupHeader "GLOBRAW"
-  body <- if isRaw then return raw_body
+  body <- if willRaw == isRaw then return raw_body
           else defaultLayout $ with_html raw_body res
   respondSource "text/html" $ do
     sendChunkHtml body
@@ -72,7 +73,7 @@ with_summary _                   = return ()
 -- | with whose, import the author to the js
 with_whose :: Maybe Text -- ^ author
            -> WidgetT site IO ()
-with_whose (Just whose) = let w = show_js whose in toWidget [julius|author=#{w}|]
+with_whose (Just whose) = let w = show_js whose in toWidget [julius|author=#{w};|]
 with_whose _                    = return ()
 
 -- | with html combine the parts to one

@@ -188,7 +188,7 @@ fetch_res_all = do
 
 -- | update context
 update_context :: (MonadIO m, Val a)
-                  => T.Text            -- ^ Collection
+                  => T.Text            -- ^ collection
                   -> Maybe ObjectId    -- ^ obj id of item
                   -> T.Text            -- ^ field name
                   -> a
@@ -210,7 +210,7 @@ update_item t f v uR = do
   rr <- if (rType <$> res) /= Just t
         then delete_context_maybe res t >> return Nothing
         else return $ rRes <$> res
-  rO <- update_context t rr f v
+  rO <- update_context f rr t v
   update_res (uR {rRes = rO})
 
 -- | the update for resource

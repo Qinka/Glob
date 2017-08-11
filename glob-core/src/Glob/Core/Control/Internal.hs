@@ -12,8 +12,8 @@ The control part of the glob.
 
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE RecordWildCards       #-}
 
 module Glob.Core.Control.Internal
        ( lookupPostUnResT
@@ -27,9 +27,9 @@ module Glob.Core.Control.Internal
 import           Data.Conduit
 import           Glob.Core.Model
 import           Glob.Core.View
-import qualified Glob.Import.ByteString     as B
-import           Glob.Import.Text           (Text)
-import qualified Glob.Import.Text           as T
+import qualified Glob.Import.ByteString as B
+import           Glob.Import.Text       (Text)
+import qualified Glob.Import.Text       as T
 import           Glob.Utils.Handler
 import           Yesod.Core
 

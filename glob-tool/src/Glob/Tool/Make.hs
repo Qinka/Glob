@@ -21,6 +21,7 @@ import           Glob.Tool.MakeM
 import           Glob.Tool.Opt               (Glob (Make, mkItem, mkOut))
 import           Glob.Tool.Repo
 import           System.Directory
+import           System.FilePath
 import           System.IO
 
 
@@ -39,10 +40,10 @@ mkSettings rc = do
   siteURL \=\ T.pack (siteUrl rc)
   comment $   "curl settings\n"
    `T.append` "detail: show details or not\n"
-  curlDetail \=\ "\'\'"
+  curlDetail \=\ ""
   curlPath   \=\ "curl"
   comment "update time"
-  updateTime \=\ "`date -u \"+%Y-%m-%d %H:%M:%S UTC\"`"
+  updateTime \=\ "$(shell date -u \"+%Y-%m-%d %H:%M:%S UTC\")"
   comment "token for site"
   siteToken \=\ "`cat /dev/null`"
   return ()
@@ -61,11 +62,11 @@ mkItemUpdate item@Item{..} = do
         (Summary (Left p)) -> [T.pack p]
         _                  -> []
   target iId (iContent:sumDepends) $ do
-    when (not $ null sumDepends) $ do
-      "pandoc -t html -o " >> stringT (head sumDepends `T.append` ".htmlout")
+    when (not (null sumDepends) && takeExtension (T.unpack $ head sumDepends) /= ".html") $ do
+      "@pandoc -t html -o " >> stringT (head sumDepends `T.append` ".htmlout")
         >> " " >> stringT (head sumDepends) >> "\n"
-    when (iType `elem` ["post","frame"]) $ do
-      "pandoc -t html -o " >> stringT (iContent `T.append` ".htmlout")
+    when (iType `elem` ["post","frame"] && takeExtension (T.unpack iContent) /= ".html") $ do
+      "@pandoc -t html -o " >> stringT (iContent `T.append` ".htmlout")
         >> " " >> stringT iContent >> "\n"
     let url = macro siteURL `T.append` iPath
     "@"
@@ -76,10 +77,10 @@ mkItemUpdate item@Item{..} = do
           ]
         titleF = case iTitle of
           Just t -> [curlF "title" t]
-          _      -> []
+          _      -> [curlF "title" iId]
         summaryF = if null sumDepends
           then let (Summary (Right s)) = iSummary in [curlF "summary" s]
-          else [curlF "summary" ('@' `T.cons` head sumDepends `T.append` ".htmlout")]
+          else [curlF "summary" ('@' `T.cons` head sumDepends `T.append` (if takeExtension (T.unpack $ head sumDepends) /= ".html" then ".htmlout" else ""))]
         whoseF = case iWhose of
           Just w -> [curlF "whose" w]
           _      -> []
@@ -88,12 +89,13 @@ mkItemUpdate item@Item{..} = do
           _      -> []
         tagsF = map (\t -> curlF "tag" t) iTags
         contentF = return $  case T.toLower iType of
-          "post"   -> curlF "html"   ('@' `T.cons` iContent `T.append` ".htmlout")
-          "frame"  -> curlF "html"   ('@' `T.cons` iContent `T.append` ".htmlout")
+          "post"   -> curlF "html"   ('@' `T.cons` iContent `T.append` (if takeExtension (T.unpack iContent) /= ".html" then ".htmlout" else ""))
+          "frame"  -> curlF "html"   ('@' `T.cons` iContent `T.append` (if takeExtension (T.unpack iContent) /= ".html" then ".htmlout" else ""))
           "text"   -> curlF "text"   ('@' `T.cons` iContent)
           "binary" -> curlF "binary" ('@' `T.cons` iContent)
           "static" -> curlF "url"                  iContent
           "query"  -> curlF "var"                  iContent
+          _        -> error $ "error type" ++ T.unpack iType
     curl "" "PUT" url $ commonF ++ contentF ++ summaryF ++ titleF ++ whoseF ++ mimeF ++ tagsF
 
 
@@ -112,12 +114,12 @@ renewExtensionT path new =
 
 makeNavList :: [Nav T.Text] -> MakeM ()
 makeNavList navs = target "navs" [] $ do
-  "@" >> curl "" "DELETE" "/@/@nav" [] >> endLine
+  "@" >> curl "" "DELETE" "${SITE_URL}/.query/.nav" [] >> endLine
   flip mapM_ navs $ \Nav{..} ->
-    "@" >> curl "" "PUT" nUrl [ curlF "order" (T.show nOrder)
-                             , curlF "url"            nUrl
-                             , curlF "label"          nLabel
-                             ] >> endLine
+    "@" >> curl "" "PUT" "${SITE_URL}/.query/.nav" [ curlF "order" (T.show nOrder)
+                                        , curlF "url"            nUrl
+                                        , curlF "label"          nLabel
+                                        ] >> endLine
 
 
 
@@ -154,7 +156,7 @@ makeHandler Make{..} = do
                 let text = show $ makeNavList navs
                 in case mkOut of
                   Nothing   -> putStrLn text
-                  Just file -> appendFile (repo ++ file) text
+                  Just file -> appendFile (repo ++ "/" ++ file) text
             else hPutStrLn stderr "Can not find the json file for nav-list"
         Just item' -> do
           let itemPath = repo ++ "/.glob/" ++ item' ++ ".item.json"
@@ -168,7 +170,7 @@ makeHandler Make{..} = do
                     text = show $ makeItem item''
                 case mkOut of
                   Nothing   -> putStrLn text
-                  Just file -> appendFile (repo ++ file) text
+                  Just file -> appendFile (repo ++ "/" ++ file) text
             else hPutStrLn stderr $ "Can not find the json file for item file: " ++ item' ++ ".item.json"
 
 

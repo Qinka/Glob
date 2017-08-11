@@ -115,7 +115,7 @@ curl flags method url settings = do
     let putSetting (label,value) = stringT $ "-F \"" `T.append` label `T.append` "="
           `T.append` value `T.append` "\" \\\n"
     mapM_ putSetting settings
-    "-H \"token=" >> macroM siteToken >> " \\\n"
+    "-H \"token:" >> macroM siteToken >> "\" \\\n"
     stringT url
 
 curlF :: T.Text -- param

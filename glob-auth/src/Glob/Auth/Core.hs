@@ -50,5 +50,5 @@ verifyHash :: HashAlgorithm a
               -> ByteString -- ^ Hash for key
               -> ByteString -- ^ Hash string
               -> Bool
-verifyHash a hash token = (token ==) $ generateHash a hash
+verifyHash a hash token = token == generateHash a hash
 

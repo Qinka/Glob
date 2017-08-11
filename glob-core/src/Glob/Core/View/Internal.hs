@@ -35,6 +35,7 @@ class (MonadHandler m, Mongodic a m) => Hamletic a m | m -> a where
   get_title        :: m Text  -- ^ get title
   get_frame_prefix :: m Text  -- ^ get the prefix path of frame
   get_version      :: m Text  -- ^ get the version of blog itself or application
+  get_raw          :: m Bool  -- ^ return raw html
 
 
 -- | the default of glob with Yesod
@@ -49,12 +50,13 @@ glob_layout w = do
     top_html    <- fetch_maybe_i fetch_frame [frame_prefix,"top"]
     bottom_html <- fetch_maybe_i fetch_frame [frame_prefix,"bottom"]
     nav_html    <- fetch_maybe_i fetch_frame [frame_prefix,"nav"]
-    case (top_html,bottom_html,nav_html) of
-      (Just top, Just bottom, Just nav) -> return $ Right (top,bottom,nav)
-      _                                 -> return $ Left "cannot launch frames"
+    header      <- fetch_maybe_i fetch_frame [frame_prefix,"header"]
+    case (top_html,bottom_html,nav_html,header) of
+      (Just top, Just bottom, Just nav, Just hd) -> return $ Right (top,bottom,nav,hd)
+      _                                          -> return $ Left "cannot launch frames"
   case htmls of
     Left err -> error err
-    Right (top,bottom,nav) ->
+    Right (top,bottom,nav,hd) ->
       withUrlRenderer [hamlet|
         $newline never
         $doctype 5
@@ -63,11 +65,14 @@ glob_layout w = do
             <title> #{pageTitle page_content} - #{title}
             <meta charset=utf-8>
             <meta name=viewport content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+            #{hd}
             ^{pageHead page_content}
           <body>
-            #{top}
             #{nav}
-            ^{pageBody page_content}
+            <div id="container">
+              #{top}
+              <div id="main-part">
+                ^{pageBody page_content}
             #{bottom}
     |]
 

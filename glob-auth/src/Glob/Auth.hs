@@ -44,6 +44,8 @@ checkAuth = do -- Handler _ IO
   item  <- tokenItem site
   hash  <- tokenHash site
   token <- lookupHeader "token"
+  liftIO $ print $ generateHash hash item
+  liftIO $ print token
   case verifyHash hash item <$> token of
     -- success
     Just True -> return   Authorized

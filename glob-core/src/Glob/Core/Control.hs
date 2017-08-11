@@ -12,8 +12,8 @@ The control part of the glob.
 
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 module Glob.Core.Control
        ( Controly(..)
@@ -38,21 +38,21 @@ import           Yesod.Core
 getUrlR :: Controly site
            => [T.Text] -- ^ index
            -> HandlerT site IO TypedContent
-getUrlR idx@("@":_) = getQueryR idx =<< run_db_default (fetch_res idx)
+getUrlR idx@(".query":_) = getQueryR idx =<< run_db_default (fetch_res idx)
 getUrlR idx = do
   res <- run_db_default $ fetch_res idx
   case rType <$> res of
-    Just "port"   -> getPostR           res
+    Just "post"   -> getPostR           res
     Just "text"   -> getResourceR True  res
     Just "binary" -> getResourceR False res
     Just "static" -> getStaticR         res
-    _             -> notFound
+    _             -> liftIO (print res) >> notFound
 
 -- | put method router
 putUrlR :: Controly site
            => [Text] -- ^ index
            -> HandlerT site IO TypedContent
-putUrlR ("@":"@nav":_) = putNavR
+putUrlR (".query":".nav":_) = putNavR
 putUrlR idx = do
   typ <- lookupPostParam "type"
   case typ of
@@ -68,7 +68,7 @@ putUrlR idx = do
 deleteUrlR :: Controly site
               => [Text] -- ^ index
               -> HandlerT site IO TypedContent
-deleteUrlR ("@":"@nav":_) = delNavR
+deleteUrlR (".query":".nav":_) = delNavR
 deleteUrlR idx = do
   typ <- lookupPostParam "type"
   db <- case typ of
@@ -77,6 +77,7 @@ deleteUrlR idx = do
     Just "binary" -> return "resource"
     Just "static" -> return "static"
     Just "query"  -> return "query"
+    Just "frame"  -> return "frame"
     _             -> notFound
   rt <- tryH.run_db_default $ delete_item idx db
   case rt of
@@ -92,7 +93,7 @@ getPostR (Just res@ResT{..}) = do
   html <- run_db_default $ fetch_post res
   case html of
     Just pH -> respond_post res pH
-    _       -> notFound
+    _       -> liftIO (putStrLn "Faile to get") >> notFound
 getPostR _ = notFound
 
 putPostR :: Controly site
@@ -171,19 +172,19 @@ getQueryR :: Controly site
              -> HandlerT site IO TypedContent
 getQueryR idx r =
   case tail idx of
-    "~version":"author":_ -> query_version_author
-    "~version":"utils":_  -> query_version_utils
-    "~version":"core":_   -> query_version_core
-    "~version":_          -> query_version
-    "~name":_             -> query_name
-    "~buildinfo":_        -> query_build_info
-    "~servertime":_       -> query_server_time
-    "@nav":_              -> run_db_default fetch_nav >>= query_nav
+    ".version":"author":_ -> query_version_author
+    ".version":"utils":_  -> query_version_utils
+    ".version":"core":_   -> query_version_core
+    ".version":_          -> query_version
+    ".name":_             -> query_name
+    ".buildinfo":_        -> query_build_info
+    ".servertime":_       -> query_server_time
+    ".nav":_              -> run_db_default fetch_nav >>= query_nav
     ".index":xs           -> run_db_default fetch_res_all >>= query_index (T.unpack $ T.concat xs)
     _ -> run_db_default (fetch_maybe_r fetch_query r)
       >>= (\t -> case t of
               Just text -> query_query text
-              _ -> notFound
+              _         -> notFound
           )
 putQueryR :: Controly site
             => [T.Text]
@@ -196,7 +197,7 @@ putQueryR idx = do
 
 putNavR :: Controly site
            => HandlerT site IO TypedContent
-putNavR = do  
+putNavR = do
   idx   <- lookupPostParam "label"
   url   <- lookupPostParam "url"
   order <- lookupPostParam "order"

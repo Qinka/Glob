@@ -86,6 +86,7 @@ instance Hamletic Rain (HandlerT Rain IO) where
   get_title = rainTitle <$> getYesod
   get_frame_prefix = return ".frame"
   get_version = return $(stringE (show version))
+  get_raw = return False
 
 instance Mongodic Rain (HandlerT Rain IO) where
   get_default_access_mode = return master

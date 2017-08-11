@@ -26,6 +26,7 @@ main = do
   rain <- createRain =<< parseCfgFile <$> getContents
   case rain of
     Just r@Rain{..} -> warp rainPort r
+    _               -> hPutStrLn stderr "can not parse"
   return ()
 
 
