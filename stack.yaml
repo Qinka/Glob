@@ -7,7 +7,6 @@ packages:
 - glob-core/
 - glob-launch/
 - glob-tool/
-- submodule/mask/
 # - glob-tools/glob-ih/
 # - glob-tools/glob-timecheck/
 # - glob-tools/glob-update/
