@@ -27,7 +27,7 @@ executable glob
                        Glob.Tool.Init
                        Glob.Tool.New
   -- other-extensions:    
-  build-depends:       base >=4.9 && < 5
+  build-depends:       base >= 4 && < 5
                      , glob-utils
                      , glob-auth
                      , cmdargs

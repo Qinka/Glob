@@ -2,7 +2,7 @@
 echo update
 ############
 if [ -n "$IS_DOCKER" ]; then
-    export GLOB_VERSION=0.1
+    export GLOB_VERSION=0.1.5
     export LATEST=glob-$GLOB_VERSION-$(uname)-$OS_DISTRIBUTOR-$OS_CORENAME-GHC_$GHC_VER-$(uname -m)
     export DOCKER_IMAGE_TAG=glob-$GLOB_VERSION-docker
     if [ -n "$TRAVIS_TAG" ]; then
@@ -29,11 +29,9 @@ if [ -n "$IS_DOCKER" ]; then
     mkdir docker.tmp/bin
     sudo cp $HOME/.local/bin/glob-launch docker.tmp/bin
     if [ -n "$DEBUG" ]; then
-	sudo cp $TRAVIS_BUILD_DIR/integration/Dockerfiles/hub/Dockerfile.debug docker.tmp/Dockerfile
-	sudo cp $TRAVIS_BUILD_DIR/integration/ShellScript/entrypoint.py docker.tmp
+	sudo cp $TRAVIS_BUILD_DIR./integration/Dockerfiles/hub/Dockerfile.debug docker.tmp/Dockerfile
     else
-	sudo cp $TRAVIS_BUILD_DIR/integration/Dockerfiles/hub/Dockerfile docker.tmp
-	sudo cp $TRAVIS_BUILD_DIR/integration/ShellScript/entrypoint.py docker.tmp
+	sudo cp $TRAVIS_BUILD_DIR./integration/Dockerfiles/hub/Dockerfile docker.tmp
     fi
     echo build docker
     cd docker.tmp

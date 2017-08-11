@@ -30,7 +30,7 @@ library
                        Glob.Utils.Info
   other-modules:       Paths_glob_utils
   -- other-extensions:    
-  build-depends:       base >=4.9 && <4.10
+  build-depends:       base >= 4 && < 5
                      , aeson >= 1
                      , bytestring >= 0.10
                      , text >= 1.2
