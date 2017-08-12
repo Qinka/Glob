@@ -40,7 +40,8 @@ type CTime = UTCTime
 type Sum = Either FilePath String
 type Whose = Maybe String
 type Id = String
-data Res = Res Id Path Title [Tag] Sum Content CTime Whose
+type MIME = Maybe String 
+data Res = Res Id Path Title [Tag] Sum Content CTime Whose MIME
            deriving (Eq,Show)
 data Content = Post FilePath
              | Frame FilePath
@@ -69,7 +70,7 @@ toHtml fn = if ext == "html"
 
 
 instance ToJSON Res where
-  toJSON (Res i p t ts s c ct w) = object $ 
+  toJSON (Res i p t ts s c ct w m) = object $ 
     [ "id"    .= i
     , "type"  .= (resType :: String)
     , "path"  .= p
@@ -78,6 +79,7 @@ instance ToJSON Res where
     , "create-time" .= ct
     , "whose" .= w
     , "summary" .= s
+    , "mime"  .= m
     ] ++ typRlt
     where
       (resType,typRlt) = case c of
@@ -98,6 +100,7 @@ instance FromJSON Res where
     <*> resP v
     <*> v .:  "create-time"
     <*> v .:? "whose"
+    <*> v .:? "mime"
     where resP v = do
             t <- v .: "type" :: Parser String
             case t of

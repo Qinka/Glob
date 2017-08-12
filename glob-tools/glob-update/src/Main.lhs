@@ -28,6 +28,7 @@ data Update = New
               , newSum :: Maybe String
               , newContent :: Maybe String
               , newWhose :: Maybe Whose
+              , newMIME :: Maybe String
               }
             | Del
             | Nav
@@ -119,6 +120,12 @@ new = New
               &= explicit &= name "whose"
               &= explicit &= name "w"
               &= groupname "new"
+  , newMIME    = def
+              &= help "The MIME type of the resource."
+              &= typ "MIME"
+              &= explicit &= name "mime"
+              &= explicit &= name "m"
+              &= groupname "new"              
   }
 \end{code}
 
@@ -177,7 +184,7 @@ makeHandleS (Make id Item) = do
   case item of
     Nothing -> do putStrLn "Sorry, the id is error"
                   whenLoud $ putStrLn $ ".infos/"++id++".json does not exist"
-    Just (Res i su ti ts s co ct w) -> do
+    Just (Res i su ti ts s co ct w m) -> do
       let dpS = case s of
             Left i -> ' ':i
             Right _ -> ""
@@ -189,7 +196,7 @@ makeHandleS (Make id Item) = do
             Static u' -> ("static","url","")
             Query v' -> ("query","var","")
       let isPandoc fn = (fn,length fn > 6 && take 5 (reverse fn) /= "lmth.")
-      print $ mkUpdate id (isPandoc dpF,isPandoc dpS) ct ti i ts su typ (cn,fetchContent co) s w
+      print $ mkUpdate id (isPandoc dpF,isPandoc dpS) ct ti i ts su typ (cn,fetchContent co) s w m
  
       
 
@@ -227,7 +234,7 @@ makeHandleS (Make id Basic) = do
                          mkCHighlight
      
 --mkUpdate :: UpdateM ()
-mkUpdate tag ((dpF,isF),(dpS,isS)) ct ti i ts su typ (cn,co) s w = do
+mkUpdate tag ((dpF,isF),(dpS,isS)) ct ti i ts su typ (cn,co) s w m = do
   target tag [dpF,dpS] $ do
     let chg is ii dp = when (is && (typ == "post" || typ == "frame")) $ cmd $ do
           string $ "pandoc -o " ++ toHtml (tail dp) ++ dp
@@ -248,8 +255,11 @@ mkUpdate tag ((dpF,isF),(dpS,isS)) ct ti i ts su typ (cn,co) s w = do
         Left f'  -> tCurlF "summary" $ "@" ++ (reverse $ dropWhile(/='.') $ reverse co) ++ "sum.html"
         Right "" -> return ()
         Right t' -> tCurlF "summary" t'
+      case m of
+        Just m' -> tCurlF "mime" m'
+        _ -> return ()
       case w of
-        Just w -> tCurlF "whose" w
+        Just w' -> tCurlF "whose" w'
         _ -> return ()
       mapM_ (\x -> tCurlF "tag" x) ts
       tSiteUrl su
@@ -380,11 +390,12 @@ newHandle New{..} = do
   content' <- newContent `fetch` getContent
   whose' <- newWhose `fetch` getWhose
   ctime <- getCurrentTime
+  mime' <- newMIME `fetchM` getMIME typ'
 \end{code}
 transform to Res
 \begin{code}
   let res = Res id' path' title' tags' sum'
-                (getContent' typ' content') ctime whose'
+                (getContent' typ' content') ctime whose' mime'
   createDirectoryIfMissing True ".infos"
   BL.writeFile (".infos/" ++ id' ++ ".json") $ encode res
   where
@@ -408,6 +419,11 @@ transform to Res
       putStrLn "Type in the contents of the updation:"
       x <- getLine
       return x
+    getMIME con = if con == "text" || con == "binary" then do
+      putStrLn "Type in your resource's MIME:"
+      x <- getLine
+      return $ Just x
+      else return Nothing 
     getId = do
       putStrLn "Type in this updation's id:"
       x <-  (head.words) <$> getLine
