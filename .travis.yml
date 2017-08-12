@@ -10,7 +10,7 @@ cache:
 # the matrix of settings
 matrix:
   include:
-    - env: GHC_VER=8.0.2 THREADED=t RUN_TEST=t LLVM=3.7 DEBUG=debug
+    - env: GHC_VER=8.0.2 THREADED=t RUN_TEST=t LLVM=3.7 DEBUG=debug RUN_BUILD=true
       addons:
         apt:
           sources:
@@ -19,7 +19,7 @@ matrix:
             - wget
             - curl
             - ghc-8.0.2
-    - env: GHC_VER=8.0.2 THREADED=t RUN_TEST=t DEBUG=debug IS_DOCKER=docker
+    - env: GHC_VER=8.0.2 THREADED=t RUN_TEST=t DEBUG=debug IS_DOCKER=docker RUN_BUILD=true
       addons:
         apt:
           sources:
