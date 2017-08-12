@@ -26,6 +26,7 @@ executable glob
                        Glob.Tool.Del
                        Glob.Tool.Init
                        Glob.Tool.New
+                       Glob.Tool.Script
   -- other-extensions:    
   build-depends:       base >= 4 && < 5
                      , glob-utils
