@@ -29,9 +29,9 @@ if [ -n "$IS_DOCKER" ]; then
     mkdir docker.tmp/bin
     sudo cp $HOME/.local/bin/glob-launch docker.tmp/bin
     if [ -n "$DEBUG" ]; then
-	sudo cp $TRAVIS_BUILD_DIR./integration/Dockerfiles/hub/Dockerfile.debug docker.tmp/Dockerfile
+	sudo cp $TRAVIS_BUILD_DIR/.integration/Dockerfiles/hub/Dockerfile.debug docker.tmp/Dockerfile
     else
-	sudo cp $TRAVIS_BUILD_DIR./integration/Dockerfiles/hub/Dockerfile docker.tmp
+	sudo cp $TRAVIS_BUILD_DIR/.integration/Dockerfiles/hub/Dockerfile docker.tmp
     fi
     echo build docker
     cd docker.tmp
