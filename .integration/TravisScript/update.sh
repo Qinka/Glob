@@ -35,6 +35,7 @@ if [ -n "$IS_DOCKER" ]; then
     fi
     echo build docker
     cd docker.tmp
+    export DOCKER_IMAGE_TAG=`echo $DOCKER_IMAGE_TAG | sed 's/\//-/g~'`
     docker build -t qinka/glob:$DOCKER_IMAGE_TAG .
     if [ -z "$DEBUG" ]; then
 	docker build -t qinka/glob:$LATEST .
