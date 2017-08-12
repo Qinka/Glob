@@ -2,13 +2,14 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-ih
-version:             0.1.0.50
+version:             0.1.0.51
 synopsis:            a serial tool of glob
 description:         the tool transform tokens and other things to curl's options
+license:             GPL-3
 license-file:        LICENSE
 author:              Qinka
 maintainer:          qinka@live.com
-copyright:           Copymiddle (C-M) 2016-2017 Qinka <qinka@live.com>
+copyright:           Copyright 2016-2017 Qinka <qinka@live.com>
 build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10

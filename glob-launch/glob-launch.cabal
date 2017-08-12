@@ -2,13 +2,14 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                glob-launch
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            The launch of glob.
 description:         Just a small blog backend.
+license:             GPL-3
 license-file:        LICENSE
 author:              Qinka
 maintainer:          qinka@live.com
-copyright:           Copymiddle (C-M) 2016-2017 Qinka <qinka@live.com>
+copyright:           Copyright 2016-2017 Qinka <qinka@live.com>
 category:            Web
 build-type:          Simple
 extra-source-files:  ChangeLog.md
