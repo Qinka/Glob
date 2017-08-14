@@ -35,5 +35,6 @@ executable glob
                      , directory
                      , echo
                      , filepath
+                     , process
   hs-source-dirs:      src
   default-language:    Haskell2010

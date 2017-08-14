@@ -46,6 +46,9 @@ data Glob = Ih -- ^ identification helper
             { sptKind :: Maybe String
             }
           | Path
+          | Other -- other command
+            { oCmds :: [String]
+            }
             deriving (Show,Data)
 
 ih :: Glob
@@ -181,6 +184,14 @@ script = Script { sptKind = def
 
 path :: Glob
 path = Path
+
+
+other :: Glob
+other = Other { oCmds = def
+                &= help "sciprt"
+                &= args
+              }
+
 
 glob :: Glob
 glob = modes [ ih
