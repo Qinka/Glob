@@ -25,9 +25,9 @@ if [ -n "$IS_DOCKER" ]; then
     fi
     echo copy files
     cd $TRAVIS_BUILD_DIR
-    mkdir docker.tmp
-    mkdir docker.tmp/bin
+    mkdir -p docker.tmp/bin
     sudo cp $HOME/.local/bin/glob-launch docker.tmp/bin
+    sudo cp $HOME/.local/bin/glob        docker.tmp/bin
     if [ -n "$DEBUG" ]; then
 	sudo cp $TRAVIS_BUILD_DIR/.integration/Dockerfiles/Dockerfile.debug docker.tmp/Dockerfile
     else

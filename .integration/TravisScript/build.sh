@@ -20,6 +20,6 @@ if [ -n "$RUN_BUILD" ]; then
 	fi
     fi
 
-    stack install glob-launch $STACKFILE $O2FLAG $THREADFLAG $LLVMFLAG $DEBUGFLAG
+    stack install glob-tool glob-launch $STACKFILE $O2FLAG $THREADFLAG $LLVMFLAG $DEBUGFLAG
 
 fi
