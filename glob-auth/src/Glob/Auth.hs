@@ -37,8 +37,8 @@ class HashAlgorithm a => Auth site a | site -> a where
   -- | to get the password
   tokenItem :: MonadIO m => site -> m ByteString
 
-checkAuth :: Auth site hash -- ^ need token hash and token item
-             => HandlerT site IO AuthResult -- ^ return result
+checkAuth :: Auth site hash
+          => HandlerT site IO AuthResult -- ^ return result
 checkAuth = do -- Handler _ IO
   site  <- getYesod
   item  <- tokenItem site

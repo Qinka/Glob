@@ -31,3 +31,8 @@ test
 *.ignore
 
 *.lhs~
+
+
+## un-ignore
+!glob-auth/test
+!glob-core/test
