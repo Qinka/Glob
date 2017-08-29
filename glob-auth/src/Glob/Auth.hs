@@ -1,3 +1,7 @@
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE MultiParamTypeClasses  #-}
+{-# LANGUAGE OverloadedStrings      #-}
+
 {-|
 Module:       Glob.Auth
 Description:  The methods for authentication
@@ -9,10 +13,6 @@ Portability:  unknown
 
 The methods about authentication for Glob (using Yesod)
 -}
-
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE MultiParamTypeClasses  #-}
-{-# LANGUAGE OverloadedStrings      #-}
 
 module Glob.Auth
        ( -- * check whether it is authorized
@@ -37,6 +37,7 @@ class HashAlgorithm a => Auth site a | site -> a where
   -- | to get the password
   tokenItem :: MonadIO m => site -> m ByteString
 
+-- | check auth
 checkAuth :: Auth site hash
           => HandlerT site IO AuthResult -- ^ return result
 checkAuth = do -- Handler _ IO
