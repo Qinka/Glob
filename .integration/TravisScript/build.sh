@@ -13,8 +13,8 @@ if [ -n "$RUN_BUILD" ]; then
 	export THREADFLAG=" --ghc-options -threaded "
     fi
     if [ -n "$DEBUG" ]; then
-	export DEBUGFLAG=" --flag glob-core:debug-info "
-	export DEBUGFLAG=$DEBUGFLAG" --ghc-options -rtsopts "
+	export XDEBUGFLAG=" --flag glob-core:debug-info "
+	export XDEBUGFLAG=$DEBUGFLAG" --ghc-options -rtsopts "
 	if [ -z "$LLVM" ]; then
 	    O2FLAG=" "
 	fi
