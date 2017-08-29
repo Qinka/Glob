@@ -10,7 +10,7 @@ cache:
 # the matrix of settings
 matrix:
   include:
-    - env: GHC_VER=8.0.2 THREADED=t RUN_TEST=t LLVM=3.7 DEBUG=debug RUN_BUILD=true
+    - env: GHC_VER=8.0.2 THREADED=t RUN_TEST=t DEBUG=debug RUN_BUILD=true STACKSOLVER=stack-lts-9.0.yaml LLVM=3.7
       addons:
         apt:
           sources:
@@ -19,13 +19,32 @@ matrix:
             - wget
             - curl
             - ghc-8.0.2
-    - env: GHC_VER=8.0.2 THREADED=t RUN_TEST=t DEBUG=debug IS_DOCKER=docker RUN_BUILD=true
+    - env: GHC_VER=8.0.2 THREADED=t RUN_TEST=t DEBUG=debug RUN_BUILD=true STACKSOLVER=stack-lts-9.0.yaml
       addons:
         apt:
           sources:
             - hvr-ghc
           packages:
+            - wget
+            - curl
             - ghc-8.0.2
+            - ghc-8.0.2
+    - env: GHC_VER=8.2.1 THREADED=t RUN_TEST=t DEBUG=debug RUN_BUILD=true
+      addons:
+        apt:
+          sources:
+            - hvr-ghc
+          packages:
+            - wget
+            - curl
+            - ghc-8.2.1
+    - env: GHC_VER=8.2.1 THREADED=t RUN_TEST=t DEBUG=debug IS_DOCKER=docker LLVM=3.9 RUN_BUILD=true
+      addons:
+        apt:
+          sources:
+            - hvr-ghc
+          packages:
+            - ghc-8.2.1
             - curl
             - wget
 
