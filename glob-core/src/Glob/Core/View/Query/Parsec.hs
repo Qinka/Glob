@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 {-|
 Module      : Glob.Core.View.Query.Parsec
 Description : The parsec for query command
@@ -10,16 +12,31 @@ Portability : unknown
 This module is for the query command, to parsec the query command
 -}
 
-{-# LANGUAGE RecordWildCards #-}
-
 module Glob.Core.View.Query.Parsec
-       ( run_qp
+       ( -- | parse the query command for query
+         --
+         -- $query
+         run_qp
        ) where
 
 import           Data.Time
 import           Glob.Core.Model  (ResT (..))
 import qualified Glob.Import.Text as T
 import           Text.Parsec
+
+-- $query commands
+--
+-- The query commands include
+-- * type={t,f}={post,text,binary,query,..}
+-- * take=SIZE
+-- * drop=SIZE
+-- * befor=DATE
+-- * after=DATE
+-- * tag={t,f}=TAG
+-- * or
+-- * and
+-- * true
+-- * false
 
 
 -- | the ADT for parser
@@ -95,7 +112,7 @@ qpOr = do
 -- | parser for query command
 qp :: Parsec String () [QueryParser]
 qp =  concat <$> many qps
-
+-- | single command
 qps :: Parsec String () [QueryParser]
 qps = foldl (<|>) qpEmpty $ try <$>
   [qpTake,qpDrop,qpBefor,qpAfter,qpTag,qpOr,qpAnd
@@ -127,3 +144,4 @@ time_filter t o b ResT{..} = t `o` res_time
 -- | transform the command to function
 run_qp :: String -> Either ParseError ([ResT]->[ResT])
 run_qp str = to_filter <$> runP qp () "QueryPaserError" str
+
