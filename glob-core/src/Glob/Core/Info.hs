@@ -1,4 +1,5 @@
 {-# OPTIONS_HADDOCK hide #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 {-|
 Module        : Glob.Core.Info
@@ -9,10 +10,10 @@ Maintainer    : qinka@live.com
                 me@qinka.pro
 Stability     : experimental
 Portability   : x86/64
+
 The information of thos package, such as version, git commit-id.
 -}
 
-{-# LANGUAGE TemplateHaskell #-}
 
 
 
