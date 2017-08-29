@@ -1,5 +1,3 @@
-{-# OPTIONS_HADDOCK hide #-}
-
 {-|
 Module        : Glob.Auth.Info
 Description   : THe info of this package

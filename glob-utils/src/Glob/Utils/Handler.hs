@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 {-|
 Module       : Glob.Utils.Handler
 Description  : The some methods used in server
@@ -10,7 +12,6 @@ Portability  : unknown
 The method which might be useful for server
 -}
 
-{-# LANGUAGE OverloadedStrings #-}
 
 module Glob.Utils.Handler
   ( -- * about exception
