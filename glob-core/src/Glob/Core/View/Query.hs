@@ -1,3 +1,9 @@
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TemplateHaskell       #-}
+
+
 {-|
 Module        : Glob.Core.View.Query
 Description   : The view for query and nav
@@ -10,10 +16,6 @@ Portability   : unknown
 The View part for query command, nav query.
 -}
 
-{-# LANGUAGE FlexibleContexts      #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings     #-}
-{-# LANGUAGE TemplateHaskell       #-}
 
 
 module Glob.Core.View.Query
@@ -50,40 +52,50 @@ import qualified Glob.Import.Text            as T
 import           Glob.Utils.Info
 import           Yesod.Core
 
+-- | version of Blog version
 query_version :: Hamletic a (HandlerT a IO)
-                 => HandlerT a IO TypedContent
+              => HandlerT a IO TypedContent
 query_version = get_version >>= respondSource "text/plain" . sendChunkText
 
+-- | version of glob-core
 query_version_author :: HandlerT a IO TypedContent
 query_version_author = respondSource "text/plain" $ sendChunkText $glob_auth_version_quote
 
+-- | version of glob-utils
 query_version_utils :: HandlerT a IO TypedContent
 query_version_utils = respondSource "text/plain" $ sendChunkText $glob_utils_version_quote
 
+-- | version of glov-core
 query_version_core :: HandlerT a IO TypedContent
 query_version_core = respondSource "text/plain" $ sendChunkText $glob_core_version_quote
 
+-- | name of this
 query_name :: HandlerT a IO TypedContent
 query_name = respondSource "text/plain" $ sendChunkText "Glob"
 
+-- | build information
 query_build_info :: HandlerT a IO TypedContent
 query_build_info = respondSource "text/plain" $ sendChunkText $glob_build_info_quote
 
+-- | server time
 query_server_time :: HandlerT a IO TypedContent
 query_server_time = T.show <$> (liftIO getCurrentTime) >>= respondSource "text/plain" . sendChunkText
 
-query_nav :: [Nav] -- ^ navs
+-- | fetch the list for nav
+query_nav :: [Nav] -- ^ navs (from Model)
           -> HandlerT a IO TypedContent
 query_nav = respondSource "application/json" . sendChunkLBS . encode
 
+-- | index
 query_index :: String -- ^ parameters
-            -> [ResT] -- ^ resources index
+            -> [ResT] -- ^ resources index (from Model)
             -> HandlerT a IO TypedContent
 query_index t = respondSource "application/json" . sendChunkLBS . encode . (run $ run_qp t)
   where run (Left e)  = error $ show e
         run (Right i) = i
 
-query_query :: Text -- ^ query value
+-- | query
+query_query :: Text -- ^ query value (from Model)
             -> HandlerT a IO TypedContent
 query_query t = respondSource "text/plain" $ do
   sendChunkText t
