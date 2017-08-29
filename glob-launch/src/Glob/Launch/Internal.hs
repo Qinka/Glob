@@ -75,7 +75,7 @@ instance Yesod Rain where
     case me of
       "GET" -> return Authorized
       _     -> checkAuth
-  defaultLayout = glob_layout
+  defaultLayout = glob_layout layout_bootstrap
   maximumContentLength _ _ = Nothing
 
 instance Auth Rain SHA256 where

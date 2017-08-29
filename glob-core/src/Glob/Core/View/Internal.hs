@@ -1,3 +1,9 @@
+{-# LANGUAGE FlexibleContexts       #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE MultiParamTypeClasses  #-}
+{-# LANGUAGE OverloadedStrings      #-}
+{-# LANGUAGE QuasiQuotes            #-}
+
 {-|
 Module       : Glob.Core.View.Internal
 Description  : The internal module for view
@@ -7,19 +13,16 @@ Maintainer   : me@qinka.pro
 Stability    : experimental
 Portability  : unknown
 
-TODO
+The internal party for View, including Hamletic.
 -}
 
-{-# LANGUAGE FlexibleContexts       #-}
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE MultiParamTypeClasses  #-}
-{-# LANGUAGE OverloadedStrings      #-}
-{-# LANGUAGE QuasiQuotes            #-}
 
 module Glob.Core.View.Internal
        ( Hamletic(..)
        , glob_layout
        , glob_error_handler
+         -- * layouts
+       , layout_bootstrap
        ) where
 
 import           Glob.Core.Model
@@ -30,7 +33,9 @@ import           Yesod.Core
 import           Yesod.Core.Handler
 import           Yesod.Core.Json
 
--- | The Hamtletic
+-- | Hamtletic
+--
+--   Limit, and test
 class (MonadHandler m, Mongodic a m) => Hamletic a m | m -> a where
   get_title        :: m Text  -- ^ get title
   get_frame_prefix :: m Text  -- ^ get the prefix path of frame
@@ -38,11 +43,66 @@ class (MonadHandler m, Mongodic a m) => Hamletic a m | m -> a where
   get_raw          :: m Bool  -- ^ return raw html
 
 
+-- | layout for layout
+type GlobLayout site = (  PageContent (Route site)
+                       -> Html -- hd
+                       -> Text -- title
+                       -> Html -- nav
+                       -> Html -- top
+                       -> Html -- bottom
+                       -> ((Route site -> [(Text, Text)] -> Text) -> Html)
+                       )
+
+-- | layout with bootstrap
+layout_bootstrap :: Yesod site => GlobLayout site
+layout_bootstrap page_content hd title nav top bottom = [hamlet|
+  $newline never
+  $doctype 5
+  <html>
+    <head>
+      <title> #{pageTitle page_content} - #{title}
+      <meta charset=utf-8>
+      <meta name=viewport content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+      #{hd}
+      ^{pageHead page_content}
+    <body>
+      #{nav}
+      <div id="container">
+        #{top}
+        <div id="main-part">
+          ^{pageBody page_content}
+      #{bottom}
+  |]
+
+{-|
+The example, or say template for layout
+
+@
+layout_xx page_content hd title nav top bottom = [hamlet|
+  $newline never
+  $doctype 5
+  \<html>\
+    \<head\>
+      \<title\> #{pageTitle page_content} - #{title}
+      \<meta charset=utf-8\>
+      \<meta name=viewport content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"\>
+      #{hd}
+      ^{pageHead page_content}
+    \<body\>
+      #{nav}
+      #{top}
+      ^{pageBody page_content}
+      #{bottom}
+  |]
+@
+-}
+
 -- | the default of glob with Yesod
 glob_layout :: (Hamletic a (HandlerT a IO),Yesod a)
-               => WidgetT a IO ()     -- ^ widget
-               -> HandlerT a IO Html  -- ^ return
-glob_layout w = do
+            => GlobLayout a        -- ^ the layout for glob
+            -> WidgetT a IO ()     -- ^ widget
+            -> HandlerT a IO Html  -- ^ return
+glob_layout layout w = do
   frame_prefix <- get_frame_prefix
   title        <- get_title
   page_content <- widgetToPageContent w
@@ -56,25 +116,8 @@ glob_layout w = do
       _                                          -> return $ Left "cannot launch frames"
   case htmls of
     Left err -> error err
-    Right (top,bottom,nav,hd) ->
-      withUrlRenderer [hamlet|
-        $newline never
-        $doctype 5
-        <html>
-          <head>
-            <title> #{pageTitle page_content} - #{title}
-            <meta charset=utf-8>
-            <meta name=viewport content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-            #{hd}
-            ^{pageHead page_content}
-          <body>
-            #{nav}
-            <div id="container">
-              #{top}
-              <div id="main-part">
-                ^{pageBody page_content}
-            #{bottom}
-    |]
+    Right (top,bottom,nav,hd) -> withUrlRenderer $ layout page_content hd title nav top bottom
+
 
 
 -- | handler the error
