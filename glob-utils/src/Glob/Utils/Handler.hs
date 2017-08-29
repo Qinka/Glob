@@ -52,8 +52,8 @@ catchH m h = handlerToIO >>=
 
 -- | The method for handler, equal to @flip catchH@
 handlerH :: Exception e
-         => (e -> HandlerT site IO a)
-         -> HandlerT site IO a
+         => (e -> HandlerT site IO a) -- ^ the handler for exceptions
+         -> HandlerT site IO a -- ^ operation
          -> HandlerT site IO a
 handlerH = flip catchH
 
@@ -84,7 +84,7 @@ return_e = pure . (\str -> "{\"error\":\"exception\",\"context\":\"" ++ str ++ "
 
 -- | the text-returned version for return_e
 return_e_t :: (Monad m,Exception e)
-           => e
+           => e -- ^ exception
            -> m T.Text
 return_e_t = (fmap T.pack) . return_e
 

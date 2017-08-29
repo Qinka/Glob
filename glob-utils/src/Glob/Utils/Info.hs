@@ -12,7 +12,8 @@ The information and version of the package.
 -}
 
 module Glob.Utils.Info
-       ( glob_utils_version
+       ( -- * version
+         glob_utils_version
        , -- * quotes
          glob_utils_version_quote
        , glob_utils_git_branch_quote

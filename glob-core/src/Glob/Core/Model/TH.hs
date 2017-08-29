@@ -32,7 +32,7 @@ make_fetch :: Name   -- ^ filter   name
            -> String -- ^ field name
            -> String -- ^ collection
            -> Q [Dec]
-make_fetch func n kind field collection = do
+make_fetch func n kind field collection =
   let name = mkName $ "fetch_" ++ n
       m    = mkName  "m"
       dec = SigD name $ ForallT [PlainTV m] [AppT (ConT ''MonadIO) (VarT m)]
@@ -48,7 +48,7 @@ make_fetch func n kind field collection = do
                                             (LitE $ StringL field))
                                       (VarE resv))
                                 (LitE $ StringL collection)))) []]
-  return [dec,body]
+  in return [dec,body]
 
 
 -- | to create update_xxx
@@ -57,7 +57,7 @@ make_update :: String -- ^ function name
             -> String -- ^ field
             -> String -- ^ collection
             -> Q [Dec]
-make_update n kind f c = do
+make_update n kind f c =
   let field = LitE $ StringL f
       coll  = LitE $ StringL c
       name  = mkName $ "update_" ++ n
@@ -71,4 +71,4 @@ make_update n kind f c = do
         [Clause [] (NormalB $
                     (AppE (AppE (VarE 'update_item) field)
                      coll)) []]
-  return [dec,body]
+  in return [dec,body]

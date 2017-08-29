@@ -65,19 +65,21 @@ data Nav = Nav { navUrl   :: T.Text -- ^ The url of the link
                , navOrder :: Int    -- ^ The order of the link
                }
 
--- instance eq, order for nav
+-- | instance eq, order for nav
 instance Eq Nav where
   n1 == n2 = navOrder n1 == navOrder n2
 instance Ord Nav where
  compare n1 n2 = compare (navOrder n1) (navOrder n2)
 
--- |transfor between nav and document
+-- |transform between nav and document
 nav_to_doc :: Nav -> Document
 nav_to_doc Nav{..} =
   [ "index"   =: navLabel
   , "url"   =: navUrl
   , "order" =: navOrder
   ]
+
+-- | transform Document to nav
 doc_to_nav :: Document -> Maybe Nav
 doc_to_nav doc = Nav
   <$> doc !? "url"
