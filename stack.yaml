@@ -1,5 +1,5 @@
 # Glob's stack yaml
-resolver: lts-9.0
+resolver: nightly-2017-08-29
 
 packages:
 - glob-auth/
@@ -7,14 +7,7 @@ packages:
 - glob-core/
 - glob-launch/
 - glob-tool/
-# - glob-tools/glob-ih/
-# - glob-tools/glob-timecheck/
-# - glob-tools/glob-update/
 
 extra-deps: []
-
-flags:
-#  glob-core:
-#    debug-info: true
 
 extra-package-dbs: []
