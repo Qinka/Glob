@@ -1,3 +1,10 @@
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE QuasiQuotes           #-}
+{-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE TypeFamilies          #-}
+
 {-|
 Module       : Glob.Core.View
 Description  : The view of glob
@@ -10,12 +17,6 @@ Portability  : unknow
 The view part of the glob.
 -}
 
-{-# LANGUAGE FlexibleContexts      #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings     #-}
-{-# LANGUAGE QuasiQuotes           #-}
-{-# LANGUAGE RecordWildCards       #-}
-{-# LANGUAGE TypeFamilies          #-}
 
 module Glob.Core.View
        ( -- * responds
@@ -47,14 +48,14 @@ import           Yesod.Core.Widget
 
 -- | response the post with ResT and html
 respond_post :: (Yesod a, Hamletic a (HandlerT a IO))
-                => ResT -- ^ resource index
-                -> Html -- ^ html body
-                -> HandlerT a IO TypedContent
+             => ResT -- ^ resource index
+             -> Html -- ^ html body
+             -> HandlerT a IO TypedContent
 respond_post res@ResT{..} raw_body = do
   willRaw <- get_raw
-  isRaw <- null <$> lookupHeader "GLOBRAW"
-  body <- if willRaw == isRaw then return raw_body
-          else defaultLayout $ with_html raw_body res
+  isRaw   <- null <$> lookupHeader "GLOBRAW"
+  body    <- if willRaw == isRaw then return raw_body
+             else defaultLayout $ with_html raw_body res
   respondSource "text/html" $ do
     sendChunkHtml body
     sendFlush
@@ -90,9 +91,9 @@ with_html body ResT{..} = do
 
 -- | respond resource(text)
 respond_resource_t :: (Yesod a, Hamletic a (HandlerT a IO))
-                      => ResT    -- ^ resource index
-                      -> Text    -- ^ text
-                      -> HandlerT a IO TypedContent
+                   => ResT    -- ^ resource index
+                   -> Text    -- ^ text
+                   -> HandlerT a IO TypedContent
 respond_resource_t ResT{..} text = do
   respondSource (fromMaybe "" $ fmap T.encodeUtf8 rMIME) $ do
     sendChunkText text
@@ -100,9 +101,9 @@ respond_resource_t ResT{..} text = do
 
 -- | respond resource(binary)
 respond_resource_b :: (Yesod a, Hamletic a (HandlerT a IO))
-                      => ResT    -- ^ resource index
-                      -> ByteString    -- ^ text
-                      -> HandlerT a IO TypedContent
+                   => ResT    -- ^ resource index
+                   -> ByteString    -- ^ text
+                   -> HandlerT a IO TypedContent
 respond_resource_b ResT{..} bin = do
   respondSource (fromMaybe "" $ fmap T.encodeUtf8 rMIME) $ do
     sendChunkBS bin
@@ -111,7 +112,7 @@ respond_resource_b ResT{..} bin = do
 
 -- | response the static url
 respond_static :: (Yesod a, Hamletic a (HandlerT a IO))
-                  => ResT -- ^ index for resource
-                  -> Text -- ^ Url
-                  -> HandlerT a IO TypedContent
+               => ResT -- ^ index for resource
+               -> Text -- ^ Url
+               -> HandlerT a IO TypedContent
 respond_static _ url = redirectWith status301 url
