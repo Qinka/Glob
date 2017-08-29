@@ -1,3 +1,8 @@
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE RecordWildCards       #-}
+
 {-|
 Module       : Glob.Core.Control
 Description  : The view of glob
@@ -10,10 +15,6 @@ Portability  : unknow
 The control part of the glob.
 -}
 
-{-# LANGUAGE FlexibleContexts      #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings     #-}
-{-# LANGUAGE RecordWildCards       #-}
 
 module Glob.Core.Control
        ( Controly(..)
@@ -36,8 +37,8 @@ import           Yesod.Core
 
 -- | get method router
 getUrlR :: Controly site
-           => [T.Text] -- ^ index
-           -> HandlerT site IO TypedContent
+        => [T.Text] -- ^ index
+        -> HandlerT site IO TypedContent
 getUrlR idx@(".query":_) = getQueryR idx =<< run_db_default (fetch_res idx)
 getUrlR idx = do
   res <- run_db_default $ fetch_res idx
@@ -50,8 +51,8 @@ getUrlR idx = do
 
 -- | put method router
 putUrlR :: Controly site
-           => [Text] -- ^ index
-           -> HandlerT site IO TypedContent
+        => [Text] -- ^ index
+        -> HandlerT site IO TypedContent
 putUrlR (".query":".nav":_) = putNavR
 putUrlR idx = do
   typ <- lookupPostParam "type"
@@ -66,8 +67,8 @@ putUrlR idx = do
 
 -- | delete
 deleteUrlR :: Controly site
-              => [Text] -- ^ index
-              -> HandlerT site IO TypedContent
+           => [Text] -- ^ index
+           -> HandlerT site IO TypedContent
 deleteUrlR (".query":".nav":_) = delNavR
 deleteUrlR idx = do
   typ <- lookupPostParam "type"
@@ -87,8 +88,8 @@ deleteUrlR idx = do
 
 -- | get post
 getPostR :: Controly site
-            => Maybe ResT -- ^ index
-            -> HandlerT site IO TypedContent
+         => Maybe ResT -- ^ index
+         -> HandlerT site IO TypedContent
 getPostR (Just res@ResT{..}) = do
   html <- run_db_default $ fetch_post res
   case html of
@@ -96,6 +97,7 @@ getPostR (Just res@ResT{..}) = do
     _       -> liftIO (putStrLn "Faile to get") >> notFound
 getPostR _ = notFound
 
+-- | put post
 putPostR :: Controly site
             => [Text] -- ^ index
             -> HandlerT site IO TypedContent
@@ -104,8 +106,9 @@ putPostR idx = do
   html <- T.decodeUtf8 <#> getFile "html"
   putItem unR html update_post
 
+-- | get resource
 getResourceR :: Controly site
-                => Bool
+                => Bool -- ^ whether item is text
                 -> Maybe ResT
                 -> HandlerT site IO TypedContent
 getResourceR t (Just res@ResT{..}) = do
@@ -123,9 +126,9 @@ getResourceR t (Just res@ResT{..}) = do
                  else (Right <#>) <$> fetch_resource_b
 getResourceR _ _ = notFound
 
-
+-- | put resource
 putResourceR :: Controly site
-                => Bool
+                => Bool -- ^ whether item is text
                 -> [T.Text]
                 -> HandlerT site IO TypedContent
 putResourceR t idx = do
@@ -136,7 +139,7 @@ putResourceR t idx = do
     then putItem unR            text  update_resource_t
     else putItem unR (Binary <$> bin) update_resource_b
 
-
+-- | get static
 getStaticR :: Controly site
               => Maybe ResT
               -> HandlerT site IO TypedContent
@@ -147,7 +150,7 @@ getStaticR (Just res@ResT{..}) = do
     _      -> notFound
 getStaticR _ = notFound
 
-
+-- | put static
 putStaticR :: Controly site
                => [Text]
                -> HandlerT site IO  TypedContent
@@ -157,7 +160,7 @@ putStaticR idx = do
   putItem unR url update_static
 
 
-
+-- | put frame
 putFrameR :: Controly site
              => [T.Text]
              -> HandlerT site IO TypedContent
@@ -166,6 +169,7 @@ putFrameR idx = do
   html <- T.decodeUtf8 <#> getFile "html"
   putItem unR html update_frame
 
+-- | get query
 getQueryR :: Controly site
              => [Text]
              -> Maybe ResT
@@ -186,6 +190,8 @@ getQueryR idx r =
               Just text -> query_query text
               _         -> notFound
           )
+
+-- | put query
 putQueryR :: Controly site
             => [T.Text]
             -> HandlerT site IO TypedContent
@@ -194,7 +200,7 @@ putQueryR idx = do
   var <- lookupPostParam "var"
   putItem unR var update_query
 
-
+-- | put navs
 putNavR :: Controly site
            => HandlerT site IO TypedContent
 putNavR = do
@@ -204,6 +210,7 @@ putNavR = do
   run_db_default $ update_nav idx url (T.read <$> order)
   return_succ
 
+-- | delete navs
 delNavR :: Controly site
            => HandlerT site IO TypedContent
 delNavR = do
