@@ -1,0 +1,3 @@
+steps:
+  - language_pragmas:
+      remove_redundant: false
