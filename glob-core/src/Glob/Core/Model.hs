@@ -1,3 +1,8 @@
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TemplateHaskell       #-}
+
 {-|
 Module       : Glob.Core.Model
 Description  : The module for model
@@ -9,11 +14,6 @@ Portability  : unknown
 
 The codes for model
 -}
-
-{-# LANGUAGE FlexibleContexts      #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings     #-}
-{-# LANGUAGE TemplateHaskell       #-}
 
 module Glob.Core.Model
        ( -- * run database
@@ -61,44 +61,44 @@ import qualified Text.Blaze.Html             as TBH
 preEscapedToHtml :: Text -> Html
 preEscapedToHtml = TBH.preEscapedToHtml
 
--- about frame
+-- | about frame
 make_fetch 'preEscapedToHtml "frame" ''Html "html" "frame"
 make_update                  "frame" ''Text "html" "frame"
 
--- about post
+-- | about post
 make_fetch 'preEscapedToHtml "post" ''Html "html" "post"
 make_update                  "post" ''Text "html" "post"
 
--- about text resource
+-- | about text resource
 make_fetch 'id "resource_t" ''Text "text" "resource"
 make_update    "resource_t" ''Text "text" "resource"
 
--- about binary resource
+-- | about binary resource
 make_fetch 'fromBinary "resource_b" ''ByteString "binary" "resource"
 make_update            "resource_b" ''Binary "binary" "resource"
 
--- about static
+-- | about static
 make_fetch 'id "static" ''Text "url" "static"
 make_update    "static" ''Text "url" "static"
 
--- about query
+-- | about query
 make_fetch 'id "query" ''Text "var" "query"
 make_update    "query" ''Text "var" "query"
 
 
 -- | fetch maybe index
 fetch_maybe_i :: MonadIO m
-                 => (ResT -> Action m (Maybe a))
-                 -> [Text] -- ^ index
-                 -> Action m (Maybe a)
+              => (ResT -> Action m (Maybe a))  -- ^ funcion for action
+              -> [Text] -- ^ index
+              -> Action m (Maybe a)
 fetch_maybe_i mf idx =
   fetch_res idx >>= fetch_maybe_r mf
 
 -- | fetch maybe resource
 fetch_maybe_r :: MonadIO m
-                 => (ResT -> Action m (Maybe a))
-                 -> Maybe ResT -- ^ index
-                 -> Action m (Maybe a)
+              => (ResT -> Action m (Maybe a)) -- ^ function for action
+              -> Maybe ResT -- ^ index
+              -> Action m (Maybe a)
 fetch_maybe_r mf (Just r) = mf r
 fetch_maybe_r _  _        = return Nothing
 
@@ -111,12 +111,12 @@ fetch_nav = do
   closeCursor cr
   return $ catMaybes navs
 
--- update nav
+-- | update nav
 update_nav :: MonadIO m
-              => Maybe Text  -- ^ label
-              -> Maybe Text  -- ^ url
-              -> Maybe Int     -- ^ order
-              -> Action m ()
+           => Maybe Text  -- ^ label
+           -> Maybe Text  -- ^ url
+           -> Maybe Int     -- ^ order
+           -> Action m ()
 update_nav label url order =
   void $ upsert (select ["label" =: label] "nav") $ catMaybes
   [ Just ("index" =: label)
@@ -124,18 +124,19 @@ update_nav label url order =
   , "order" =@ order
   ]
 
+-- | delete the nav
 delete_nav :: MonadIO m
-              => Maybe Text -- ^ label ( if it is Nothing, the all nav item will be delete)
-              -> Action m ()
+           => Maybe Text -- ^ label ( if it is Nothing, the all nav item will be delete)
+           -> Action m ()
 delete_nav label =
     delete $ select (catMaybes ["index" =@ label]) "nav"
 
 -- | run mongo
 run_db :: Mongodic site m
-          => AccessMode  -- ^ access mode
-          -> Database    -- ^ database
-          -> Action m a  -- ^ action
-          -> m a
+       => AccessMode  -- ^ access mode
+       -> Database    -- ^ database
+       -> Action m a  -- ^ action
+       -> m a
 run_db am db mf = get_pool >>= \pool ->
   withResource pool $ \p -> do
   (user,pass) <- get_db_u_p
