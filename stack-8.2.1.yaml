@@ -1,5 +1,5 @@
 # Glob's stack yaml
-resolver: lts-9.2
+resolver: nightly-2017-08-29
 
 packages:
 - glob-auth/

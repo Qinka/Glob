@@ -10,7 +10,7 @@ cache:
 # the matrix of settings
 matrix:
   include:
-    - env: GHC_VER=8.0.2 THREADED=t RUN_TEST=t DEBUG=debug RUN_BUILD=true STACKSOLVER=stack-lts-9.0.yaml LLVM=3.7
+    - env: GHC_VER=8.0.2 THREADED=t RUN_TEST=t DEBUG=debug RUN_BUILD=true LLVM=3.7
       addons:
         apt:
           sources:
@@ -19,7 +19,7 @@ matrix:
             - wget
             - curl
             - ghc-8.0.2
-    - env: GHC_VER=8.0.2 THREADED=t RUN_TEST=t DEBUG=debug RUN_BUILD=true STACKSOLVER=stack-lts-9.0.yaml
+    - env: GHC_VER=8.0.2 THREADED=t RUN_TEST=t DEBUG=debug RUN_BUILD=true
       addons:
         apt:
           sources:
@@ -29,7 +29,7 @@ matrix:
             - curl
             - ghc-8.0.2
             - ghc-8.0.2
-    - env: GHC_VER=8.2.1 THREADED=t RUN_TEST=t DEBUG=debug RUN_BUILD=true
+    - env: GHC_VER=8.2.1 THREADED=t RUN_TEST=t DEBUG=debug STACKSOLVER=stack-8.2.1.yaml RUN_BUILD=true
       addons:
         apt:
           sources:
@@ -38,7 +38,7 @@ matrix:
             - wget
             - curl
             - ghc-8.2.1
-    - env: GHC_VER=8.2.1 THREADED=t RUN_TEST=t DEBUG=debug IS_DOCKER=docker LLVM=3.9 RUN_BUILD=true
+    - env: GHC_VER=8.2.1 THREADED=t RUN_TEST=t DEBUG=debug STACKSOLVER=stack-8.2.1.yaml IS_DOCKER=docker LLVM=3.9 RUN_BUILD=true
       addons:
         apt:
           sources:
