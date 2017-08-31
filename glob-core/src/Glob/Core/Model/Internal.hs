@@ -108,7 +108,21 @@ data ResT = ResT
             , rMIME    :: Maybe T.Text  -- ^ the MIME type of the result
             , rTags    :: [T.Text]      -- ^ the tags for result
             }
-          deriving (Eq,Show)
+          deriving (Show)
+
+instance Eq ResT where
+  res1 == res2 = and
+    [ abs (rCTime res1 `diffUTCTime` rCTime res2) <= 1
+    , abs (rUTime res1 `diffUTCTime` rUTime res2) <= 1
+    , rIndex   res1 == rIndex   res2
+    , rRes     res1 == rRes     res2
+    , rType    res1 == rType    res2
+    , rTitle   res1 == rTitle   res2
+    , rSummary res1 == rSummary res2
+    , rWhose   res1 == rWhose   res2
+    , rMIME    res1 == rMIME    res2
+    , rTags    res1 == rTags    res2
+    ]
 
 -- | transform between res document
 res_to_doc :: ResT -> Document

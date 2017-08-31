@@ -10,7 +10,7 @@ import Test.Hspec
 import Glob.Core.Model
 import System.IO
 import Internal
-import Data.Time
+import Data.Time (diffUTCTime,getCurrentTime,UTCTime)
 import Data.IORef
 import Control.Monad
   
@@ -138,5 +138,75 @@ spec = do
         runDB $ delete_context ResT{rRes = cto} contextTestCollection
         rt <- runDB $ rest =<< find (select [] contextTestCollection)
         rt `shouldBe` []
+    describe "for res" $ beforeAll_ cleanDatabase $ do
+      now <- runIO $ getCurrentTime
+      let resItem1 = ResT { rIndex   = ["the","path","to","resource","1"]
+                          , rRes     = Oid 233 233
+                          , rType    = "type"
+                          , rCTime   = now
+                          , rUTime   = now
+                          , rTitle   = "title"
+                          , rSummary = Just "summary"
+                          , rWhose   = Just "whose"
+                          , rMIME    = Just "mime"
+                          , rTags    = ["tag","s"]
+                          }
+          resItem2 = ResT { rIndex   = ["the","path","to","resource","2"]
+                          , rRes     = Oid 233 233
+                          , rType    = "type"
+                          , rCTime   = now
+                          , rUTime   = now
+                          , rTitle   = "title"
+                          , rSummary = Just "summary"
+                          , rWhose   = Just "whose"
+                          , rMIME    = Just "mime"
+                          , rTags    = ["tag","s"]
+                          }                     
+          docItem1  = [ "index"       =: ["the","path","to","resource","1" :: String]
+                      , "res"         =: Oid 233 233
+                      , "type"        =: ("type" :: String)
+                      , "create-time" =: now
+                      , "update-time" =: now
+                      , "title"       =: ("title" :: String)
+                      , "summary"     =: Just ("summary" :: String)
+                      , "whose"       =: Just ("whose" :: String)
+                      , "mime"        =: Just ("mime" :: String)
+                      , "tags"        =: ["tag","s" :: String]
+                      ]                   
+          docItem2  = [ "index"       =: ["the","path","to","resource","2" :: String]
+                      , "res"         =: Oid 233 233
+                      , "type"        =: ("type" :: String)
+                      , "create-time" =: now
+                      , "update-time" =: now
+                      , "title"       =: ("title" :: String)
+                      , "summary"     =: Just ("summary" :: String)
+                      , "whose"       =: Just ("whose" :: String)
+                      , "mime"        =: Just ("mime" :: String)
+                      , "tags"        =: ["tag","s" :: String]
+                      ]
+      it "update a new resource index" $ do
+        runDB $ update_res resItem1
+        rt:_ <- runDB $ rest =<< find (select [] "index")
+        doc_to_res rt `shouldBe` Just resItem1
+      it "fetch a resource index" $ do
+        rt1 <- runDB $ fetch_res ["the","path","to","resource","1"]
+        rt2  <- runDB $ fetch_res ["the","path","to","resource","2"]
+        rt1 `shouldBe` Just resItem1
+        rt2 `shouldBe` Nothing
+      it "fetch all inedxes, when there are indexes in database" $ do
+        runDB $ update_res resItem2
+        rt <- runDB $ fetch_res_all
+        rt `shouldBe` [resItem1,resItem2]
+      it "delete a index" $ do
+        runDB $ delete_res resItem1
+        rt1:_ <- runDB $ rest =<< find (select [] "index")
+        doc_to_res rt1 `shouldBe` Just resItem2
+        runDB $ delete_res resItem2
+        rt2 <- runDB $ rest =<< find (select [] "index")
+        rt2 `shouldBe` []
+      it "fetch all indexes, when database is empty" $ do
+        rt <- runDB $ fetch_res_all
+        rt `shouldBe` []
         
         
+     
