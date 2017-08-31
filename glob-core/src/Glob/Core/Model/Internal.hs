@@ -64,6 +64,7 @@ data Nav = Nav { navUrl   :: T.Text -- ^ The url of the link
                , navLabel :: T.Text -- ^ The label of the link
                , navOrder :: Int    -- ^ The order of the link
                }
+         deriving (Show)
 
 -- | instance eq, order for nav
 instance Eq Nav where
