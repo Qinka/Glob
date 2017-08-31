@@ -43,5 +43,5 @@ stack config set system-ghc --global true
 stack path --programs $STACKFILE
 ######
 echo setup database
-sudo apt install -y mongodb mongodb-client mongodb-server mongodb-dev
+sudo apt install -y mongodb mongodb-clients mongodb-server mongodb-dev
 nohup mongod &
