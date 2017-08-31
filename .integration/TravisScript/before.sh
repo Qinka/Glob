@@ -11,7 +11,7 @@ export OS_DISTRIBUTOR=$(lsb_release -a | grep Description | awk '{print $2}')
 echo using $OS_DISTRIBUTOR  $OS_CORENAME
 #####
 if [ -n "$STACKSOLVER" ]; then
-    export STACKFILE=" --stack-yaml $TRAVIS_BUILD_DIR/.integration/StackYaml/$STACKSOLVER"
+    export STACKFILE=" --stack-yaml $TRAVIS_BUILD_DIR/$STACKSOLVER"
 fi
 echo STACKFILE $STACKFILE
 ######
