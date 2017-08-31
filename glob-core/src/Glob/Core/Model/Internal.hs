@@ -167,16 +167,16 @@ class (MonadIO m,MonadBaseControl IO m) => Mongodic a m | m -> a where
 
 -- | fetch context
 fetch_context :: (MonadIO m,Val a)
-                 => T.Text    -- ^ field name
-                 -> ResT      -- ^ resource index
-                 -> T.Text    -- ^ collection
-                 -> Action m (Maybe a) -- ^ result
+              => T.Text    -- ^ field name
+              -> ResT      -- ^ resource index
+              -> T.Text    -- ^ collection
+              -> Action m (Maybe a) -- ^ result
 fetch_context field ResT{..} =  ((!? field) <%>).findOne.select ["_id" =: rRes]
 
 -- | fetch resource index
 fetch_res :: MonadIO m
-             => [T.Text]
-             -> Action m (Maybe ResT)
+          => [T.Text]
+          -> Action m (Maybe ResT)
 fetch_res index = (doc_to_res <%>) . findOne $ select ["index" =: index] "index"
 
 -- | fetch all resource index
@@ -190,22 +190,22 @@ fetch_res_all = do
 
 -- | update context
 update_context :: (MonadIO m, Val a)
-                  => T.Text            -- ^ collection
-                  -> Maybe ObjectId    -- ^ obj id of item
-                  -> T.Text            -- ^ field name
-                  -> a
-                  -> Action m ObjectId -- ^ return id
+               => T.Text            -- ^ collection
+               -> Maybe ObjectId    -- ^ obj id of item
+               -> T.Text            -- ^ field name
+               -> a
+               -> Action m ObjectId -- ^ return id
 update_context c oid field v = case oid of
   Just i -> upsert (select ["_id" =: i] c) [field =: v] >> return i
   _      -> (\(ObjId i) -> i) <$> insert c [field =: v]
 
 -- | the update for item
 update_item :: (MonadIO m, Val a)
-               => T.Text   -- ^ type, or say collection
-               -> T.Text   -- ^ field name
-               -> a        -- ^ item
-               -> ResT     -- ^ ``undefined'' ResT
-               -> Action m ()
+            => T.Text   -- ^ type, or say collection
+            -> T.Text   -- ^ field name
+            -> a        -- ^ item
+            -> ResT     -- ^ ``undefined'' ResT
+            -> Action m ()
 update_item t f v uR = do
   let index = rIndex uR
   res <- fetch_res index
@@ -217,40 +217,40 @@ update_item t f v uR = do
 
 -- | the update for resource
 update_res :: MonadIO m
-              => ResT     -- ^ the index
-              -> Action m ()
+           => ResT     -- ^ the index
+           -> Action m ()
 update_res res@ResT{..} =
   upsert (select ["index" =: rIndex] "index") $ res_to_doc res
 
 -- | delete the context
 delete_context :: MonadIO m
-                  => ResT           -- ^ index
-                  -> T.Text         -- ^ collection
-                  -> Action m ()
+               => ResT           -- ^ index
+               -> T.Text         -- ^ collection
+               -> Action m ()
 delete_context ResT{..} c =
   delete $ select ["_id" =: rRes] c
 
 
 -- | delete resource
 delete_res :: MonadIO m
-              => ResT        -- ^ index
-              -> Action m ()
+           => ResT        -- ^ index
+           -> Action m ()
 delete_res ResT{..} =
   delete $ select ["index" =: rIndex] "index"
 
 -- | delete the resouce in maybe
 delete_context_maybe :: MonadIO m
-                    => Maybe ResT -- ^ index
-                    -> T.Text     -- ^ field
-                    -> Action m ()
+                     => Maybe ResT -- ^ index
+                     -> T.Text     -- ^ field
+                     -> Action m ()
 delete_context_maybe (Just r) = delete_context r
 delete_context_maybe _        = \_ -> return ()
 
 -- | delete item
 delete_item :: MonadIO m
-               => [T.Text] -- ^ url
-               -> T.Text   -- ^ collection
-               -> Action m ()
+            => [T.Text] -- ^ url
+            -> T.Text   -- ^ collection
+            -> Action m ()
 delete_item index c = fetch_res index >>=
   (\res -> case res of
       Just r -> delete_context r c >> delete_res r
@@ -264,7 +264,7 @@ fromBinary (Binary b) = b
 -- | update nothing
 infix 0 =@
 (=@) :: Val v
-        => Label        -- ^ label
-        -> Maybe v      -- ^ value
-        -> Maybe Field  -- ^ maybe field
+     => Label        -- ^ label
+     -> Maybe v      -- ^ value
+     -> Maybe Field  -- ^ maybe field
 (=@) l = ((Just.(l =:)) =<<)
