@@ -5,5 +5,5 @@ if [ -n "$RUN_TEST" ]; then
     echo testing
     # display the version of ghc
     ghc -V
-    stack test $STACKFIL
+    stack test $STACKFILE
 fi
