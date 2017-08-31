@@ -11,7 +11,7 @@ export OS_DISTRIBUTOR=$(lsb_release -a | grep Description | awk '{print $2}')
 echo using $OS_DISTRIBUTOR  $OS_CORENAME
 #####
 if [ -n "$STACKSOLVER" ]; then
-    export STACKFILE=" --stack-yaml $TRAVIS_BUILD_DIR/.integration/StackSolver/$STACKSOLVER"
+    export STACKFILE=" --stack-yaml $TRAVIS_BUILD_DIR/.integration/StackYaml/$STACKSOLVER"
 fi
 echo STACKFILE $STACKFILE
 ######
@@ -42,3 +42,6 @@ echo installed
 stack config set system-ghc --global true
 stack path --programs $STACKFILE
 ######
+echo setup database
+sudo apt install -y mongodb mongodb-client mongodb-server mongodb-dev
+nohup mongod &
