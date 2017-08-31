@@ -9,6 +9,11 @@ echo fetch the system\' name
 export OS_CORENAME=$(lsb_release -a | grep Codename | awk '{print $2}')
 export OS_DISTRIBUTOR=$(lsb_release -a | grep Description | awk '{print $2}')
 echo using $OS_DISTRIBUTOR  $OS_CORENAME
+#####
+if [ -n "$STACKSOLVER" ]; then
+    export STACKFILE=" --stack-yaml $TRAVIS_BUILD_DIR/.integration/StackSolver/$STACKSOLVER"
+fi
+echo STACKFILE $STACKFILE
 ######
 if [ -n "$LLVM" ]; then
   echo install llvm
@@ -33,6 +38,6 @@ echo install stack
 mkdir -p ~/.local/bin
 export PATH=$HOME/.local/bin:$PATH
 travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
-stack config set system-ghc --global true
-stack path --programs
+stack config set system-ghc --global true $STACKFIL
+stack path --programs $STACKFIL
 ######
