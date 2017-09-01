@@ -9,7 +9,7 @@ Description  : The module for model
 Copyright    : (C) Qinka 2017
 Maintainer   : me@qinka.pro
 License      : GPL3
-Stability    : experimenta
+Stability    : experimental
 Portability  : unknown
 
 The codes for model

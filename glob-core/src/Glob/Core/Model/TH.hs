@@ -69,6 +69,6 @@ make_update n kind f c =
           (AppT (AppT (ConT ''Action) (VarT m)) (ConT ''()))))
       body  = FunD name
         [Clause [] (NormalB $
-                    (AppE (AppE (VarE 'update_item) field)
-                     coll)) []]
+                    (AppE (AppE (VarE 'update_item) coll)
+                     field)) []]
   in return [dec,body]

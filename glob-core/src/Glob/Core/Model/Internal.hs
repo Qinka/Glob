@@ -225,9 +225,9 @@ update_item t f v uR = do
   let index = rIndex uR
   res <- fetch_res index
   rr <- if (rType <$> res) /= Just t
-        then delete_context_maybe res t >> return Nothing
+        then delete_context_maybe res >> return Nothing
         else return $ rRes <$> res
-  rO <- update_context f rr t v
+  rO <- update_context t rr f v
   update_res (uR {rRes = rO})
 
 -- | the update for resource
@@ -256,10 +256,9 @@ delete_res ResT{..} =
 -- | delete the resouce in maybe
 delete_context_maybe :: MonadIO m
                      => Maybe ResT -- ^ index
-                     -> T.Text     -- ^ field
                      -> Action m ()
-delete_context_maybe (Just r) = delete_context r
-delete_context_maybe _        = \_ -> return ()
+delete_context_maybe (Just r) = delete_context r $ rType r
+delete_context_maybe _        = return ()
 
 -- | delete item
 delete_item :: MonadIO m

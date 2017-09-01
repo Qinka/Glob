@@ -13,6 +13,9 @@ import Internal
 import Data.Time (diffUTCTime,getCurrentTime,UTCTime)
 import Data.IORef
 import Control.Monad
+import qualified Glob.Import.Text as T
+import Text.Blaze.Renderer.Text
+import qualified Data.Text.Lazy as TL
   
 -- | step one: get pipe
 getPipe :: IO Pipe
@@ -207,6 +210,339 @@ spec = do
       it "fetch all indexes, when database is empty" $ do
         rt <- runDB $ fetch_res_all
         rt `shouldBe` []
+    describe "for item" $ beforeAll_ cleanDatabase $ do
+      now <- runIO $ getCurrentTime
+      let itemTestTypeOld = "itto"
+          itemTestType    = "itt" :: T.Text
+          itemTestIndex   = ["i","t","i"]
+          itemTestField   = "itf"
+          itemTestItem    = "item" :: T.Text
+          resItemOld = ResT { rIndex   = itemTestIndex
+                            , rRes     = undefined
+                            , rType    = itemTestTypeOld
+                            , rCTime   = now
+                            , rUTime   = now
+                            , rTitle   = "title"
+                            , rSummary = Just "summary"
+                            , rWhose   = Just "whose"
+                            , rMIME    = Just "mime"
+                            , rTags    = ["tag","s"]
+                            }
+          resItem = ResT { rIndex   = itemTestIndex
+                         , rRes     = undefined
+                         , rType    = itemTestType
+                         , rCTime   = now
+                         , rUTime   = now
+                         , rTitle   = "title"
+                         , rSummary = Just "summary"
+                         , rWhose   = Just "whose"
+                         , rMIME    = Just "mime"
+                         , rTags    = ["tag","s"]
+                         }
+          docC = [ itemTestField =: itemTestItem ]
+          docR = [ "index"       =: itemTestIndex
+                 , "type"        =: itemTestType
+                 , "create-time" =: now
+                 , "update-time" =: now
+                 , "title"       =: ("title" :: String)
+                 , "summary"     =: Just ("summary" :: String)
+                 , "whose"       =: Just ("whose" :: String)
+                 , "mime"        =: Just ("mime" :: String)
+                 , "tags"        =: ["tag","s" :: String]
+                 ]
+      it "update an old item" $ do
+        runDB $ update_item
+          itemTestTypeOld
+          itemTestField
+          itemTestItem
+          resItemOld
+        rt1:_ <- runDB $ rest =<< find (select [] itemTestTypeOld)
+        rt2:_ <- runDB $ rest =<< find (select [] "index")
+        rt1 `shouldContain` docC
+        let Just rt2' = doc_to_res rt2
+        rt2' `shouldBe` resItemOld {rRes = rRes rt2'}
+      it "update an new item" $ do
+        runDB $ update_item
+          itemTestType
+          itemTestField
+          itemTestItem
+          resItem
+        rt1:_ <- runDB $ rest =<< find (select [] itemTestType)
+        rt3   <- runDB $ rest =<< find (select [] itemTestTypeOld)
+        rt2:_ <- runDB $ rest =<< find (select [] "index")
+        rt1 `shouldContain` docC
+        rt3 `shouldBe` []
+        let Just rt2' = doc_to_res rt2
+        rt2' `shouldBe` resItem {rRes = rRes rt2'}
+      it "delete the item" $ do
+        runDB $ delete_item itemTestIndex itemTestType
+        rt1 <- runDB $ rest =<< find (select [] itemTestType)
+        rt2 <- runDB $ rest =<< find (select [] "index")
+        rt1 `shouldBe` []
+        rt2 `shouldBe` []
+    describe "for update/fetch" $ do
+      describe "for frame" $ beforeAll_ cleanDatabase $ do
+        now <- runIO $ getCurrentTime
+        let res = ResT { rIndex   = itemIndex
+                       , rRes     = undefined
+                       , rType    = itemType
+                       , rCTime   = now
+                       , rUTime   = now
+                       , rTitle   = "title"
+                       , rSummary = Just "summary"
+                       , rWhose   = Just "whose"
+                       , rMIME    = Just "mime"
+                       , rTags    = ["tag","s"]
+                       }
+            doc = [ "index"       =: itemIndex
+                  , "type"        =: itemType
+                  , "create-time" =: now
+                  , "update-time" =: now
+                  , "title"       =: ("title" :: String)
+                  , "summary"     =: Just ("summary" :: String)
+                  , "whose"       =: Just ("whose" :: String)
+                  , "mime"        =: Just ("mime" :: String)
+                  , "tags"        =: ["tag","s" :: String]
+                  ]
+            itemType = "frame"
+            itemIndex = ["path","to","item"]
+            item    = "123"
+            itemDoc = ["html" =: item]
+        it "update" $ do
+          runDB $ update_frame item res
+          rt1:_ <- runDB $ rest =<< find (select [] itemType)
+          rt2:_ <- runDB $ rest =<< find (select [] "index")
+          rt1 `shouldContain` itemDoc
+          let Just rt2' = doc_to_res rt2
+          rt2' `shouldBe` res {rRes = rRes rt2'}
+        it "fetch" $ do
+          Just r  <- runDB $ fetch_res   itemIndex
+          Just rt <- runDB $ fetch_frame r
+          renderMarkup rt `shouldBe` TL.fromStrict item 
+      describe "for html" $ beforeAll_ cleanDatabase $ do
+        now <- runIO $ getCurrentTime
+        let res = ResT { rIndex   = itemIndex
+                       , rRes     = undefined
+                       , rType    = itemType
+                       , rCTime   = now
+                       , rUTime   = now
+                       , rTitle   = "title"
+                       , rSummary = Just "summary"
+                       , rWhose   = Just "whose"
+                       , rMIME    = Just "mime"
+                       , rTags    = ["tag","s"]
+                       }
+            doc = [ "index"       =: itemIndex
+                  , "type"        =: itemType
+                  , "create-time" =: now
+                  , "update-time" =: now
+                  , "title"       =: ("title" :: String)
+                  , "summary"     =: Just ("summary" :: String)
+                  , "whose"       =: Just ("whose" :: String)
+                  , "mime"        =: Just ("mime" :: String)
+                  , "tags"        =: ["tag","s" :: String]
+                  ]
+            itemType = "post"
+            itemIndex = ["path","to","item"]
+            item    = "123"
+            itemDoc = ["html" =: item]
+        it "update" $ do
+          runDB $ update_post item res
+          rt1:_ <- runDB $ rest =<< find (select [] itemType)
+          rt2:_ <- runDB $ rest =<< find (select [] "index")
+          rt1 `shouldContain` itemDoc
+          let Just rt2' = doc_to_res rt2
+          rt2' `shouldBe` res {rRes = rRes rt2'}
+        it "fetch" $ do
+          Just r  <- runDB $ fetch_res   itemIndex
+          Just rt <- runDB $ fetch_post r
+          renderMarkup rt `shouldBe` TL.fromStrict item 
+      describe "for text" $ beforeAll_ cleanDatabase $ do
+        now <- runIO $ getCurrentTime
+        let res = ResT { rIndex   = itemIndex
+                       , rRes     = undefined
+                       , rType    = itemType
+                       , rCTime   = now
+                       , rUTime   = now
+                       , rTitle   = "title"
+                       , rSummary = Just "summary"
+                       , rWhose   = Just "whose"
+                       , rMIME    = Just "mime"
+                       , rTags    = ["tag","s"]
+                       }
+            doc = [ "index"       =: itemIndex
+                  , "type"        =: itemType
+                  , "create-time" =: now
+                  , "update-time" =: now
+                  , "title"       =: ("title" :: String)
+                  , "summary"     =: Just ("summary" :: String)
+                  , "whose"       =: Just ("whose" :: String)
+                  , "mime"        =: Just ("mime" :: String)
+                  , "tags"        =: ["tag","s" :: String]
+                  ]
+            itemType = "resource"
+            itemIndex = ["path","to","item"]
+            item    = "123"
+            itemDoc = ["text" =: item]
+        it "update" $ do
+          runDB $ update_resource_t item res
+          rt1:_ <- runDB $ rest =<< find (select [] itemType)
+          rt2:_ <- runDB $ rest =<< find (select [] "index")
+          rt1 `shouldContain` itemDoc
+          let Just rt2' = doc_to_res rt2
+          rt2' `shouldBe` res {rRes = rRes rt2'}
+        it "fetch" $ do
+          Just r  <- runDB $ fetch_res   itemIndex
+          Just rt <- runDB $ fetch_resource_t r
+          rt `shouldBe` item
+      describe "for binary" $ beforeAll_ cleanDatabase $ do
+        now <- runIO $ getCurrentTime
+        let res = ResT { rIndex   = itemIndex
+                       , rRes     = undefined
+                       , rType    = itemType
+                       , rCTime   = now
+                       , rUTime   = now
+                       , rTitle   = "title"
+                       , rSummary = Just "summary"
+                       , rWhose   = Just "whose"
+                       , rMIME    = Just "mime"
+                       , rTags    = ["tag","s"]
+                       }
+            doc = [ "index"       =: itemIndex
+                  , "type"        =: itemType
+                  , "create-time" =: now
+                  , "update-time" =: now
+                  , "title"       =: ("title" :: String)
+                  , "summary"     =: Just ("summary" :: String)
+                  , "whose"       =: Just ("whose" :: String)
+                  , "mime"        =: Just ("mime" :: String)
+                  , "tags"        =: ["tag","s" :: String]
+                  ]
+            itemType = "resource"
+            itemIndex = ["path","to","item"]
+            item    = "123"
+            itemDoc = ["binary" =: Binary item]
+        it "update" $ do
+          runDB $ update_resource_b (Binary item) res
+          rt1:_ <- runDB $ rest =<< find (select [] itemType)
+          rt2:_ <- runDB $ rest =<< find (select [] "index")
+          rt1 `shouldContain` itemDoc
+          let Just rt2' = doc_to_res rt2
+          rt2' `shouldBe` res {rRes = rRes rt2'}
+        it "fetch" $ do
+          Just r  <- runDB $ fetch_res   itemIndex
+          Just rt <- runDB $ fetch_resource_b r
+          rt `shouldBe` item
+      describe "for static" $ beforeAll_ cleanDatabase $ do
+        now <- runIO $ getCurrentTime
+        let res = ResT { rIndex   = itemIndex
+                       , rRes     = undefined
+                       , rType    = itemType
+                       , rCTime   = now
+                       , rUTime   = now
+                       , rTitle   = "title"
+                       , rSummary = Just "summary"
+                       , rWhose   = Just "whose"
+                       , rMIME    = Just "mime"
+                       , rTags    = ["tag","s"]
+                       }
+            doc = [ "index"       =: itemIndex
+                  , "type"        =: itemType
+                  , "create-time" =: now
+                  , "update-time" =: now
+                  , "title"       =: ("title" :: String)
+                  , "summary"     =: Just ("summary" :: String)
+                  , "whose"       =: Just ("whose" :: String)
+                  , "mime"        =: Just ("mime" :: String)
+                  , "tags"        =: ["tag","s" :: String]
+                  ]
+            itemType = "static"
+            itemIndex = ["path","to","item"]
+            item    = "123"
+            itemDoc = ["url" =: item]
+        it "update" $ do
+          runDB $ update_static item res
+          rt1:_ <- runDB $ rest =<< find (select [] itemType)
+          rt2:_ <- runDB $ rest =<< find (select [] "index")
+          rt1 `shouldContain` itemDoc
+          let Just rt2' = doc_to_res rt2
+          rt2' `shouldBe` res {rRes = rRes rt2'}
+        it "fetch" $ do
+          Just r  <- runDB $ fetch_res   itemIndex
+          Just rt <- runDB $ fetch_static r
+          rt `shouldBe` item
+      describe "for query" $ beforeAll_ cleanDatabase $ do
+        now <- runIO $ getCurrentTime
+        let res = ResT { rIndex   = itemIndex
+                       , rRes     = undefined
+                       , rType    = itemType
+                       , rCTime   = now
+                       , rUTime   = now
+                       , rTitle   = "title"
+                       , rSummary = Just "summary"
+                       , rWhose   = Just "whose"
+                       , rMIME    = Just "mime"
+                       , rTags    = ["tag","s"]
+                       }
+            doc = [ "index"       =: itemIndex
+                  , "type"        =: itemType
+                  , "create-time" =: now
+                  , "update-time" =: now
+                  , "title"       =: ("title" :: String)
+                  , "summary"     =: Just ("summary" :: String)
+                  , "whose"       =: Just ("whose" :: String)
+                  , "mime"        =: Just ("mime" :: String)
+                  , "tags"        =: ["tag","s" :: String]
+                  ]
+            itemType = "query"
+            itemIndex = ["path","to","item"]
+            item    = "123"
+            itemDoc = ["var" =: item]
+        it "update" $ do
+          runDB $ update_query item res
+          rt1:_ <- runDB $ rest =<< find (select [] itemType)
+          rt2:_ <- runDB $ rest =<< find (select [] "index")
+          rt1 `shouldContain` itemDoc
+          let Just rt2' = doc_to_res rt2
+          rt2' `shouldBe` res {rRes = rRes rt2'}
+        it "fetch" $ do
+          Just r  <- runDB $ fetch_res   itemIndex
+          Just rt <- runDB $ fetch_query r
+          rt `shouldBe` item
+    describe "for navigate bar" $ beforeAll_ cleanDatabase $ do
+      let label = "label"
+          url   = "url"
+          order = 0
+          nav = Nav { navLabel = label
+                    , navUrl   = url
+                    , navOrder = order
+                    }
+          doc = [ "index" =: label
+                , url     =: url
+                , "order" =: order
+                ]
+      it "update/add one" $ do
+        runDB $ update_nav (Just label) (Just url) (Just order)
+        rt:_ <- runDB $ rest =<< find (select [] "nav")
+        rt `shouldContain` doc
+      it "fetch" $ do
+        rt:_ <- runDB $ fetch_nav
+        rt `shouldBe` nav
+      it "delete one" $ do
+        runDB $ update_nav (Just label) (Just url) (Just order)
+        runDB $ update_nav (Just "345") (Just url) (Just order)
+        runDB $ update_nav (Just "123") (Just url) (Just order)
+        runDB $ delete_nav $ Just "123"
+        rt <- runDB $ fetch_nav
+        length rt `shouldBe` 3
+      it "delete all" $ do
+        runDB $ delete_nav Nothing
+        rt <- runDB $ fetch_nav
+        rt `shouldBe` []
         
+
+          
+
+          
         
      
