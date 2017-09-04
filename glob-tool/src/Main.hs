@@ -42,7 +42,6 @@ main = do
             Make{..}   -> makeHandler   it
             Nav{..}    -> navHandler    it
             Script{..} -> scriptHandler it
-        exitSucc
         otherProg ExitSuccess _ = return ()
         otherProg e1 (fc:fo) = do
           rt <- try $ callProcess ("glob-" ++ fc) fo :: IO (Either ExitCode ())
