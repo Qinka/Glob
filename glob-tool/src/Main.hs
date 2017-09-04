@@ -42,7 +42,7 @@ main = do
             Make{..}   -> makeHandler   it
             Nav{..}    -> navHandler    it
             Script{..} -> scriptHandler it
-        otherProg ExitSuccess _ = return ()
+        otherProg (SomeException ExitSuccess) _ = return ()
         otherProg e1 (fc:fo) = do
           rt <- try $ callProcess ("glob-" ++ fc) fo :: IO (Either SomeException ())
           when (isLeft rt) $ do
