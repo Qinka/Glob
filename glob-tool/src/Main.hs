@@ -20,6 +20,7 @@ import           Glob.Tool.Opt
 import           Glob.Tool.Script
 import           System.Console.CmdArgs
 import           System.Environment
+import           System.Exit
 import           System.IO
 import           System.Process
 
