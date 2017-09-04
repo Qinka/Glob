@@ -28,7 +28,7 @@ import           System.Process
 main :: IO ()
 main = do
   args' <- getArgs
-  rt <- try $ cmdArgs glob :: IO (Either SomeException Glob)
+  rt <- try $ cmdArgs glob :: IO (Either ExitCode Glob)
   case rt of
     Left e   -> otherProg e args'
     Right it -> matchArgs it
