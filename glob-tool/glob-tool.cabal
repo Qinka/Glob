@@ -2,7 +2,7 @@
 -- Gy
         
 name:                glob-tool
-version:             0.1.5.12
+version:             0.1.5.15
 synopsis:            The tool set for glob
 description:         The tool set for glob
 license:             GPL-3
